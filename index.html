@@ -14,11 +14,14 @@
       theme: {
         extend: {
           colors: {
-            primary: "#0B1C2D",
-            primaryDark: "#102A43",
-            accent: "#1F4ED8",
-            accentLight: "#2563EB",
-            muted: "rgba(255,255,255,0.75)"
+            primary: "#2F3DD8",
+            primaryDark: "#1F2AA6",
+            accent: "#3F5BFF",
+            background: "#F4F6FA",
+            card: "#FFFFFF",
+            textDark: "#1E1E2D",
+            textMuted: "#6B7280",
+            borderLight: "#E5E7EB"
           }
         }
       }
@@ -30,22 +33,32 @@
   <script type="module" src="./js/auth.js"></script>
 </head>
 
-<body class="min-h-screen bg-gradient-to-br from-primary via-primaryDark to-primary text-white flex items-center justify-center px-4">
+<body class="min-h-screen bg-background flex items-center justify-center px-4">
 
-  <!-- Glow Background -->
-  <div class="absolute w-72 h-72 bg-accent opacity-20 rounded-full blur-3xl top-10 left-10"></div>
-  <div class="absolute w-72 h-72 bg-blue-400 opacity-10 rounded-full blur-3xl bottom-10 right-10"></div>
-
-  <!-- Container -->
-  <div class="relative w-full max-w-md bg-white/10 backdrop-blur-xl border border-white/10 rounded-3xl p-8 shadow-2xl">
+  <div class="w-full max-w-md bg-card rounded-2xl shadow-xl p-8 border border-borderLight">
 
     <!-- Logo -->
     <div class="text-center mb-10">
-      <h1 class="text-3xl font-bold tracking-wide">
-        Trust<span class="text-accent">Link</span>
+      <div class="w-14 h-14 mx-auto mb-4 rounded-xl bg-primary flex items-center justify-center shadow-lg">
+        <!-- Shield Icon -->
+        <svg xmlns="http://www.w3.org/2000/svg"
+             fill="none"
+             viewBox="0 0 24 24"
+             stroke-width="1.8"
+             stroke="white"
+             class="w-6 h-6">
+          <path stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M12 3l7.5 4.5v6c0 5.25-3.75 8.25-7.5 9-3.75-.75-7.5-3.75-7.5-9v-6L12 3z"/>
+        </svg>
+      </div>
+
+      <h1 class="text-3xl font-bold text-primary">
+        TrustLink
       </h1>
-      <p class="text-muted text-sm mt-2">
-        Votre portefeuille digital sécurisé
+
+      <p class="text-textMuted text-sm mt-2">
+        Plateforme de transfert sécurisée
       </p>
     </div>
 
@@ -54,26 +67,30 @@
 
       <!-- Phone -->
       <div>
-        <label class="text-sm text-muted">Numéro de téléphone</label>
+        <label class="block text-sm font-medium text-textDark">
+          Numéro de téléphone
+        </label>
         <div class="mt-2 relative">
           <input 
             id="phone"
             type="text"
             placeholder="+33 6 12 34 56 78"
-            class="w-full bg-primary border border-white/10 text-white px-4 py-3 rounded-xl outline-none focus:ring-2 focus:ring-accent transition"
+            class="w-full border border-borderLight rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary focus:outline-none transition"
           />
         </div>
       </div>
 
       <!-- Password -->
       <div>
-        <label class="text-sm text-muted">Mot de passe</label>
+        <label class="block text-sm font-medium text-textDark">
+          Mot de passe
+        </label>
         <div class="mt-2 relative">
           <input 
             id="password"
             type="password"
             placeholder="••••••••"
-            class="w-full bg-primary border border-white/10 text-white px-4 py-3 rounded-xl outline-none focus:ring-2 focus:ring-accent transition"
+            class="w-full border border-borderLight rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary focus:outline-none transition"
           />
         </div>
       </div>
@@ -81,35 +98,37 @@
       <!-- Button -->
       <button 
         id="authBtn"
-        class="w-full bg-accent hover:bg-accentLight text-white font-semibold py-3 rounded-xl transition duration-300 shadow-lg"
+        class="w-full bg-primary hover:bg-primaryDark text-white font-semibold py-3 rounded-xl transition duration-300 shadow-md"
       >
         Connexion
       </button>
 
       <!-- Toggle -->
-      <p class="text-center text-muted text-sm">
+      <p class="text-center text-textMuted text-sm">
         <span id="toggleText">Pas encore de compte ?</span>
-        <button id="toggleAuth" class="text-accent font-medium hover:underline">
+        <button id="toggleAuth" class="text-primary font-medium hover:underline">
           Créer un compte
         </button>
       </p>
 
       <!-- Error -->
-      <p id="errorMsg" class="text-red-400 text-sm text-center hidden"></p>
+      <p id="errorMsg" class="text-red-500 text-sm text-center hidden"></p>
 
     </div>
 
-    <!-- Footer Security -->
-    <div class="mt-10 flex items-center justify-center gap-2 text-xs text-muted">
-      <!-- Shield Icon -->
-      <svg xmlns="http://www.w3.org/2000/svg" 
-           fill="none" viewBox="0 0 24 24" 
-           stroke-width="1.5" stroke="currentColor" 
-           class="w-4 h-4">
-        <path stroke-linecap="round" stroke-linejoin="round" 
-          d="M12 3l7.5 4.5v6c0 5.25-3.75 8.25-7.5 9-3.75-.75-7.5-3.75-7.5-9v-6L12 3z"/>
+    <!-- Footer -->
+    <div class="mt-8 flex items-center justify-center gap-2 text-xs text-textMuted">
+      <svg xmlns="http://www.w3.org/2000/svg"
+           fill="none"
+           viewBox="0 0 24 24"
+           stroke-width="1.5"
+           stroke="currentColor"
+           class="w-4 h-4 text-primary">
+        <path stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M12 3l7.5 4.5v6c0 5.25-3.75 8.25-7.5 9-3.75-.75-7.5-3.75-7.5-9v-6L12 3z"/>
       </svg>
-      Connexion sécurisée
+      Connexion sécurisée SSL
     </div>
 
   </div>
