@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NeoWallet</title>
+
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Custom Tailwind Config -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            neon: "#00F5FF",
+            primary: "#7C3AED"
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Firebase -->
+  <script type="module" src="./js/firebase-init.js"></script>
+  <script type="module" src="./js/auth.js"></script>
+</head>
+
+<body class="bg-gradient-to-br from-black via-gray-900 to-black min-h-screen flex items-center justify-center px-4">
+
+  <!-- Background Glow -->
+  <div class="absolute w-72 h-72 bg-purple-600 opacity-30 rounded-full blur-3xl top-20 left-10"></div>
+  <div class="absolute w-72 h-72 bg-cyan-500 opacity-30 rounded-full blur-3xl bottom-10 right-10"></div>
+
+  <!-- Card -->
+  <div class="relative w-full max-w-md backdrop-blur-xl bg-white/5 border border-white/10 rounded-3xl p-8 shadow-2xl">
+
+    <!-- Logo -->
+    <div class="text-center mb-8">
+      <h1 class="text-3xl font-bold text-white tracking-wide">
+        Neo<span class="text-neon">Wallet</span>
+      </h1>
+      <p class="text-gray-400 text-sm mt-2">
+        Transfert sécurisé & instantané
+      </p>
+    </div>
+
+    <!-- Phone Input -->
+    <div id="phone-section">
+
+      <label class="text-gray-400 text-sm">Numéro de téléphone</label>
+
+      <div class="mt-2 flex items-center bg-white/10 rounded-xl px-4 py-3 focus-within:ring-2 focus-within:ring-neon transition">
+        <span class="text-gray-400 mr-2">+</span>
+        <input 
+          id="phoneNumber"
+          type="tel"
+          placeholder="33 6 12 34 56 78"
+          class="bg-transparent w-full text-white outline-none placeholder-gray-500"
+        />
+      </div>
+
+      <!-- Recaptcha -->
+      <div id="recaptcha-container" class="mt-4"></div>
+
+      <button
+        id="sendOtpBtn"
+        class="mt-6 w-full bg-gradient-to-r from-primary to-neon text-black font-semibold py-3 rounded-xl shadow-lg hover:scale-105 transition transform duration-300"
+      >
+        Envoyer le code
+      </button>
+    </div>
+
+    <!-- OTP Section -->
+    <div id="otp-section" class="hidden mt-6">
+
+      <label class="text-gray-400 text-sm">Code OTP</label>
+
+      <input
+        id="otpCode"
+        type="text"
+        maxlength="6"
+        class="mt-2 w-full bg-white/10 text-white px-4 py-3 rounded-xl outline-none focus:ring-2 focus:ring-neon text-center tracking-widest text-lg"
+        placeholder="------"
+      />
+
+      <button
+        id="verifyOtpBtn"
+        class="mt-6 w-full bg-neon text-black font-semibold py-3 rounded-xl hover:scale-105 transition transform duration-300"
+      >
+        Vérifier
+      </button>
+    </div>
+
+  </div>
+
+</body>
+</html>
