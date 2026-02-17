@@ -8,7 +8,6 @@
   <!-- Tailwind CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- Tailwind Config -->
   <script>
     tailwind.config = {
       theme: {
@@ -28,19 +27,17 @@
     }
   </script>
 
-  <!-- Firebase -->
   <script type="module" src="./js/firebase-init.js"></script>
   <script type="module" src="./js/register.js"></script>
 </head>
 
-<body class="min-h-screen bg-background flex items-center justify-center px-4">
+<body class="min-h-screen bg-background flex items-center justify-center px-4 py-10">
 
   <div class="w-full max-w-md bg-card rounded-2xl shadow-xl p-8 border border-borderLight">
 
     <!-- Logo -->
     <div class="text-center mb-8">
       <div class="w-14 h-14 mx-auto mb-4 rounded-xl bg-primary flex items-center justify-center shadow-lg">
-        <!-- Shield Icon -->
         <svg xmlns="http://www.w3.org/2000/svg"
              fill="none"
              viewBox="0 0 24 24"
@@ -58,14 +55,63 @@
       </h1>
 
       <p class="text-textMuted text-sm mt-2">
-        Rejoignez TrustLink en quelques secondes
+        Complétez vos informations
       </p>
     </div>
 
-    <!-- Form -->
     <form id="registerForm" class="space-y-5">
 
-      <!-- Phone -->
+      <!-- Nom & Prénom -->
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-textDark">Nom</label>
+          <input 
+            id="lastName"
+            type="text"
+            required
+            class="mt-2 w-full border border-borderLight rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary focus:outline-none transition"
+          />
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-textDark">Prénom</label>
+          <input 
+            id="firstName"
+            type="text"
+            required
+            class="mt-2 w-full border border-borderLight rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary focus:outline-none transition"
+          />
+        </div>
+      </div>
+
+      <!-- Username -->
+      <div>
+        <label class="block text-sm font-medium text-textDark">
+          Nom d'utilisateur
+        </label>
+        <input 
+          id="username"
+          type="text"
+          required
+          placeholder="ex: trust_john"
+          class="mt-2 w-full border border-borderLight rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary focus:outline-none transition"
+        />
+      </div>
+
+      <!-- Date de naissance -->
+      <div>
+        <label class="block text-sm font-medium text-textDark">
+          Date de naissance
+        </label>
+        <input 
+          id="birthDate"
+          type="date"
+          required
+          class="mt-2 w-full border border-borderLight rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary focus:outline-none transition"
+        />
+      </div>
+
+      <!-- Téléphone -->
       <div>
         <label class="block text-sm font-medium text-textDark">
           Numéro de téléphone
@@ -84,7 +130,6 @@
         <label class="block text-sm font-medium text-textDark">
           Mot de passe
         </label>
-
         <div class="mt-2 relative">
           <input 
             id="password"
@@ -94,8 +139,6 @@
             placeholder="Minimum 6 caractères"
             class="w-full border border-borderLight rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary focus:outline-none transition"
           />
-
-          <!-- Toggle -->
           <button type="button"
             id="togglePassword"
             class="absolute right-3 top-3 text-textMuted hover:text-primary transition">
@@ -114,7 +157,6 @@
           type="password"
           required
           minlength="6"
-          placeholder="Confirmez votre mot de passe"
           class="mt-2 w-full border border-borderLight rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary focus:outline-none transition"
         />
       </div>
@@ -142,7 +184,7 @@
 
   </div>
 
-  <!-- Password Toggle Script -->
+  <!-- Toggle Password -->
   <script>
     const togglePassword = document.getElementById("togglePassword");
     const password = document.getElementById("password");
