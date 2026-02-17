@@ -5,17 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>TrustLink</title>
 
-  <!-- Tailwind -->
+  <!-- Tailwind CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
 
+  <!-- Tailwind Config -->
   <script>
     tailwind.config = {
       theme: {
         extend: {
           colors: {
-            primaryDark: "#0B1C2D",
-            cardDark: "#102A43",
-            accentBlue: "#1F4ED8"
+            primary: "#0B1C2D",
+            primaryDark: "#102A43",
+            accent: "#1F4ED8",
+            accentLight: "#2563EB",
+            muted: "rgba(255,255,255,0.75)"
           }
         }
       }
@@ -27,22 +30,22 @@
   <script type="module" src="./js/auth.js"></script>
 </head>
 
-<body class="bg-primaryDark min-h-screen flex items-center justify-center px-4">
+<body class="min-h-screen bg-gradient-to-br from-primary via-primaryDark to-primary text-white flex items-center justify-center px-4">
 
   <!-- Glow Background -->
-  <div class="absolute w-72 h-72 bg-accentBlue opacity-20 rounded-full blur-3xl top-10 left-10"></div>
+  <div class="absolute w-72 h-72 bg-accent opacity-20 rounded-full blur-3xl top-10 left-10"></div>
   <div class="absolute w-72 h-72 bg-blue-400 opacity-10 rounded-full blur-3xl bottom-10 right-10"></div>
 
-  <!-- Card -->
-  <div class="relative w-full max-w-md bg-cardDark rounded-3xl p-8 shadow-2xl border border-white/5">
+  <!-- Container -->
+  <div class="relative w-full max-w-md bg-white/10 backdrop-blur-xl border border-white/10 rounded-3xl p-8 shadow-2xl">
 
     <!-- Logo -->
     <div class="text-center mb-10">
-      <h1 class="text-3xl font-bold text-white tracking-wide">
-        Trust<span class="text-accentBlue">Link</span>
+      <h1 class="text-3xl font-bold tracking-wide">
+        Trust<span class="text-accent">Link</span>
       </h1>
-      <p class="text-gray-300 text-sm mt-2">
-        Transferts rapides & sécurisés
+      <p class="text-muted text-sm mt-2">
+        Votre portefeuille digital sécurisé
       </p>
     </div>
 
@@ -51,38 +54,42 @@
 
       <!-- Phone -->
       <div>
-        <label class="text-gray-300 text-sm">Numéro de téléphone</label>
-        <input 
-          id="phone"
-          type="text"
-          placeholder="+33 6 12 34 56 78"
-          class="mt-2 w-full bg-primaryDark border border-white/10 text-white px-4 py-3 rounded-xl outline-none focus:ring-2 focus:ring-accentBlue transition"
-        />
+        <label class="text-sm text-muted">Numéro de téléphone</label>
+        <div class="mt-2 relative">
+          <input 
+            id="phone"
+            type="text"
+            placeholder="+33 6 12 34 56 78"
+            class="w-full bg-primary border border-white/10 text-white px-4 py-3 rounded-xl outline-none focus:ring-2 focus:ring-accent transition"
+          />
+        </div>
       </div>
 
       <!-- Password -->
       <div>
-        <label class="text-gray-300 text-sm">Mot de passe</label>
-        <input 
-          id="password"
-          type="password"
-          placeholder="••••••••"
-          class="mt-2 w-full bg-primaryDark border border-white/10 text-white px-4 py-3 rounded-xl outline-none focus:ring-2 focus:ring-accentBlue transition"
-        />
+        <label class="text-sm text-muted">Mot de passe</label>
+        <div class="mt-2 relative">
+          <input 
+            id="password"
+            type="password"
+            placeholder="••••••••"
+            class="w-full bg-primary border border-white/10 text-white px-4 py-3 rounded-xl outline-none focus:ring-2 focus:ring-accent transition"
+          />
+        </div>
       </div>
 
       <!-- Button -->
       <button 
         id="authBtn"
-        class="w-full bg-accentBlue text-white font-semibold py-3 rounded-xl hover:bg-blue-600 transition duration-300 shadow-lg"
+        class="w-full bg-accent hover:bg-accentLight text-white font-semibold py-3 rounded-xl transition duration-300 shadow-lg"
       >
         Connexion
       </button>
 
       <!-- Toggle -->
-      <p class="text-center text-gray-400 text-sm">
+      <p class="text-center text-muted text-sm">
         <span id="toggleText">Pas encore de compte ?</span>
-        <button id="toggleAuth" class="text-accentBlue font-medium">
+        <button id="toggleAuth" class="text-accent font-medium hover:underline">
           Créer un compte
         </button>
       </p>
@@ -90,6 +97,19 @@
       <!-- Error -->
       <p id="errorMsg" class="text-red-400 text-sm text-center hidden"></p>
 
+    </div>
+
+    <!-- Footer Security -->
+    <div class="mt-10 flex items-center justify-center gap-2 text-xs text-muted">
+      <!-- Shield Icon -->
+      <svg xmlns="http://www.w3.org/2000/svg" 
+           fill="none" viewBox="0 0 24 24" 
+           stroke-width="1.5" stroke="currentColor" 
+           class="w-4 h-4">
+        <path stroke-linecap="round" stroke-linejoin="round" 
+          d="M12 3l7.5 4.5v6c0 5.25-3.75 8.25-7.5 9-3.75-.75-7.5-3.75-7.5-9v-6L12 3z"/>
+      </svg>
+      Connexion sécurisée
     </div>
 
   </div>
