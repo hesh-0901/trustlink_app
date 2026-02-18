@@ -17,7 +17,26 @@ if (!userId) {
 }
 
 /* ===============================
-   LOAD USER HEADER
+   GENERATE GRADIENT
+================================ */
+
+function generateGradient(seed) {
+
+  const colors = [
+    ["#1E2BE0", "#3D4BFF"],
+    ["#0F1ACD", "#1E2BE0"],
+    ["#1E40AF", "#2563EB"],
+    ["#1D4ED8", "#3B82F6"]
+  ];
+
+  const index = seed.charCodeAt(0) % colors.length;
+  const selected = colors[index];
+
+  return `linear-gradient(135deg, ${selected[0]}, ${selected[1]})`;
+}
+
+/* ===============================
+   LOAD HEADER USER
 ================================ */
 
 async function loadHeaderUser() {
@@ -31,7 +50,23 @@ async function loadHeaderUser() {
 
   const fullNameEl = document.getElementById("headerFullName");
   const usernameEl = document.getElementById("headerUsername");
-  const genderIconEl = document.getElementById("headerGenderIcon");
+  const initialsEl = document.getElementById("headerInitials");
+  const avatarEl = document.getElementById("headerAvatar");
+  const genderBadgeEl = document.getElementById("headerGenderBadge");
+
+  const initials =
+    (user.firstName?.[0] || "") +
+    (user.lastName?.[0] || "");
+
+  if (initialsEl) {
+    initialsEl.textContent = initials.toUpperCase();
+  }
+
+  if (avatarEl) {
+    avatarEl.style.background =
+      generateGradient(user.firstName || "A");
+    avatarEl.classList.add("scale-100");
+  }
 
   if (fullNameEl) {
     fullNameEl.textContent =
@@ -43,15 +78,15 @@ async function loadHeaderUser() {
     setTimeout(() => {
       usernameEl.classList.remove("opacity-0");
       usernameEl.classList.add("opacity-100");
-    }, 200);
+    }, 300);
   }
 
-  if (genderIconEl) {
+  if (genderBadgeEl) {
     if (user.gender === "Homme") {
-      genderIconEl.innerHTML =
+      genderBadgeEl.innerHTML =
         `<i class="bi bi-gender-male"></i>`;
     } else if (user.gender === "Femme") {
-      genderIconEl.innerHTML =
+      genderBadgeEl.innerHTML =
         `<i class="bi bi-gender-female"></i>`;
     }
   }
