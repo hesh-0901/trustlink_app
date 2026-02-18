@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Historique - TrustLink</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
+<script type="module" src="/trustlink_app/js/firebase-init.js"></script>
+<script type="module" src="/trustlink_app/js/historique.js"></script>
+<script type="module" src="/trustlink_app/main_js/layout.js"></script>
+
+</head>
+
+<body class="bg-gray-50 min-h-screen">
+
+<div id="header-container"></div>
+
+<div class="max-w-md mx-auto px-6 py-6 pb-24">
+
+  <h1 class="text-xl font-semibold mb-6">Historique des transactions</h1>
+
+  <!-- FILTER -->
+  <div class="flex gap-3 mb-6">
+    <button data-filter="all"
+            class="filter-btn bg-primaryStrong text-white px-4 py-2 rounded-full text-sm">
+      Toutes
+    </button>
+    <button data-filter="deposit"
+            class="filter-btn bg-white border px-4 py-2 rounded-full text-sm">
+      Dépôts
+    </button>
+    <button data-filter="transfer"
+            class="filter-btn bg-white border px-4 py-2 rounded-full text-sm">
+      Transferts
+    </button>
+  </div>
+
+  <!-- LIST -->
+  <div id="transactionsList" class="space-y-4"></div>
+
+</div>
+
+<div id="navbar-container"></div>
+
+</body>
+</html>
