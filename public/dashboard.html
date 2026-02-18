@@ -78,46 +78,49 @@ tailwind.config = {
   </div>
 
   <!-- PREMIUM WALLET CARD -->
-<!-- REALISTIC BANK CARD -->
-<div class="relative mb-12">
+<!-- ULTRA PREMIUM BANK CARD -->
+<div class="relative mb-14 perspective">
 
-  <div class="relative w-full aspect-[1.586] rounded-3xl p-7 text-white overflow-hidden shadow-2xl card-glow bg-gradient-to-br from-primaryDark via-primary to-indigo-600">
+  <div id="bankCard"
+       class="relative w-full aspect-[1.586] rounded-3xl p-7 text-white overflow-hidden shadow-2xl transition-transform duration-200 ease-out card-3d">
 
-    <!-- Light reflection sweep -->
-    <div class="absolute inset-0 bg-gradient-to-tr from-white/5 via-white/10 to-transparent opacity-60"></div>
+    <!-- Animated Gradient Background -->
+    <div class="absolute inset-0 animated-gradient"></div>
 
-    <!-- Floating blur bubble -->
-    <div class="absolute -right-10 -top-10 w-44 h-44 bg-white/10 rounded-full blur-3xl"></div>
+    <!-- Carbon Texture -->
+    <div class="absolute inset-0 carbon-texture opacity-20"></div>
 
-    <!-- CARD CONTENT -->
+    <!-- Shimmer -->
+    <div class="absolute inset-0 shimmer"></div>
+
     <div class="relative flex flex-col justify-between h-full">
 
-      <!-- TOP ROW -->
+      <!-- Top Row -->
       <div class="flex justify-between items-start">
 
-        <div class="text-sm tracking-wide opacity-90">
-          TrustLink
-        </div>
+        <img src="/trustlink_app/assets/white.logo.png"
+             class="h-6 opacity-90"
+             alt="TrustLink"/>
 
         <i class="bi bi-credit-card text-2xl opacity-70"></i>
 
       </div>
 
-      <!-- CHIP -->
+      <!-- Chip -->
       <div class="mt-6 w-14 h-10 rounded-md bg-gradient-to-br from-yellow-300 to-yellow-500 shadow-inner"></div>
 
-      <!-- CARD NUMBER -->
-      <div class="mt-6 text-lg tracking-widest font-medium">
+      <!-- Card Number -->
+      <div class="mt-8 text-xl tracking-[0.25em] font-semibold emboss">
         **** **** **** 0987
       </div>
 
-      <!-- BOTTOM ROW -->
+      <!-- Bottom -->
       <div class="flex justify-between items-end mt-6">
 
         <div>
           <div class="text-xs opacity-70">Titulaire</div>
           <div id="userName" class="text-sm font-semibold tracking-wide">
-            Nom Utilisateur
+            NOM UTILISATEUR
           </div>
         </div>
 
@@ -135,7 +138,6 @@ tailwind.config = {
   </div>
 
 </div>
-
 
   <!-- QUICK ACTIONS -->
   <div class="grid grid-cols-4 gap-5 text-center mb-12">
