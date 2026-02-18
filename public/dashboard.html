@@ -14,11 +14,11 @@
           colors: {
             primary: "#2F3DD8",
             primaryDark: "#1F2AA6",
+            accent: "#4F6BFF",
             background: "#F4F6FA",
             card: "#FFFFFF",
-            textDark: "#1E1E2D",
-            textMuted: "#6B7280",
-            borderLight: "#E5E7EB"
+            textDark: "#111827",
+            textMuted: "#6B7280"
           }
         }
       }
@@ -31,28 +31,26 @@
 
 <body class="bg-background min-h-screen">
 
-  <div class="max-w-md mx-auto px-4 py-6">
+  <!-- BACKGROUND DECOR -->
+  <div class="absolute top-0 left-0 w-72 h-72 bg-primary opacity-10 blur-3xl rounded-full"></div>
+  <div class="absolute bottom-0 right-0 w-72 h-72 bg-accent opacity-10 blur-3xl rounded-full"></div>
+
+  <div class="relative max-w-md mx-auto px-4 py-6">
 
     <!-- HEADER -->
     <div class="flex justify-between items-center mb-8">
 
       <div>
         <p class="text-sm text-textMuted">Bienvenue</p>
-        <div class="flex items-center gap-2">
-          <h2 id="userName" class="text-lg font-semibold text-textDark">
-            Chargement...
-          </h2>
-          <span id="adminBadge"
-                class="hidden text-xs bg-primary text-white px-2 py-1 rounded-full">
-            ADMIN
-          </span>
-        </div>
+        <h2 id="userName" class="text-xl font-bold text-textDark">
+          Chargement...
+        </h2>
       </div>
 
       <div class="flex items-center gap-3">
 
         <div id="userAvatar"
-             class="w-11 h-11 bg-primary text-white rounded-full flex items-center justify-center font-semibold shadow-md">
+             class="w-12 h-12 bg-gradient-to-br from-primary to-accent text-white rounded-full flex items-center justify-center font-semibold shadow-lg">
           --
         </div>
 
@@ -64,33 +62,118 @@
       </div>
     </div>
 
-    <!-- BALANCE -->
-    <div class="bg-primary rounded-2xl p-6 text-white shadow-lg mb-8 relative overflow-hidden">
+    <!-- PREMIUM BALANCE CARD -->
+    <div class="relative rounded-3xl p-6 mb-8 text-white shadow-2xl overflow-hidden
+                bg-gradient-to-br from-primary to-primaryDark">
 
-      <div class="absolute -right-10 -top-10 w-32 h-32 bg-white/10 rounded-full"></div>
+      <div class="absolute inset-0 bg-white/5 backdrop-blur-xl"></div>
 
-      <p class="text-sm opacity-80 mb-2">
-        Solde disponible
-      </p>
+      <div class="relative">
 
-      <h1 id="balanceAmount" class="text-3xl font-bold tracking-tight">
-        0.00
-      </h1>
+        <p class="text-sm opacity-80 mb-1">
+          Solde disponible
+        </p>
 
-      <div id="currencyLabel" class="mt-2 text-sm opacity-80">
-        USD
+        <h1 id="balanceAmount"
+            class="text-4xl font-bold tracking-tight mb-1">
+          0.00
+        </h1>
+
+        <div id="currencyLabel"
+             class="text-sm opacity-80">
+          USD
+        </div>
+
+        <!-- Card chip -->
+        <div class="absolute top-4 right-4 w-10 h-7 bg-white/20 rounded-md"></div>
+
+      </div>
+    </div>
+
+    <!-- QUICK ACTIONS -->
+    <div class="grid grid-cols-2 gap-4 mb-8">
+
+      <button class="group bg-white rounded-2xl p-5 shadow-lg hover:shadow-xl transition-all duration-300">
+
+        <div class="w-12 h-12 mx-auto mb-3 bg-gradient-to-br from-primary to-accent 
+                    text-white rounded-xl flex items-center justify-center 
+                    group-hover:scale-110 transition">
+          →
+        </div>
+
+        <p class="text-sm font-semibold text-textDark text-center">
+          Envoyer
+        </p>
+
+      </button>
+
+      <button class="group bg-white rounded-2xl p-5 shadow-lg hover:shadow-xl transition-all duration-300">
+
+        <div class="w-12 h-12 mx-auto mb-3 bg-gradient-to-br from-green-400 to-emerald-500 
+                    text-white rounded-xl flex items-center justify-center 
+                    group-hover:scale-110 transition">
+          +
+        </div>
+
+        <p class="text-sm font-semibold text-textDark text-center">
+          Recharger
+        </p>
+
+      </button>
+
+    </div>
+
+    <!-- ANALYTICS MINI CARD -->
+    <div class="bg-white rounded-2xl p-5 shadow-lg mb-6">
+
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-sm font-semibold text-textDark">
+          Activité Mensuelle
+        </h3>
+        <span class="text-xs text-textMuted">
+          30 jours
+        </span>
+      </div>
+
+      <div class="h-24 flex items-end gap-2">
+        <div class="w-full bg-primary/30 rounded-t-lg h-10"></div>
+        <div class="w-full bg-primary/40 rounded-t-lg h-16"></div>
+        <div class="w-full bg-primary/60 rounded-t-lg h-20"></div>
+        <div class="w-full bg-primary/80 rounded-t-lg h-14"></div>
+        <div class="w-full bg-primary rounded-t-lg h-24"></div>
       </div>
 
     </div>
 
-    <!-- ACTIONS -->
-    <div class="grid grid-cols-2 gap-4 mb-10">
-      <button class="bg-card border border-borderLight rounded-xl py-5 shadow-sm hover:shadow-md transition">
-        Envoyer
-      </button>
-      <button class="bg-card border border-borderLight rounded-xl py-5 shadow-sm hover:shadow-md transition">
-        Recharger
-      </button>
+    <!-- LAST TRANSACTION -->
+    <div class="bg-white rounded-2xl p-5 shadow-lg">
+
+      <div class="flex justify-between items-center mb-3">
+        <h3 class="text-sm font-semibold text-textDark">
+          Dernière transaction
+        </h3>
+        <span class="text-xs text-primary font-medium">
+          Voir tout
+        </span>
+      </div>
+
+      <div class="flex justify-between items-center">
+
+        <div>
+          <p class="text-sm font-medium text-textDark">
+            Paiement reçu
+          </p>
+          <p class="text-xs text-textMuted">
+            Aujourd’hui • 14:32
+          </p>
+        </div>
+
+        <span class="text-sm font-bold text-green-600">
+          +120.00
+        </span>
+
+      </div>
+
     </div>
 
   </div>
