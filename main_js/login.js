@@ -10,7 +10,7 @@ const loginForm = document.getElementById("loginForm");
 const errorMsg = document.getElementById("errorMsg");
 
 /* ===============================
-   SHA-256 Hash Function
+   SHA-256 Hash
 ================================ */
 async function hashPassword(password) {
   const encoder = new TextEncoder();
@@ -22,15 +22,15 @@ async function hashPassword(password) {
 }
 
 /* ===============================
-   LOGIN EVENT
+   LOGIN
 ================================ */
 loginForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  const username = document.getElementById("username").value.trim();
+  const phoneNumber = document.getElementById("phone").value.trim();
   const password = document.getElementById("password").value.trim();
 
-  if (!username || !password) {
+  if (!phoneNumber || !password) {
     showError("Veuillez remplir tous les champs.");
     return;
   }
@@ -41,7 +41,7 @@ loginForm.addEventListener("submit", async (e) => {
 
     const q = query(
       collection(db, "users"),
-      where("username", "==", username)
+      where("phoneNumber", "==", phoneNumber)
     );
 
     const querySnapshot = await getDocs(q);
@@ -64,10 +64,10 @@ loginForm.addEventListener("submit", async (e) => {
       return;
     }
 
-    // ✅ SESSION STORAGE
+    // ✅ SESSION
     localStorage.setItem("userId", userDoc.id);
-    localStorage.setItem("username", userData.username);
     localStorage.setItem("role", userData.role);
+    localStorage.setItem("phoneNumber", userData.phoneNumber);
 
     // ✅ Redirect
     window.location.href = "dashboard.html";
@@ -79,7 +79,7 @@ loginForm.addEventListener("submit", async (e) => {
 });
 
 /* ===============================
-   Error Display
+   ERROR
 ================================ */
 function showError(message) {
   errorMsg.textContent = message;
