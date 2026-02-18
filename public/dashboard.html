@@ -87,15 +87,8 @@ body {
 <div class="max-w-md mx-auto px-6 pt-10 pb-28">
 
   <!-- HEADER -->
-  <div class="flex justify-between items-center mb-8">
-    <h1 id="userName" class="text-xl font-semibold text-gray-800">
-      Chargement...
-    </h1>
+<div id="header-container"></div>
 
-    <button id="logoutBtn" class="text-primaryStrong text-xl">
-      <i class="bi bi-box-arrow-right"></i>
-    </button>
-  </div>
 
   <!-- SWIPE WALLETS -->
   <div class="swipe-container mb-10">
@@ -251,6 +244,17 @@ async function loadNavbar() {
 }
 loadNavbar();
 </script>
+  <script type="module">
+async function loadHeader() {
+  const res = await fetch("../partials/header.html");
+  const data = await res.text();
+  document.getElementById("header-container").innerHTML = data;
+
+  import("../main_js/header.js");
+}
+loadHeader();
+</script>
+
 
 </body>
 </html>
