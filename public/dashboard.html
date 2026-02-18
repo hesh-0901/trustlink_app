@@ -1,182 +1,206 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Dashboard - TrustLink</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>TrustLink – Dashboard</title>
 
-  <script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.tailwindcss.com"></script>
 
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            primary: "#2F3DD8",
-            primaryDark: "#1F2AA6",
-            accent: "#4F6BFF",
-            background: "#F4F6FA",
-            card: "#FFFFFF",
-            textDark: "#111827",
-            textMuted: "#6B7280"
-          }
-        }
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        darkBg: "#0F172A",
+        cardGlass: "rgba(255,255,255,0.05)",
+        primary: "#4F6BFF",
+        accent: "#7C3AED",
+        success: "#22C55E",
+        danger: "#EF4444"
       }
     }
-  </script>
+  }
+}
+</script>
 
-  <script type="module" src="/trustlink_app/js/firebase-init.js"></script>
-  <script type="module" src="/trustlink_app/public/js/dashboard.js"></script>
+<script type="module" src="/trustlink_app/js/firebase-init.js"></script>
+<script type="module" src="/trustlink_app/public/js/dashboard.js"></script>
 </head>
 
-<body class="bg-background min-h-screen">
+<body class="bg-darkBg text-white min-h-screen overflow-x-hidden">
 
-  <!-- BACKGROUND DECOR -->
-  <div class="absolute top-0 left-0 w-72 h-72 bg-primary opacity-10 blur-3xl rounded-full"></div>
-  <div class="absolute bottom-0 right-0 w-72 h-72 bg-accent opacity-10 blur-3xl rounded-full"></div>
+<!-- Background Glow -->
+<div class="absolute -top-32 -left-32 w-96 h-96 bg-primary opacity-20 blur-3xl rounded-full"></div>
+<div class="absolute bottom-0 right-0 w-96 h-96 bg-accent opacity-20 blur-3xl rounded-full"></div>
 
-  <div class="relative max-w-md mx-auto px-4 py-6">
+<div class="relative max-w-md mx-auto px-5 pt-8 pb-28">
 
-    <!-- HEADER -->
-    <div class="flex justify-between items-center mb-8">
+  <!-- HEADER -->
+  <div class="flex justify-between items-center mb-10">
 
-      <div>
-        <p class="text-sm text-textMuted">Bienvenue</p>
-        <h2 id="userName" class="text-xl font-bold text-textDark">
-          Chargement...
-        </h2>
-      </div>
-
-      <div class="flex items-center gap-3">
-
-        <div id="userAvatar"
-             class="w-12 h-12 bg-gradient-to-br from-primary to-accent text-white rounded-full flex items-center justify-center font-semibold shadow-lg">
-          --
-        </div>
-
-        <button id="logoutBtn"
-                class="text-xs text-red-500 hover:underline">
-          Logout
-        </button>
-
-      </div>
+    <div>
+      <p class="text-sm text-gray-400">Bienvenue</p>
+      <h2 id="userName" class="text-2xl font-bold tracking-tight">
+        Chargement...
+      </h2>
     </div>
 
-    <!-- PREMIUM BALANCE CARD -->
-    <div class="relative rounded-3xl p-6 mb-8 text-white shadow-2xl overflow-hidden
-                bg-gradient-to-br from-primary to-primaryDark">
+    <div id="userAvatar"
+         class="w-12 h-12 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center font-semibold shadow-lg">
+      --
+    </div>
 
-      <div class="absolute inset-0 bg-white/5 backdrop-blur-xl"></div>
+  </div>
+
+  <!-- CREDIT CARD -->
+  <div class="relative mb-10">
+
+    <div class="bg-gradient-to-br from-primary to-accent rounded-3xl p-6 shadow-2xl relative overflow-hidden">
+
+      <div class="absolute inset-0 bg-white/10 backdrop-blur-xl"></div>
 
       <div class="relative">
 
-        <p class="text-sm opacity-80 mb-1">
-          Solde disponible
-        </p>
+        <p class="text-xs opacity-70 mb-1">Balance disponible</p>
 
         <h1 id="balanceAmount"
-            class="text-4xl font-bold tracking-tight mb-1">
+            class="text-4xl font-bold tracking-tight mb-2">
           0.00
         </h1>
 
-        <div id="currencyLabel"
-             class="text-sm opacity-80">
+        <div id="currencyLabel" class="text-sm opacity-70">
           USD
         </div>
 
-        <!-- Card chip -->
-        <div class="absolute top-4 right-4 w-10 h-7 bg-white/20 rounded-md"></div>
-
-      </div>
-    </div>
-
-    <!-- QUICK ACTIONS -->
-    <div class="grid grid-cols-2 gap-4 mb-8">
-
-      <button class="group bg-white rounded-2xl p-5 shadow-lg hover:shadow-xl transition-all duration-300">
-
-        <div class="w-12 h-12 mx-auto mb-3 bg-gradient-to-br from-primary to-accent 
-                    text-white rounded-xl flex items-center justify-center 
-                    group-hover:scale-110 transition">
-          →
+        <div class="mt-8 flex justify-between items-end">
+          <span class="text-sm opacity-80">TrustLink</span>
+          <div class="w-10 h-7 bg-white/30 rounded-md"></div>
         </div>
-
-        <p class="text-sm font-semibold text-textDark text-center">
-          Envoyer
-        </p>
-
-      </button>
-
-      <button class="group bg-white rounded-2xl p-5 shadow-lg hover:shadow-xl transition-all duration-300">
-
-        <div class="w-12 h-12 mx-auto mb-3 bg-gradient-to-br from-green-400 to-emerald-500 
-                    text-white rounded-xl flex items-center justify-center 
-                    group-hover:scale-110 transition">
-          +
-        </div>
-
-        <p class="text-sm font-semibold text-textDark text-center">
-          Recharger
-        </p>
-
-      </button>
-
-    </div>
-
-    <!-- ANALYTICS MINI CARD -->
-    <div class="bg-white rounded-2xl p-5 shadow-lg mb-6">
-
-      <div class="flex justify-between items-center mb-4">
-        <h3 class="text-sm font-semibold text-textDark">
-          Activité Mensuelle
-        </h3>
-        <span class="text-xs text-textMuted">
-          30 jours
-        </span>
-      </div>
-
-      <div class="h-24 flex items-end gap-2">
-        <div class="w-full bg-primary/30 rounded-t-lg h-10"></div>
-        <div class="w-full bg-primary/40 rounded-t-lg h-16"></div>
-        <div class="w-full bg-primary/60 rounded-t-lg h-20"></div>
-        <div class="w-full bg-primary/80 rounded-t-lg h-14"></div>
-        <div class="w-full bg-primary rounded-t-lg h-24"></div>
-      </div>
-
-    </div>
-
-    <!-- LAST TRANSACTION -->
-    <div class="bg-white rounded-2xl p-5 shadow-lg">
-
-      <div class="flex justify-between items-center mb-3">
-        <h3 class="text-sm font-semibold text-textDark">
-          Dernière transaction
-        </h3>
-        <span class="text-xs text-primary font-medium">
-          Voir tout
-        </span>
-      </div>
-
-      <div class="flex justify-between items-center">
-
-        <div>
-          <p class="text-sm font-medium text-textDark">
-            Paiement reçu
-          </p>
-          <p class="text-xs text-textMuted">
-            Aujourd’hui • 14:32
-          </p>
-        </div>
-
-        <span class="text-sm font-bold text-green-600">
-          +120.00
-        </span>
 
       </div>
 
     </div>
 
   </div>
+
+  <!-- QUICK ACTIONS -->
+  <div class="grid grid-cols-3 gap-4 mb-10">
+
+    <button class="glassBtn">
+      <div class="iconCircle bg-primary/20">↑</div>
+      <span>Envoyer</span>
+    </button>
+
+    <button class="glassBtn">
+      <div class="iconCircle bg-success/20">+</div>
+      <span>Recharger</span>
+    </button>
+
+    <button class="glassBtn">
+      <div class="iconCircle bg-accent/20">⇄</div>
+      <span>Échanger</span>
+    </button>
+
+  </div>
+
+  <!-- ANALYTICS CARD -->
+  <div class="bg-cardGlass backdrop-blur-xl border border-white/10 rounded-3xl p-6 shadow-xl mb-8">
+
+    <div class="flex justify-between mb-4">
+      <h3 class="text-sm font-semibold">Statistiques</h3>
+      <span class="text-xs text-gray-400">30 jours</span>
+    </div>
+
+    <!-- Circular Chart Fake -->
+    <div class="flex justify-center items-center">
+
+      <div class="relative w-40 h-40">
+
+        <div class="absolute inset-0 rounded-full border-8 border-white/10"></div>
+
+        <div class="absolute inset-0 rounded-full border-8 border-primary border-t-transparent rotate-45"></div>
+
+        <div class="absolute inset-6 bg-darkBg rounded-full flex items-center justify-center text-lg font-bold">
+          78%
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- RECENT TRANSACTIONS -->
+  <div>
+
+    <div class="flex justify-between mb-4">
+      <h3 class="text-sm font-semibold">Transactions récentes</h3>
+      <span class="text-xs text-primary">Voir tout</span>
+    </div>
+
+    <div id="transactionsList" class="space-y-3"></div>
+
+  </div>
+
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="fixed bottom-0 left-0 right-0 bg-cardGlass backdrop-blur-xl border-t border-white/10 px-6 py-4">
+
+  <div class="max-w-md mx-auto flex justify-between text-sm text-gray-400">
+
+    <div class="flex flex-col items-center text-primary">
+      <span>🏠</span>
+      <span class="text-xs mt-1">Home</span>
+    </div>
+
+    <div class="flex flex-col items-center">
+      <span>📊</span>
+      <span class="text-xs mt-1">Stats</span>
+    </div>
+
+    <div class="flex flex-col items-center">
+      <span>💳</span>
+      <span class="text-xs mt-1">Cartes</span>
+    </div>
+
+    <div class="flex flex-col items-center">
+      <span>⚙️</span>
+      <span class="text-xs mt-1">Profil</span>
+    </div>
+
+  </div>
+
+</div>
+
+<style>
+.glassBtn{
+  background: rgba(255,255,255,0.05);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 20px;
+  padding: 16px 10px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:8px;
+  font-size:12px;
+  transition:0.3s;
+}
+.glassBtn:hover{
+  transform: translateY(-4px);
+}
+.iconCircle{
+  width:40px;
+  height:40px;
+  border-radius:14px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:18px;
+}
+</style>
 
 </body>
 </html>
