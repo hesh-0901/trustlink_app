@@ -82,24 +82,7 @@ const walletQuery = query(
   where("userId", "==", userId)
 );
 
-onSnapshotCollection(walletQuery, (snapshot) => {
-
-  snapshot.forEach((doc) => {
-
-    const wallet = doc.data();
-    const currency = wallet.currency?.toUpperCase();
-
-    if (currency === "USD") {
-      animateBalance("balanceUSD", Number(wallet.balance || 0), "USD");
-    }
-
-    if (currency === "CDF") {
-      animateBalance("balanceCDF", Number(wallet.balance || 0), "CDF");
-    }
-
-  });
-
-});
+onSnapshotCollection
 
 /* ===============================
    LOAD TRANSACTIONS
