@@ -87,13 +87,14 @@ onSnapshotCollection(walletQuery, (snapshot) => {
   snapshot.forEach((doc) => {
 
     const wallet = doc.data();
+    const currency = wallet.currency?.toUpperCase();
 
-    if (wallet.currency === "USD") {
-      animateBalance("balanceUSD", wallet.balance, "USD");
+    if (currency === "USD") {
+      animateBalance("balanceUSD", Number(wallet.balance || 0), "USD");
     }
 
-    if (wallet.currency === "CDF") {
-      animateBalance("balanceCDF", wallet.balance, "CDF");
+    if (currency === "CDF") {
+      animateBalance("balanceCDF", Number(wallet.balance || 0), "CDF");
     }
 
   });
