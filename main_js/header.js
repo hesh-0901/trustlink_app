@@ -1,7 +1,7 @@
 import { db } from "../js/firebase-init.js";
 import {
   doc,
-  getDoc
+  onSnapshot
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 /* ==========================================
@@ -17,61 +17,77 @@ if (!userId) {
 }
 
 /* ==========================================
-   LOAD HEADER USER
+   REALTIME USER LISTENER
 ========================================== */
 
-async function loadHeaderUser() {
+function initRealtimeUser() {
 
-  try {
+  const userRef = doc(db, "users", userId);
 
-    const userRef = doc(db, "users", userId);
-    const snap = await getDoc(userRef);
+  onSnapshot(userRef, (snap) => {
 
     if (!snap.exists()) {
-      localStorage.clear();
-      sessionStorage.clear();
-      window.location.href = "/trustlink_app/index.html";
+      forceLogout();
       return;
     }
 
     const user = snap.data();
 
-    const fullNameEl = document.getElementById("headerFullName");
-    const usernameEl = document.getElementById("headerUsername");
-    const avatarEl = document.getElementById("headerAvatar");
-
-    /* ===== Full Name ===== */
-    if (fullNameEl) {
-      fullNameEl.textContent =
-        `${user.firstName} ${user.lastName}`;
+    if (!user.isActive) {
+      forceLogout();
+      return;
     }
 
-    /* ===== Username Fade In ===== */
-    if (usernameEl) {
-      usernameEl.textContent = user.username;
-      setTimeout(() => {
-        usernameEl.classList.remove("opacity-0");
-        usernameEl.classList.add("opacity-100");
-      }, 250);
-    }
+    updateHeaderUI(user);
 
-    /* ===== Avatar Generation ===== */
-    if (avatarEl) {
+  }, (error) => {
+    console.error("Realtime user error:", error);
+  });
 
-      // DiceBear style avataaars (flat illustration like your example)
-      avatarEl.src =
-        `https://api.dicebear.com/7.x/avataaars/png?seed=${user.username}&backgroundColor=b6e3f4,c0aede,d1d4f9`;
+}
 
-    }
+/* ==========================================
+   UPDATE HEADER UI
+========================================== */
 
-  } catch (error) {
-    console.error("Header load error:", error);
+function updateHeaderUI(user) {
+
+  const fullNameEl = document.getElementById("headerFullName");
+  const usernameEl = document.getElementById("headerUsername");
+  const avatarEl = document.getElementById("headerAvatar");
+
+  if (fullNameEl) {
+    fullNameEl.textContent =
+      `${user.firstName} ${user.lastName}`;
+  }
+
+  if (usernameEl) {
+    usernameEl.textContent = user.username;
+    usernameEl.classList.remove("opacity-0");
+    usernameEl.classList.add("opacity-100");
+  }
+
+  if (avatarEl) {
+    avatarEl.src =
+      `https://api.dicebear.com/7.x/avataaars/png?seed=${user.username}&backgroundColor=b6e3f4,c0aede,d1d4f9`;
   }
 
 }
 
 /* ==========================================
-   LOGOUT
+   FORCE LOGOUT
+========================================== */
+
+function forceLogout() {
+
+  localStorage.clear();
+  sessionStorage.clear();
+  window.location.href = "/trustlink_app/index.html";
+
+}
+
+/* ==========================================
+   LOGOUT BUTTON
 ========================================== */
 
 function initLogout() {
@@ -81,12 +97,7 @@ function initLogout() {
   if (!logoutBtn) return;
 
   logoutBtn.addEventListener("click", () => {
-
-    localStorage.clear();
-    sessionStorage.clear();
-
-    window.location.href = "/trustlink_app/index.html";
-
+    forceLogout();
   });
 
 }
@@ -96,6 +107,6 @@ function initLogout() {
 ========================================== */
 
 document.addEventListener("DOMContentLoaded", () => {
-  loadHeaderUser();
+  initRealtimeUser();
   initLogout();
 });
