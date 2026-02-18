@@ -19,8 +19,8 @@ tailwind.config = {
         cardBg: "#FFFFFF",
         textDark: "#111827",
         textMuted: "#6B7280",
-        success: "#22C55E",
-        danger: "#EF4444"
+        success: "#16A34A",
+        danger: "#DC2626"
       }
     }
   }
@@ -57,7 +57,7 @@ tailwind.config = {
   <div class="bg-gradient-to-r from-primary to-accent rounded-3xl p-6 text-white shadow-xl mb-8">
 
     <p class="text-sm opacity-80 mb-2">
-      Votre solde
+      Solde disponible
     </p>
 
     <h1 id="balanceAmount"
@@ -69,26 +69,74 @@ tailwind.config = {
       USD
     </div>
 
-    <!-- ACTION ICONS -->
-    <div class="flex justify-between">
+    <!-- ACTIONS -->
+    <div class="grid grid-cols-4 gap-4 text-center">
 
+      <!-- Send -->
       <button class="walletAction">
-        <div class="walletIcon bg-white/20">↑</div>
+        <div class="walletIcon">
+          <svg xmlns="http://www.w3.org/2000/svg"
+               fill="none"
+               viewBox="0 0 24 24"
+               stroke-width="1.8"
+               stroke="currentColor"
+               class="w-5 h-5">
+            <path stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M4.5 19.5l15-15M9 4.5h10.5V15"/>
+          </svg>
+        </div>
         <span>Envoyer</span>
       </button>
 
+      <!-- Receive -->
       <button class="walletAction">
-        <div class="walletIcon bg-white/20">↓</div>
+        <div class="walletIcon">
+          <svg xmlns="http://www.w3.org/2000/svg"
+               fill="none"
+               viewBox="0 0 24 24"
+               stroke-width="1.8"
+               stroke="currentColor"
+               class="w-5 h-5">
+            <path stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M19.5 4.5l-15 15M4.5 9V19.5H15"/>
+          </svg>
+        </div>
         <span>Recevoir</span>
       </button>
 
+      <!-- Add -->
       <button class="walletAction">
-        <div class="walletIcon bg-white/20">+</div>
+        <div class="walletIcon">
+          <svg xmlns="http://www.w3.org/2000/svg"
+               fill="none"
+               viewBox="0 0 24 24"
+               stroke-width="1.8"
+               stroke="currentColor"
+               class="w-5 h-5">
+            <path stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M12 4.5v15m7.5-7.5h-15"/>
+          </svg>
+        </div>
         <span>Ajouter</span>
       </button>
 
+      <!-- History -->
       <button class="walletAction">
-        <div class="walletIcon bg-white/20">⟳</div>
+        <div class="walletIcon">
+          <svg xmlns="http://www.w3.org/2000/svg"
+               fill="none"
+               viewBox="0 0 24 24"
+               stroke-width="1.8"
+               stroke="currentColor"
+               class="w-5 h-5">
+            <path stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M12 6v6l4 2"/>
+          </svg>
+        </div>
         <span>Historique</span>
       </button>
 
@@ -100,29 +148,73 @@ tailwind.config = {
   <div class="bg-cardBg rounded-3xl p-6 shadow-sm mb-8">
 
     <h3 class="text-sm font-semibold mb-4">
-      Autres services
+      Services
     </h3>
 
     <div class="grid grid-cols-4 gap-4 text-center text-xs">
 
       <div class="serviceItem">
-        <div class="serviceIcon bg-primary/10 text-primary">💡</div>
-        Électricité
+        <div class="serviceIcon text-primary">
+          <svg xmlns="http://www.w3.org/2000/svg"
+               fill="none"
+               viewBox="0 0 24 24"
+               stroke-width="1.8"
+               stroke="currentColor"
+               class="w-5 h-5">
+            <path stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M12 3v18m9-9H3"/>
+          </svg>
+        </div>
+        Paiement
       </div>
 
       <div class="serviceItem">
-        <div class="serviceIcon bg-green-100 text-green-600">📱</div>
-        Recharge
+        <div class="serviceIcon text-green-600">
+          <svg xmlns="http://www.w3.org/2000/svg"
+               fill="none"
+               viewBox="0 0 24 24"
+               stroke-width="1.8"
+               stroke="currentColor"
+               class="w-5 h-5">
+            <path stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M3 7.5h18M3 12h18m-18 4.5h18"/>
+          </svg>
+        </div>
+        Transfert
       </div>
 
       <div class="serviceItem">
-        <div class="serviceIcon bg-purple-100 text-purple-600">🏦</div>
-        Banque
+        <div class="serviceIcon text-purple-600">
+          <svg xmlns="http://www.w3.org/2000/svg"
+               fill="none"
+               viewBox="0 0 24 24"
+               stroke-width="1.8"
+               stroke="currentColor"
+               class="w-5 h-5">
+            <path stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M12 6v6l4 2"/>
+          </svg>
+        </div>
+        Historique
       </div>
 
       <div class="serviceItem">
-        <div class="serviceIcon bg-yellow-100 text-yellow-600">💰</div>
-        Épargne
+        <div class="serviceIcon text-yellow-600">
+          <svg xmlns="http://www.w3.org/2000/svg"
+               fill="none"
+               viewBox="0 0 24 24"
+               stroke-width="1.8"
+               stroke="currentColor"
+               class="w-5 h-5">
+            <path stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M12 3l7.5 4.5v6c0 5.25-3.75 8.25-7.5 9-3.75-.75-7.5-3.75-7.5-9v-6L12 3z"/>
+          </svg>
+        </div>
+        Sécurité
       </div>
 
     </div>
@@ -131,10 +223,9 @@ tailwind.config = {
 
   <!-- TRANSACTIONS -->
   <div>
-
     <div class="flex justify-between items-center mb-4">
       <h3 class="text-sm font-semibold">
-        Transactions
+        Transactions récentes
       </h3>
       <span class="text-xs text-primary font-medium">
         Voir tout
@@ -142,73 +233,9 @@ tailwind.config = {
     </div>
 
     <div id="transactionsList" class="space-y-3"></div>
-
   </div>
 
 </div>
-
-<!-- BOTTOM NAVIGATION -->
-<div class="fixed bottom-0 left-0 right-0 bg-white border-t shadow-md py-3">
-
-  <div class="max-w-md mx-auto flex justify-around text-xs">
-
-    <div class="flex flex-col items-center text-primary">
-      🏠
-      <span>Accueil</span>
-    </div>
-
-    <div class="flex flex-col items-center text-textMuted">
-      📊
-      <span>Stats</span>
-    </div>
-
-    <div class="flex flex-col items-center text-textMuted">
-      👤
-      <span>Profil</span>
-    </div>
-
-  </div>
-
-</div>
-
-<style>
-
-.walletAction{
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  gap:4px;
-  font-size:11px;
-}
-
-.walletIcon{
-  width:40px;
-  height:40px;
-  border-radius:14px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:16px;
-}
-
-.serviceItem{
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  gap:6px;
-}
-
-.serviceIcon{
-  width:40px;
-  height:40px;
-  border-radius:12px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:16px;
-}
-
-</style>
 
 </body>
 </html>
