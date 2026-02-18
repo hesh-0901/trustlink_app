@@ -1,22 +1,28 @@
-<!-- NAVIGATION BAS -->
-<div class="fixed bottom-6 left-0 right-0 flex justify-center z-50">
-  <div class="bottom-nav backdrop-blur-md bg-white/90 px-12 py-3 flex gap-10 items-center">
+<nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg">
 
-    <button id="navHome" class="text-primaryStrong text-xl">
-      <i class="bi bi-house-door-fill"></i>
-    </button>
+  <div class="max-w-md mx-auto flex justify-around py-3 text-gray-500 text-lg">
 
-    <button id="navSearch" class="text-gray-400 text-xl">
-      <i class="bi bi-search"></i>
-    </button>
+    <!-- ACCUEIL -->
+    <a href="/trustlink_app/public/dashboard.html"
+       class="nav-link flex flex-col items-center hover:text-primaryStrong transition">
+      <i class="bi bi-house"></i>
+      <span class="text-xs">Accueil</span>
+    </a>
 
-    <button id="navMessages" class="text-gray-400 text-xl">
-      <i class="bi bi-envelope"></i>
-    </button>
+    <!-- HISTORIQUE -->
+    <a href="/trustlink_app/public/actions/historique.html"
+       class="nav-link flex flex-col items-center hover:text-primaryStrong transition">
+      <i class="bi bi-clock-history"></i>
+      <span class="text-xs">Historique</span>
+    </a>
 
-    <button id="navSettings" class="text-gray-400 text-xl">
-      <i class="bi bi-gear"></i>
-    </button>
+    <!-- PROFIL -->
+    <a href="/trustlink_app/public/profile.html"
+       class="nav-link flex flex-col items-center hover:text-primaryStrong transition">
+      <i class="bi bi-person"></i>
+      <span class="text-xs">Profil</span>
+    </a>
 
   </div>
-</div>
+
+</nav>
