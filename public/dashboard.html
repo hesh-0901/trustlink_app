@@ -28,39 +28,25 @@ tailwind.config = {
 <script type="module" src="/trustlink_app/public/js/dashboard.js"></script>
 
 <style>
-.card-glow {
-  box-shadow: 0 20px 40px rgba(47,61,216,0.25);
-}
-.premium-shadow {
-  box-shadow: 0 10px 25px rgba(0,0,0,0.08);
-}
-.soft-press:active {
-  transform: scale(0.96);
-}
-.fade-in {
-  animation: fadeIn 0.6s ease-out;
-}
+.card-glow { box-shadow: 0 20px 40px rgba(47,61,216,0.25); }
+.premium-shadow { box-shadow: 0 10px 25px rgba(0,0,0,0.08); }
+.soft-press:active { transform: scale(0.96); }
+.fade-in { animation: fadeIn 0.6s ease-out; }
+
 @keyframes fadeIn {
   from { opacity:0; transform: translateY(10px); }
   to { opacity:1; transform: translateY(0); }
 }
-  /* Perspective */
-.perspective {
-  perspective: 1200px;
-}
 
-.card-3d {
-  transform-style: preserve-3d;
-}
+.perspective { perspective: 1200px; }
+.card-3d { transform-style: preserve-3d; }
 
-/* Emboss effect */
 .emboss {
   text-shadow:
     0 1px 0 rgba(255,255,255,0.3),
     0 2px 4px rgba(0,0,0,0.6);
 }
 
-/* Carbon texture */
 .carbon-texture {
   background-image:
     repeating-linear-gradient(
@@ -72,7 +58,6 @@ tailwind.config = {
     );
 }
 
-/* Animated gradient */
 .animated-gradient {
   background: linear-gradient(
     135deg,
@@ -91,7 +76,6 @@ tailwind.config = {
   100% { background-position: 0% 50%; }
 }
 
-/* Shimmer */
 .shimmer {
   background: linear-gradient(
     110deg,
@@ -107,8 +91,11 @@ tailwind.config = {
   from { background-position: 200% 0; }
   to { background-position: -200% 0; }
 }
-</style>
 
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+</style>
 </head>
 
 <body class="bg-background min-h-screen font-sans">
@@ -140,67 +127,92 @@ tailwind.config = {
 
   </div>
 
-  <!-- PREMIUM WALLET CARD -->
-<!-- ULTRA PREMIUM BANK CARD -->
-<div class="relative mb-14 perspective">
+  <!-- WALLET SWIPE -->
+  <div class="relative mb-14">
+    <div class="flex gap-6 overflow-x-auto snap-x snap-mandatory scroll-smooth no-scrollbar">
 
-  <div id="bankCard"
-       class="relative w-full aspect-[1.586] rounded-3xl p-7 text-white overflow-hidden shadow-2xl transition-transform duration-200 ease-out card-3d">
+      <!-- USD CARD -->
+      <div class="snap-center shrink-0 w-full perspective">
+        <div class="relative w-full aspect-[1.586] rounded-3xl p-7 text-white overflow-hidden shadow-2xl card-3d">
 
-    <!-- Animated Gradient Background -->
-    <div class="absolute inset-0 animated-gradient"></div>
+          <div class="absolute inset-0 animated-gradient"></div>
+          <div class="absolute inset-0 carbon-texture opacity-20"></div>
+          <div class="absolute inset-0 shimmer"></div>
 
-    <!-- Carbon Texture -->
-    <div class="absolute inset-0 carbon-texture opacity-20"></div>
+          <div class="relative flex flex-col justify-between h-full">
 
-    <!-- Shimmer -->
-    <div class="absolute inset-0 shimmer"></div>
+            <div class="flex justify-between items-start">
+              <img src="/trustlink_app/assets/white.logo.png"
+                   class="h-6 opacity-90"
+                   alt="TrustLink"/>
+              <i class="bi bi-currency-dollar text-2xl opacity-80"></i>
+            </div>
 
-    <div class="relative flex flex-col justify-between h-full">
+            <div class="mt-6 w-14 h-10 rounded-md bg-gradient-to-br from-yellow-300 to-yellow-500 shadow-inner"></div>
 
-      <!-- Top Row -->
-      <div class="flex justify-between items-start">
+            <div class="mt-8 text-lg tracking-[0.25em] font-semibold emboss">
+              TL-X4F9-2A7C-8D3B-01
+            </div>
 
-        <img src="/trustlink_app/assets/white.logo.png"
-             class="h-6 opacity-90"
-             alt="TrustLink"/>
+            <div class="flex justify-between items-end mt-6">
+              <div>
+                <div class="text-xs opacity-70">Titulaire</div>
+                <div id="cardUserNameUSD" class="text-sm font-semibold tracking-wide">
+                  NOM UTILISATEUR
+                </div>
+              </div>
+              <div class="text-right">
+                <div class="text-xs opacity-70">Solde USD</div>
+                <div id="balanceUSD" class="text-lg font-bold">0.00</div>
+              </div>
+            </div>
 
-        <i class="bi bi-credit-card text-2xl opacity-70"></i>
-
-      </div>
-
-      <!-- Chip -->
-      <div class="mt-6 w-14 h-10 rounded-md bg-gradient-to-br from-yellow-300 to-yellow-500 shadow-inner"></div>
-
-      <!-- Card Number -->
-      <div class="mt-8 text-xl tracking-[0.25em] font-semibold emboss">
-        **** **** **** 0987
-      </div>
-
-      <!-- Bottom -->
-      <div class="flex justify-between items-end mt-6">
-
-        <div>
-          <div class="text-xs opacity-70">Titulaire</div>
-          <div id="userName" class="text-sm font-semibold tracking-wide">
-            NOM UTILISATEUR
           </div>
         </div>
+      </div>
 
-        <div class="text-right">
-          <div class="text-xs opacity-70">Solde</div>
-          <div id="balanceAmount" class="text-lg font-bold">
-            0.00
+      <!-- CDF CARD -->
+      <div class="snap-center shrink-0 w-full perspective">
+        <div class="relative w-full aspect-[1.586] rounded-3xl p-7 text-white overflow-hidden shadow-2xl card-3d">
+
+          <div class="absolute inset-0 bg-gradient-to-br from-[#141b6e] via-[#1a238f] to-[#101552]"></div>
+          <div class="absolute inset-0 carbon-texture opacity-25"></div>
+          <div class="absolute inset-0 shimmer"></div>
+
+          <div class="relative flex flex-col justify-between h-full">
+
+            <div class="flex justify-between items-start">
+              <img src="/trustlink_app/assets/white.logo.png"
+                   class="h-6 opacity-90"
+                   alt="TrustLink"/>
+              <i class="bi bi-cash-stack text-2xl opacity-80"></i>
+            </div>
+
+            <div class="mt-6 w-14 h-10 rounded-md bg-gradient-to-br from-yellow-300 to-yellow-500 shadow-inner"></div>
+
+            <div class="mt-8 text-lg tracking-[0.25em] font-semibold emboss">
+              TL-X4F9-2A7C-8D3B-02
+            </div>
+
+            <div class="flex justify-between items-end mt-6">
+              <div>
+                <div class="text-xs opacity-70">Titulaire</div>
+                <div id="cardUserNameCDF" class="text-sm font-semibold tracking-wide">
+                  NOM UTILISATEUR
+                </div>
+              </div>
+              <div class="text-right">
+                <div class="text-xs opacity-70">Solde CDF</div>
+                <div id="balanceCDF" class="text-lg font-bold">0</div>
+              </div>
+            </div>
+
           </div>
         </div>
-
       </div>
 
     </div>
-
   </div>
-
-</div>
 
   <!-- QUICK ACTIONS -->
   <div class="grid grid-cols-4 gap-5 text-center mb-12">
@@ -239,12 +251,8 @@ tailwind.config = {
   <div>
 
     <div class="flex justify-between items-center mb-5">
-      <h3 class="text-sm font-semibold">
-        Activité récente
-      </h3>
-      <span class="text-xs text-primary font-medium">
-        Voir tout
-      </span>
+      <h3 class="text-sm font-semibold">Activité récente</h3>
+      <span class="text-xs text-primary font-medium">Voir tout</span>
     </div>
 
     <div id="transactionsList" class="space-y-4"></div>
@@ -255,24 +263,18 @@ tailwind.config = {
 
 <!-- FLOATING ACTION BUTTON -->
 <div class="fixed bottom-24 left-1/2 -translate-x-1/2">
-
   <button class="w-16 h-16 bg-primary rounded-full flex items-center justify-center text-white text-3xl shadow-2xl soft-press">
     <i class="bi bi-qr-code-scan"></i>
   </button>
-
 </div>
 
 <!-- BOTTOM NAV -->
 <div class="fixed bottom-6 left-0 right-0 flex justify-center">
-
   <div class="bg-white/90 backdrop-blur-lg rounded-full shadow-xl px-14 py-4 flex gap-14 items-center">
-
     <i class="bi bi-house-door-fill text-xl text-primary"></i>
     <i class="bi bi-bar-chart text-xl text-gray-500"></i>
     <i class="bi bi-person text-xl text-gray-500"></i>
-
   </div>
-
 </div>
 
 </body>
