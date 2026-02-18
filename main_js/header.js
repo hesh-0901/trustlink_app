@@ -13,7 +13,51 @@ const userId =
   sessionStorage.getItem("userId");
 
 if (!userId) {
-  window.location.href = "/trustlink_app/index.html";
+  window.location.href = "../index.html";
+}
+
+/* ==========================================
+   FORCE LOGOUT
+========================================== */
+
+function forceLogout() {
+  localStorage.clear();
+  sessionStorage.clear();
+  window.location.href = "../index.html";
+}
+
+/* ==========================================
+   UPDATE HEADER UI
+========================================== */
+
+function updateHeaderUI(user) {
+
+  const fullNameEl = document.getElementById("headerFullName");
+  const usernameEl = document.getElementById("headerUsername");
+  const avatarContainer = document.getElementById("headerAvatar");
+
+  if (fullNameEl) {
+    fullNameEl.textContent =
+      `${user.firstName} ${user.lastName}`;
+  }
+
+  if (usernameEl) {
+    usernameEl.textContent = user.username;
+    usernameEl.classList.remove("opacity-0");
+    usernameEl.classList.add("opacity-100");
+  }
+
+  if (avatarContainer) {
+
+    // On injecte une vraie image avatar
+    avatarContainer.innerHTML = `
+      <img
+        src="https://api.dicebear.com/7.x/avataaars/png?seed=${user.username}&backgroundColor=b6e3f4,c0aede,d1d4f9"
+        class="w-full h-full rounded-full object-cover"
+        alt="avatar"
+      />
+    `;
+  }
 }
 
 /* ==========================================
@@ -43,47 +87,6 @@ function initRealtimeUser() {
   }, (error) => {
     console.error("Realtime user error:", error);
   });
-
-}
-
-/* ==========================================
-   UPDATE HEADER UI
-========================================== */
-
-function updateHeaderUI(user) {
-
-  const fullNameEl = document.getElementById("headerFullName");
-  const usernameEl = document.getElementById("headerUsername");
-  const avatarEl = document.getElementById("headerAvatar");
-
-  if (fullNameEl) {
-    fullNameEl.textContent =
-      `${user.firstName} ${user.lastName}`;
-  }
-
-  if (usernameEl) {
-    usernameEl.textContent = user.username;
-    usernameEl.classList.remove("opacity-0");
-    usernameEl.classList.add("opacity-100");
-  }
-
-  if (avatarEl) {
-    avatarEl.src =
-      `https://api.dicebear.com/7.x/avataaars/png?seed=${user.username}&backgroundColor=b6e3f4,c0aede,d1d4f9`;
-  }
-
-}
-
-/* ==========================================
-   FORCE LOGOUT
-========================================== */
-
-function forceLogout() {
-
-  localStorage.clear();
-  sessionStorage.clear();
-  window.location.href = "/trustlink_app/index.html";
-
 }
 
 /* ==========================================
@@ -99,14 +102,12 @@ function initLogout() {
   logoutBtn.addEventListener("click", () => {
     forceLogout();
   });
-
 }
 
 /* ==========================================
-   INIT
+   INIT DIRECT (PAS DOMContentLoaded)
 ========================================== */
 
-document.addEventListener("DOMContentLoaded", () => {
-  initRealtimeUser();
-  initLogout();
-});
+// ⚠️ IMPORTANT : exécuter directement
+initRealtimeUser();
+initLogout();
