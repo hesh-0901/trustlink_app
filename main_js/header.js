@@ -29,7 +29,6 @@ function forceLogout() {
 /* ==========================================
    UPDATE HEADER UI
 ========================================== */
-
 function updateHeaderUI(user) {
 
   const fullNameEl = document.getElementById("headerFullName");
@@ -50,6 +49,26 @@ function updateHeaderUI(user) {
   if (avatarImg) {
 
     const seed = user.username || user.firstName || "user";
+    const gender = user.gender || "neutral";
+
+    let extraOptions = "";
+
+    if (gender === "Homme") {
+      extraOptions =
+        "&clothes=blazerShirt" +
+        "&hair=short01,short02,short03" +
+        "&facialHairProbability=50";
+    }
+    else if (gender === "Femme") {
+      extraOptions =
+        "&clothes=blazerShirt" +
+        "&hair=long01,long02,long03" +
+        "&facialHairProbability=0";
+    }
+    else {
+      extraOptions =
+        "&clothes=blazerShirt";
+    }
 
     const avatarUrl =
       "https://api.dicebear.com/7.x/personas/png" +
@@ -57,8 +76,7 @@ function updateHeaderUI(user) {
       "&backgroundColor=f3f4f6" +
       "&radius=50" +
       "&size=256" +
-      "&clothes=blazerShirt" +
-      "&mouth=smile";
+      extraOptions;
 
     avatarImg.onerror = () => {
       avatarImg.src =
@@ -68,6 +86,7 @@ function updateHeaderUI(user) {
     avatarImg.src = avatarUrl;
   }
 }
+
 
 /* ==========================================
    REALTIME USER LISTENER
