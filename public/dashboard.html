@@ -31,201 +31,280 @@ tailwind.config = {
 <script type="module" src="/trustlink_app/public/js/dashboard.js"></script>
 
 <style>
-/* Shadows */
-.premium-shadow { box-shadow: 0 8px 20px rgba(0,0,0,0.06); }
-.soft-press:active { transform: scale(0.96); }
+/* ===============================
+   GLOBAL SHADOW SYSTEM
+================================ */
 
-/* Swipe clean */
-.no-scrollbar::-webkit-scrollbar { display: none; }
-.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-
-/* Card depth */
-.perspective { perspective: 1200px; }
-.card-3d { transform-style: preserve-3d; }
-
-/* Premium gradient USD */
-.animated-gradient {
-  background: linear-gradient(
-    135deg,
-    #1F2AA6,
-    #2F3DD8,
-    #4F6BFF,
-    #1F2AA6
-  );
-  background-size: 400% 400%;
-  animation: gradientMove 10s ease infinite;
+/* Premium card shadow (banking grade) */
+.premium-shadow {
+  box-shadow:
+    0 15px 35px rgba(0, 0, 0, 0.08),
+    0 5px 15px rgba(0, 0, 0, 0.04);
 }
 
-@keyframes gradientMove {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+/* Soft inner light effect */
+.inner-soft-light {
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.2),
+    inset 0 -1px 8px rgba(0,0,0,0.15);
 }
 
-/* Carbon texture */
+/* ===============================
+   INTERACTION FEEDBACK
+================================ */
+
+.soft-press {
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+.soft-press:active {
+  transform: scale(0.97);
+}
+
+/* ===============================
+   SCROLL IMPROVEMENT
+================================ */
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* ===============================
+   CARD TEXTURE (SUBTLE)
+================================ */
+
 .carbon-texture {
   background-image:
     repeating-linear-gradient(
       45deg,
-      rgba(255,255,255,0.03) 0px,
-      rgba(255,255,255,0.03) 2px,
+      rgba(255,255,255,0.015) 0px,
+      rgba(255,255,255,0.015) 2px,
       transparent 2px,
       transparent 4px
     );
 }
 
-/* Shimmer */
-.shimmer {
+/* ===============================
+   GRADIENT SYSTEM (STATIC)
+================================ */
+
+/* USD Gradient */
+.gradient-usd {
   background: linear-gradient(
-    110deg,
-    transparent 25%,
-    rgba(255,255,255,0.15) 50%,
-    transparent 75%
+    135deg,
+    #1B26A6 0%,
+    #2F3DD8 50%,
+    #4F6BFF 100%
   );
-  background-size: 200% 100%;
-  animation: shimmerMove 6s infinite;
 }
 
-@keyframes shimmerMove {
-  from { background-position: 200% 0; }
-  to { background-position: -200% 0; }
+/* CDF Gradient (slightly darker) */
+.gradient-cdf {
+  background: linear-gradient(
+    135deg,
+    #101552 0%,
+    #1C2490 50%,
+    #141B6E 100%
+  );
 }
+
+/* ===============================
+   LIGHT SPOT EFFECT
+================================ */
+
+.soft-light-spot {
+  position: absolute;
+  top: -40px;
+  right: -40px;
+  width: 140px;
+  height: 140px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 50%;
+  filter: blur(40px);
+  pointer-events: none;
+}
+
+/* ===============================
+   TYPOGRAPHY REFINEMENT
+================================ */
+
+.balance-text {
+  letter-spacing: -0.5px;
+}
+
+.wallet-address {
+  letter-spacing: 2px;
+  font-size: 10px;
+  opacity: 0.75;
+}
+
+/* ===============================
+   FADE-IN ENTRY (SUBTLE)
+================================ */
+
+.fade-in {
+  animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 </style>
 </head>
 
-<body class="bg-background min-h-screen font-sans text-gray-800">
+<body class="bg-background min-h-screen font-sans text-gray-800 antialiased">
 
-<div class="max-w-md mx-auto px-5 pt-8 pb-32">
+<div class="max-w-md mx-auto px-4 pt-6 pb-28">
 
   <!-- HEADER -->
-  <div class="flex justify-between items-center mb-8">
+  <div class="flex justify-between items-center mb-6">
 
     <div class="flex items-center gap-3">
       <div id="userAvatar"
-           class="w-11 h-11 bg-primary text-white rounded-full flex items-center justify-center text-sm font-semibold premium-shadow">
+           class="w-10 h-10 bg-primary text-white rounded-full flex items-center justify-center text-xs font-semibold premium-shadow">
         --
       </div>
       <div>
-        <p class="text-xs text-gray-400">Bienvenue</p>
-        <h1 id="userName" class="text-base font-semibold leading-tight">
+        <p class="text-[11px] text-gray-400 leading-none">Bienvenue</p>
+        <h1 id="userName" class="text-sm font-semibold leading-tight">
           Chargement...
         </h1>
       </div>
     </div>
 
-    <i class="bi bi-bell text-xl text-gray-500"></i>
+    <i class="bi bi-bell text-lg text-gray-500"></i>
 
   </div>
 
- <!-- WALLET SWIPE ULTRA COMPACT -->
-<div class="mb-6">
+  <!-- WALLET SWIPE -->
+  <div class="mb-6">
 
-  <div class="flex gap-4 overflow-x-auto snap-x snap-mandatory scroll-smooth no-scrollbar">
+    <div class="flex gap-4 overflow-x-auto snap-x snap-mandatory scroll-smooth no-scrollbar">
 
-    <!-- USD CARD -->
-    <div class="snap-center shrink-0 w-full">
-      <div class="relative w-full aspect-[1.58] rounded-2xl px-5 py-5 text-white overflow-hidden shadow-xl">
+      <!-- USD CARD -->
+      <div class="snap-center shrink-0 w-full">
+        <div class="relative w-full aspect-[1.58] rounded-2xl px-4 py-4 text-white overflow-hidden premium-shadow">
 
-        <!-- Gradient -->
-        <div class="absolute inset-0 bg-gradient-to-br from-[#1B26A6] via-[#2F3DD8] to-[#4F6BFF]"></div>
+          <div class="absolute inset-0 gradient-usd rounded-2xl"></div>
+          <div class="soft-light-spot"></div>
+          <div class="absolute inset-0 carbon-texture rounded-2xl opacity-10"></div>
 
-        <!-- Light Spot -->
-        <div class="absolute -top-10 -right-10 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
+          <div class="relative flex flex-col justify-between h-full">
 
-        <!-- Texture -->
-        <div class="absolute inset-0 opacity-15 carbon-texture"></div>
-
-        <div class="relative flex flex-col justify-between h-full">
-
-          <!-- Top -->
-          <div class="flex justify-between items-center">
-            <img src="/trustlink_app/assets/white.logo.png" class="h-4 opacity-90"/>
-            <span class="text-[10px] tracking-wide opacity-70 font-medium">
-              USD
-            </span>
-          </div>
-
-          <!-- Balance -->
-          <div class="mt-2">
-            <p class="text-[11px] opacity-70 mb-1">
-              Solde disponible
-            </p>
-            <h2 id="balanceUSD"
-                class="text-2xl font-bold tracking-tight leading-tight">
-            </h2>
-          </div>
-
-          <!-- Bottom -->
-          <div class="flex justify-between items-end mt-3">
-
-            <div>
-              <p class="text-[9px] opacity-60">
-                Titulaire
-              </p>
-              <p id="cardUserNameUSD"
-                 class="text-xs font-semibold uppercase tracking-wide">
-              </p>
+            <!-- Top -->
+            <div class="flex justify-between items-center">
+              <img src="/trustlink_app/assets/white.logo.png"
+                   class="h-4 opacity-90"
+                   alt="TrustLink"/>
+              <span class="text-[10px] tracking-wide opacity-70 font-medium">
+                USD
+              </span>
             </div>
 
-            <div class="text-right">
-              <p id="walletAddressUSD"
-                 class="text-[9px] tracking-widest opacity-70">
+            <!-- Balance -->
+            <div class="mt-2">
+              <p class="text-[10px] opacity-70 mb-1">
+                Solde disponible
               </p>
+              <h2 id="balanceUSD"
+                  class="text-2xl font-bold balance-text leading-tight">
+              </h2>
+            </div>
+
+            <!-- Bottom -->
+            <div class="flex justify-between items-end mt-2">
+
+              <div>
+                <p class="text-[9px] opacity-60">
+                  Titulaire
+                </p>
+                <p id="cardUserNameUSD"
+                   class="text-[11px] font-semibold uppercase tracking-wide">
+                </p>
+              </div>
+
+              <div class="text-right">
+                <p id="walletAddressUSD"
+                   class="wallet-address">
+                </p>
+              </div>
+
             </div>
 
           </div>
-
         </div>
       </div>
+
+      <!-- CDF CARD -->
+      <div class="snap-center shrink-0 w-full">
+        <div class="relative w-full aspect-[1.58] rounded-2xl px-4 py-4 text-white overflow-hidden premium-shadow">
+
+          <div class="absolute inset-0 gradient-cdf rounded-2xl"></div>
+          <div class="soft-light-spot"></div>
+          <div class="absolute inset-0 carbon-texture rounded-2xl opacity-15"></div>
+
+          <div class="relative flex flex-col justify-between h-full">
+
+            <div class="flex justify-between items-center">
+              <img src="/trustlink_app/assets/white.logo.png"
+                   class="h-4 opacity-90"
+                   alt="TrustLink"/>
+              <span class="text-[10px] tracking-wide opacity-70 font-medium">
+                CDF
+              </span>
+            </div>
+
+            <div class="mt-2">
+              <p class="text-[10px] opacity-70 mb-1">
+                Solde disponible
+              </p>
+              <h2 id="balanceCDF"
+                  class="text-2xl font-bold balance-text leading-tight">
+              </h2>
+            </div>
+
+            <div class="flex justify-between items-end mt-2">
+
+              <div>
+                <p class="text-[9px] opacity-60">
+                  Titulaire
+                </p>
+                <p id="cardUserNameCDF"
+                   class="text-[11px] font-semibold uppercase tracking-wide">
+                </p>
+              </div>
+
+              <div class="text-right">
+                <p id="walletAddressCDF"
+                   class="wallet-address">
+                </p>
+              </div>
+
+            </div>
+
+          </div>
+        </div>
+      </div>
+
     </div>
 
-    <!-- CDF CARD -->
-    <div class="snap-center shrink-0 w-full">
-      <div class="relative w-full aspect-[1.58] rounded-2xl px-5 py-5 text-white overflow-hidden shadow-xl">
-
-        <div class="absolute inset-0 bg-gradient-to-br from-[#111764] via-[#1C2490] to-[#141B6E]"></div>
-        <div class="absolute -top-10 -right-10 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
-        <div class="absolute inset-0 opacity-20 carbon-texture"></div>
-
-        <div class="relative flex flex-col justify-between h-full">
-
-          <div class="flex justify-between items-center">
-            <img src="/trustlink_app/assets/white.logo.png" class="h-4 opacity-90"/>
-            <span class="text-[10px] tracking-wide opacity-70 font-medium">
-              CDF
-            </span>
-          </div>
-
-          <div class="mt-2">
-            <p class="text-[11px] opacity-70 mb-1">
-              Solde disponible
-            </p>
-            <h2 id="balanceCDF"
-                class="text-2xl font-bold tracking-tight leading-tight">
-            </h2>
-          </div>
-
-          <div class="flex justify-between items-end mt-3">
-
-            <div>
-              <p class="text-[9px] opacity-60">
-                Titulaire
-              </p>
-              <p id="cardUserNameCDF"
-                 class="text-xs font-semibold uppercase tracking-wide">
-              </p>
-            </div>
-
-            <div class="text-right">
-              <p id="walletAddressCDF"
-                 class="text-[9px] tracking-widest opacity-70">
-              </p>
-            </div>
-
-          </div>
-
-        </div>
-      </div>
+    <!-- Minimal Swipe Indicator -->
+    <div class="flex justify-center gap-1.5 mt-3">
+      <div class="w-1.5 h-1.5 bg-primary rounded-full"></div>
+      <div class="w-1.5 h-1.5 bg-gray-300 rounded-full"></div>
     </div>
 
   </div>
