@@ -1,3 +1,4 @@
+/*public/js/dashboard.js*/
 import { db } from "../../js/firebase-init.js";
 
 import {
