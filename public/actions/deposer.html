@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Déposer - TrustLink</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
+<script type="module" src="/trustlink_app/js/firebase-init.js"></script>
+<script type="module" src="/trustlink_app/js/deposer.js"></script>
+
+</head>
+
+<body class="bg-gray-50 min-h-screen">
+
+<div class="max-w-md mx-auto px-6 py-10">
+
+  <h1 class="text-xl font-semibold mb-8">Déposer des fonds</h1>
+
+  <form id="depositForm" class="space-y-6">
+
+    <!-- WALLET -->
+    <div>
+      <label class="block text-sm font-medium mb-2">Wallet</label>
+      <select id="walletSelect"
+              class="w-full border rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-600">
+        <option value="">Sélectionner</option>
+      </select>
+    </div>
+
+    <!-- METHOD -->
+    <div>
+      <label class="block text-sm font-medium mb-2">Méthode</label>
+      <select id="methodSelect"
+              class="w-full border rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-600">
+        <option value="">Sélectionner</option>
+        <option>Mobile Money</option>
+        <option>Banque</option>
+        <option>Cash</option>
+      </select>
+    </div>
+
+    <!-- AMOUNT -->
+    <div>
+      <label class="block text-sm font-medium mb-2">Montant</label>
+      <input type="number"
+             id="amount"
+             min="1"
+             class="w-full border rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-600"
+             placeholder="0" />
+    </div>
+
+    <!-- MOTIF -->
+    <div>
+      <label class="block text-sm font-medium mb-2">Motif</label>
+      <input type="text"
+             id="motif"
+             class="w-full border rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-600"
+             placeholder="Ex: Recharge personnelle" />
+    </div>
+
+    <!-- ERROR -->
+    <p id="errorMsg" class="text-red-500 text-sm hidden"></p>
+
+    <!-- SUBMIT -->
+    <button type="submit"
+            id="submitBtn"
+            class="w-full bg-blue-600 text-white py-3 rounded-xl font-semibold flex items-center justify-center gap-2">
+      <span id="btnText">Confirmer dépôt</span>
+      <i id="btnSpinner" class="bi bi-arrow-repeat animate-spin hidden"></i>
+    </button>
+
+  </form>
+
+</div>
+
+</body>
+</html>
