@@ -64,9 +64,7 @@ onSnapshot(userRef, (docSnap) => {
     initials.toUpperCase();
 
   // Balance
-  document.getElementById("balanceAmount").textContent =
-    formatMoney(user.balance || 0, user.currency);
-
+ animateBalance(user.balance || 0, user.currency);
 });
 
 /* ===============================
