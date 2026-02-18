@@ -57,7 +57,7 @@ function updateHeaderUI(user) {
     avatarImg.src =
       `https://api.dicebear.com/7.x/${style}/png?seed=${user.avatarSeed || user.username}&backgroundColor=b6e3f4,c0aede,d1d4f9`;
   }
-
+}
 
 /* ==========================================
    REALTIME USER LISTENER
