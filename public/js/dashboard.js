@@ -142,6 +142,57 @@ onSnapshotCollection(q, (snapshot) => {
 });
 
 /* ===============================
+  STYLE CARD
+================================ */
+/* ===============================
+   3D TILT EFFECT
+================================ */
+const card = document.getElementById("bankCard");
+
+if (card) {
+  card.addEventListener("mousemove", (e) => {
+    const rect = card.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    const rotateY = ((x / rect.width) - 0.5) * 20;
+    const rotateX = ((y / rect.height) - 0.5) * -20;
+
+    card.style.transform =
+      `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+  });
+
+  card.addEventListener("mouseleave", () => {
+    card.style.transform = "rotateX(0deg) rotateY(0deg)";
+  });
+}
+
+/* ===============================
+   BALANCE COUNTER ANIMATION
+================================ */
+function animateBalance(targetValue, currency) {
+
+  const element = document.getElementById("balanceAmount");
+  let start = 0;
+  const duration = 1000;
+  const increment = targetValue / (duration / 16);
+
+  const counter = setInterval(() => {
+    start += increment;
+    if (start >= targetValue) {
+      start = targetValue;
+      clearInterval(counter);
+    }
+    element.textContent =
+      new Intl.NumberFormat("fr-FR", {
+        style: "currency",
+        currency: currency || "USD"
+      }).format(start);
+  }, 16);
+}
+
+
+/* ===============================
    LOGOUT
 ================================ */
 const logoutBtn = document.getElementById("logoutBtn");
