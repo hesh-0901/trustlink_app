@@ -117,97 +117,109 @@ tailwind.config = {
 
   </div>
 
-  <!-- WALLET SWIPE -->
-  <div class="mb-10">
+ <!-- WALLET CARDS -->
+<div class="mb-8">
 
-    <div class="flex gap-5 overflow-x-auto snap-x snap-mandatory scroll-smooth no-scrollbar">
+  <div class="flex gap-5 overflow-x-auto snap-x snap-mandatory scroll-smooth no-scrollbar">
 
-      <!-- USD CARD -->
-      <div class="snap-center shrink-0 w-full perspective">
-        <div class="relative w-full aspect-[1.6] rounded-2xl p-6 text-white overflow-hidden shadow-xl card-3d">
+    <!-- USD CARD -->
+    <div class="snap-center shrink-0 w-full">
+      <div class="relative w-full aspect-[1.6] rounded-3xl p-6 text-white overflow-hidden shadow-2xl">
 
-          <div class="absolute inset-0 animated-gradient rounded-2xl"></div>
-          <div class="absolute inset-0 carbon-texture opacity-20 rounded-2xl"></div>
-          <div class="absolute inset-0 shimmer rounded-2xl"></div>
+        <!-- Gradient profond -->
+        <div class="absolute inset-0 bg-gradient-to-br from-[#1B26A6] via-[#2F3DD8] to-[#4F6BFF]"></div>
 
-          <div class="relative flex flex-col justify-between h-full">
+        <!-- Soft Light -->
+        <div class="absolute top-[-40px] right-[-40px] w-40 h-40 bg-white/10 rounded-full blur-3xl"></div>
 
-            <div class="flex justify-between items-start">
-              <img src="/trustlink_app/assets/white.logo.png"
-                   class="h-5 opacity-90"
-                   alt="TrustLink"/>
-              <i class="bi bi-currency-dollar text-xl opacity-80"></i>
+        <!-- Texture -->
+        <div class="absolute inset-0 opacity-20 carbon-texture"></div>
+
+        <div class="relative flex flex-col justify-between h-full">
+
+          <div class="flex justify-between items-center">
+            <img src="/trustlink_app/assets/white.logo.png" class="h-5 opacity-90"/>
+            <span class="text-xs opacity-70 font-medium tracking-wide">USD</span>
+          </div>
+
+          <div>
+            <p class="text-xs opacity-70 mb-1">Solde disponible</p>
+            <h2 id="balanceUSD" class="text-3xl font-bold tracking-tight">
+              $0.00
+            </h2>
+          </div>
+
+          <div class="flex justify-between items-end">
+
+            <div>
+              <p class="text-[10px] opacity-60">Titulaire</p>
+              <p id="cardUserNameUSD" class="text-sm font-semibold uppercase tracking-wide">
+              </p>
             </div>
 
-            <div id="walletAddressUSD"
-                 class="text-xs tracking-widest opacity-80 mt-4">
-              <!-- Injected by JS -->
-            </div>
-
-            <div class="flex justify-between items-end mt-6">
-              <div>
-                <div class="text-[10px] opacity-70">Titulaire</div>
-                <div id="cardUserNameUSD"
-                     class="text-sm font-semibold uppercase">
-                </div>
-              </div>
-
-              <div class="text-right">
-                <div class="text-[10px] opacity-70">Solde USD</div>
-                <div id="balanceUSD"
-                     class="text-lg font-bold tracking-wide">
-                </div>
-              </div>
+            <div class="text-right">
+              <p class="text-[10px] opacity-60">Adresse</p>
+              <p id="walletAddressUSD" class="text-xs tracking-widest opacity-80">
+              </p>
             </div>
 
           </div>
+
         </div>
       </div>
+    </div>
 
-      <!-- CDF CARD -->
-      <div class="snap-center shrink-0 w-full perspective">
-        <div class="relative w-full aspect-[1.6] rounded-2xl p-6 text-white overflow-hidden shadow-xl card-3d">
+    <!-- CDF CARD -->
+    <div class="snap-center shrink-0 w-full">
+      <div class="relative w-full aspect-[1.6] rounded-3xl p-6 text-white overflow-hidden shadow-2xl">
 
-          <div class="absolute inset-0 bg-gradient-to-br from-[#141b6e] via-[#1a238f] to-[#101552] rounded-2xl"></div>
-          <div class="absolute inset-0 carbon-texture opacity-25 rounded-2xl"></div>
-          <div class="absolute inset-0 shimmer rounded-2xl"></div>
+        <div class="absolute inset-0 bg-gradient-to-br from-[#111764] via-[#1C2490] to-[#141B6E]"></div>
+        <div class="absolute top-[-40px] right-[-40px] w-40 h-40 bg-white/10 rounded-full blur-3xl"></div>
+        <div class="absolute inset-0 opacity-25 carbon-texture"></div>
 
-          <div class="relative flex flex-col justify-between h-full">
+        <div class="relative flex flex-col justify-between h-full">
 
-            <div class="flex justify-between items-start">
-              <img src="/trustlink_app/assets/white.logo.png"
-                   class="h-5 opacity-90"
-                   alt="TrustLink"/>
-              <i class="bi bi-cash-stack text-xl opacity-80"></i>
+          <div class="flex justify-between items-center">
+            <img src="/trustlink_app/assets/white.logo.png" class="h-5 opacity-90"/>
+            <span class="text-xs opacity-70 font-medium tracking-wide">CDF</span>
+          </div>
+
+          <div>
+            <p class="text-xs opacity-70 mb-1">Solde disponible</p>
+            <h2 id="balanceCDF" class="text-3xl font-bold tracking-tight">
+              0 CDF
+            </h2>
+          </div>
+
+          <div class="flex justify-between items-end">
+
+            <div>
+              <p class="text-[10px] opacity-60">Titulaire</p>
+              <p id="cardUserNameCDF" class="text-sm font-semibold uppercase tracking-wide">
+              </p>
             </div>
 
-            <div id="walletAddressCDF"
-                 class="text-xs tracking-widest opacity-80 mt-4">
-            </div>
-
-            <div class="flex justify-between items-end mt-6">
-              <div>
-                <div class="text-[10px] opacity-70">Titulaire</div>
-                <div id="cardUserNameCDF"
-                     class="text-sm font-semibold uppercase">
-                </div>
-              </div>
-
-              <div class="text-right">
-                <div class="text-[10px] opacity-70">Solde CDF</div>
-                <div id="balanceCDF"
-                     class="text-lg font-bold tracking-wide">
-                </div>
-              </div>
+            <div class="text-right">
+              <p class="text-[10px] opacity-60">Adresse</p>
+              <p id="walletAddressCDF" class="text-xs tracking-widest opacity-80">
+              </p>
             </div>
 
           </div>
+
         </div>
       </div>
-
     </div>
 
   </div>
+
+  <!-- Swipe indicator -->
+  <div class="flex justify-center gap-2 mt-4">
+    <div class="w-2 h-2 bg-primary rounded-full"></div>
+    <div class="w-2 h-2 bg-gray-300 rounded-full"></div>
+  </div>
+
+</div>
 
   <!-- QUICK ACTIONS -->
   <div class="grid grid-cols-4 gap-4 text-center mb-10">
