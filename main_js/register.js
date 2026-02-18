@@ -97,6 +97,7 @@ form.addEventListener("submit", async (e) => {
       firstName,
       lastName,
       birthDate,
+      gender,
       phoneNumber: phone,
       username,
       walletBase,
