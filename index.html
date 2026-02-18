@@ -5,8 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <title>TrustLink</title>
 
-<!-- Tailwind CDN -->
+<!-- Tailwind -->
 <script src="https://cdn.tailwindcss.com"></script>
+
+<!-- Bootstrap Icons -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 
 <script>
 tailwind.config = {
@@ -27,24 +30,37 @@ tailwind.config = {
 }
 </script>
 
-<!-- Firebase -->
 <script type="module" src="/trustlink_app/js/firebase-init.js"></script>
 <script type="module" src="/trustlink_app/main_js/login.js"></script>
 
 <style>
 
-/* Glass premium effect */
+/* ===============================
+   Glass Card
+================================ */
 .glass-card {
   backdrop-filter: blur(20px);
   background: rgba(255,255,255,0.95);
 }
 
-/* Smooth focus animation */
-.input-focus:focus {
-  box-shadow: 0 0 0 3px rgba(30,43,224,0.2);
+/* ===============================
+   Shake Animation
+================================ */
+@keyframes shake {
+  0%,100% { transform: translateX(0); }
+  20% { transform: translateX(-6px); }
+  40% { transform: translateX(6px); }
+  60% { transform: translateX(-4px); }
+  80% { transform: translateX(4px); }
 }
 
-/* Button animation */
+.shake {
+  animation: shake 0.4s ease;
+}
+
+/* ===============================
+   Button
+================================ */
 .btn-primary {
   transition: all 0.25s ease;
 }
@@ -53,15 +69,29 @@ tailwind.config = {
   transform: scale(0.97);
 }
 
+/* Spinner */
+.spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top: 2px solid white;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
 </style>
 
 </head>
 
 <body class="min-h-screen bg-background flex items-center justify-center px-4">
 
-<div class="w-full max-w-sm glass-card rounded-3xl shadow-2xl p-7 border border-borderLight">
+<div id="loginCard" class="w-full max-w-sm glass-card rounded-3xl shadow-2xl p-7 border border-borderLight">
 
-  <!-- LOGO -->
+  <!-- Logo -->
   <div class="text-center mb-8">
 
     <div class="w-14 h-14 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-lg">
@@ -81,29 +111,31 @@ tailwind.config = {
   <!-- FORM -->
   <form id="loginForm" class="space-y-5" autocomplete="off">
 
-    <!-- PHONE -->
+    <!-- Phone -->
     <div>
       <label class="block text-sm font-medium text-textDark mb-1">
         Numéro de téléphone
       </label>
-
-      <input
-        id="phone"
-        type="text"
-        autocomplete="off"
-        required
-        placeholder="+243..."
-        class="input-focus w-full border border-borderLight rounded-xl px-4 py-3 text-sm focus:outline-none transition"
-      />
+      <div class="relative">
+        <i class="bi bi-phone absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+        <input
+          id="phone"
+          type="text"
+          autocomplete="off"
+          required
+          placeholder="+243..."
+          class="w-full border border-borderLight rounded-xl pl-10 pr-4 py-3 text-sm focus:ring-2 focus:ring-primary focus:outline-none transition"
+        />
+      </div>
     </div>
 
-    <!-- PASSWORD -->
+    <!-- Password -->
     <div>
       <label class="block text-sm font-medium text-textDark mb-1">
         Mot de passe
       </label>
-
       <div class="relative">
+        <i class="bi bi-lock absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
 
         <input
           id="password"
@@ -111,24 +143,21 @@ tailwind.config = {
           autocomplete="new-password"
           required
           placeholder="••••••••"
-          class="input-focus w-full border border-borderLight rounded-xl px-4 py-3 text-sm pr-12 focus:outline-none transition"
+          class="w-full border border-borderLight rounded-xl pl-10 pr-10 py-3 text-sm focus:ring-2 focus:ring-primary focus:outline-none transition"
         />
 
-        <!-- Toggle Password -->
         <button
           type="button"
           id="togglePassword"
-          class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-primary transition"
+          class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-primary"
         >
-          👁
+          <i class="bi bi-eye"></i>
         </button>
-
       </div>
     </div>
 
-    <!-- REMEMBER ME -->
+    <!-- Remember -->
     <div class="flex items-center justify-between text-sm">
-
       <label class="flex items-center gap-2 cursor-pointer">
         <input type="checkbox" id="rememberMe" class="w-4 h-4 accent-primary">
         <span class="text-textMuted">Se souvenir de moi</span>
@@ -137,47 +166,96 @@ tailwind.config = {
       <a href="#" class="text-primary font-medium text-xs hover:underline">
         Mot de passe oublié ?
       </a>
-
     </div>
 
-    <!-- SUBMIT -->
+    <!-- Submit -->
     <button
+      id="loginBtn"
       type="submit"
-      class="btn-primary w-full bg-gradient-to-r from-primary to-accent hover:from-primaryDark hover:to-primary text-white font-semibold py-3 rounded-xl shadow-lg"
+      class="btn-primary w-full bg-gradient-to-r from-primary to-accent hover:from-primaryDark hover:to-primary text-white font-semibold py-3 rounded-xl shadow-lg flex items-center justify-center gap-2"
     >
-      Se connecter
+      <span id="btnText">Se connecter</span>
     </button>
 
-    <!-- ERROR -->
     <p id="errorMsg" class="text-red-500 text-sm text-center hidden"></p>
 
   </form>
 
-  <!-- REGISTER -->
-  <p class="text-center text-textMuted text-sm mt-6">
-    Pas encore inscrit ?
-    <a href="./public/register.html" class="text-primary font-medium hover:underline">
-      Créer un compte
-    </a>
-  </p>
-
-  <!-- FOOTER -->
-  <div class="mt-6 text-center text-xs text-textMuted flex items-center justify-center gap-2">
-    🔒 Connexion sécurisée SSL
-  </div>
-
 </div>
 
-
-<!-- PASSWORD TOGGLE SCRIPT -->
 <script>
+
+/* ===============================
+   PASSWORD TOGGLE
+================================ */
 const togglePassword = document.getElementById("togglePassword");
 const passwordInput = document.getElementById("password");
 
 togglePassword.addEventListener("click", () => {
-  const type = passwordInput.getAttribute("type") === "password" ? "text" : "password";
-  passwordInput.setAttribute("type", type);
+  const type = passwordInput.type === "password" ? "text" : "password";
+  passwordInput.type = type;
+
+  togglePassword.innerHTML =
+    type === "password"
+      ? '<i class="bi bi-eye"></i>'
+      : '<i class="bi bi-eye-slash"></i>';
 });
+
+
+/* ===============================
+   BRUTE FORCE PROTECTION
+================================ */
+
+let attempts = 0;
+let lockedUntil = null;
+
+window.handleLoginError = function(message) {
+
+  const card = document.getElementById("loginCard");
+  const errorMsg = document.getElementById("errorMsg");
+
+  attempts++;
+
+  if (navigator.vibrate) navigator.vibrate(120); // Haptic feedback
+
+  card.classList.add("shake");
+  setTimeout(() => card.classList.remove("shake"), 400);
+
+  errorMsg.textContent = message;
+  errorMsg.classList.remove("hidden");
+
+  if (attempts >= 5) {
+    lockedUntil = Date.now() + 60000; // 1 minute lock
+    errorMsg.textContent = "Trop de tentatives. Réessayez dans 1 minute.";
+  }
+};
+
+window.isLocked = function() {
+  if (!lockedUntil) return false;
+  return Date.now() < lockedUntil;
+};
+
+
+/* ===============================
+   BUTTON LOADING
+================================ */
+
+window.startLoading = function() {
+  const btn = document.getElementById("loginBtn");
+  const text = document.getElementById("btnText");
+
+  btn.disabled = true;
+  text.innerHTML = '<div class="spinner"></div>';
+};
+
+window.stopLoading = function() {
+  const btn = document.getElementById("loginBtn");
+  const text = document.getElementById("btnText");
+
+  btn.disabled = false;
+  text.innerText = "Se connecter";
+};
+
 </script>
 
 </body>
