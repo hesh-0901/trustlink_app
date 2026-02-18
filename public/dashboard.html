@@ -2,9 +2,10 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 
-<title>TrustLink</title>
+<title>Dashboard - TrustLink</title>
 
 <script src="https://cdn.tailwindcss.com"></script>
 
@@ -25,19 +26,15 @@ tailwind.config = {
 }
 </script>
 
-<style>
+<script type="module" src="/trustlink_app/js/firebase-init.js"></script>
+<script type="module" src="/trustlink_app/main_js/dashboard.js"></script>
 
-/* ===============================
-   FOND GENERAL
-================================ */
+<style>
 body {
   background: #EEF2FF;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
-/* ===============================
-   SCROLL SWIPE STYLE
-================================ */
 .swipe-container {
   display: flex;
   gap: 16px;
@@ -55,9 +52,6 @@ body {
   scroll-snap-align: center;
 }
 
-/* ===============================
-   CARTE WALLET INTENSE
-================================ */
 .wallet-card {
   border-radius: 28px;
   padding: 24px;
@@ -67,7 +61,6 @@ body {
   box-shadow: 0 30px 70px rgba(0,0,0,0.18);
 }
 
-/* Gradient plus intense */
 .gradient-wallet {
   background: linear-gradient(
     135deg,
@@ -77,44 +70,6 @@ body {
   );
 }
 
-/* Effet lumière interne */
-.wallet-card::after {
-  content: "";
-  position: absolute;
-  top: -30%;
-  left: -20%;
-  width: 140%;
-  height: 140%;
-  background: radial-gradient(
-    circle at 30% 20%,
-    rgba(255,255,255,0.35),
-    transparent 60%
-  );
-  pointer-events: none;
-}
-
-/* ===============================
-   GRID MENU
-================================ */
-.quick-item {
-  background: white;
-  border-radius: 18px;
-  padding: 18px 12px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  transition: 0.2s ease;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.08);
-}
-
-.quick-item:active {
-  transform: scale(0.95);
-}
-
-/* ===============================
-   NAVIGATION BAS
-================================ */
 .bottom-nav {
   background: white;
   border-radius: 999px;
@@ -123,165 +78,105 @@ body {
   gap: 60px;
   box-shadow: 0 20px 40px rgba(0,0,0,0.12);
 }
-
 </style>
 
 </head>
+
 <body class="min-h-screen">
 
 <div class="max-w-md mx-auto px-6 pt-10 pb-28">
 
   <!-- HEADER -->
   <div class="flex justify-between items-center mb-8">
-    <h1 class="text-xl font-semibold text-gray-800">Mon Portefeuille</h1>
-    <i class="bi bi-bell text-xl text-primaryStrong"></i>
+    <h1 id="userName" class="text-xl font-semibold text-gray-800">
+      Chargement...
+    </h1>
+
+    <button id="logoutBtn" class="text-primaryStrong text-xl">
+      <i class="bi bi-box-arrow-right"></i>
+    </button>
   </div>
 
-
-  <!-- ===============================
-       SWIPE CARTES USD / CDF
-  ================================= -->
-
+  <!-- SWIPE WALLETS -->
   <div class="swipe-container mb-10">
 
-    <!-- CARTE USD -->
+    <!-- USD -->
     <div class="swipe-item">
       <div class="wallet-card gradient-wallet">
 
-        <!-- Logo -->
         <div class="flex justify-between items-center mb-6">
-          <img src="/trustlink_app/assets/white.logo.png" class="h-6" alt="TrustLink">
-          <span class="text-sm opacity-80 font-semibold">USD</span>
+          <img src="/trustlink_app/assets/white.logo.png"
+               class="h-6" alt="TrustLink">
+          <span class="text-sm opacity-80 font-semibold">
+            USD
+          </span>
         </div>
 
-        <p class="text-sm opacity-80 mb-2">Solde disponible</p>
+        <p class="text-sm opacity-80 mb-2">
+          Solde disponible
+        </p>
 
-        <h2 id="balanceUSD" class="text-3xl font-bold tracking-tight mb-6">$0</h2>
-
-        <div class="flex justify-between items-end">
-          <div>
-            <p class="text-xs opacity-70 mb-1">Compte</p>
-            <p class="tracking-widest text-sm">**** **** 1234</p>
-          </div>
-        </div>
+        <h2 id="balanceUSD"
+            class="text-3xl font-bold tracking-tight mb-6">
+          $0
+        </h2>
 
       </div>
     </div>
 
-
-    <!-- CARTE CDF -->
+    <!-- CDF -->
     <div class="swipe-item">
       <div class="wallet-card gradient-wallet opacity-95">
 
         <div class="flex justify-between items-center mb-6">
-          <img src="/trustlink_app/assets/white.logo.png" class="h-6" alt="TrustLink">
-          <span class="text-sm opacity-80 font-semibold">CDF</span>
+          <img src="/trustlink_app/assets/white.logo.png"
+               class="h-6" alt="TrustLink">
+          <span class="text-sm opacity-80 font-semibold">
+            CDF
+          </span>
         </div>
 
-        <p class="text-sm opacity-80 mb-2">Solde disponible</p>
+        <p class="text-sm opacity-80 mb-2">
+          Solde disponible
+        </p>
 
-        <h2 id="balanceCDF" class="text-3xl font-bold tracking-tight mb-6">$0</h2>
-
-        <div class="flex justify-between items-end">
-          <div>
-            <p class="text-xs opacity-70 mb-1">Compte</p>
-            <p class="tracking-widest text-sm">**** **** 5678</p>
-          </div>
-        </div>
+        <h2 id="balanceCDF"
+            class="text-3xl font-bold tracking-tight mb-6">
+          0 CDF
+        </h2>
 
       </div>
     </div>
 
   </div>
 
+  <!-- TRANSACTIONS -->
+  <div>
 
-  <!-- ===============================
-       MENU RAPIDE 3x3
-  ================================= -->
-
-  <div class="grid grid-cols-3 gap-4 mb-10">
-
-    <div class="quick-item">
-      <i class="bi bi-credit-card text-primaryStrong text-xl"></i>
-      <span class="text-xs font-medium text-gray-700">Carte</span>
+    <div class="flex justify-between items-center mb-4">
+      <h3 class="text-base font-semibold">
+        Activité récente
+      </h3>
     </div>
 
-    <div class="quick-item">
-      <i class="bi bi-arrow-left-right text-primaryStrong text-xl"></i>
-      <span class="text-xs font-medium text-gray-700">Transfert</span>
-    </div>
-
-    <div class="quick-item">
-      <i class="bi bi-cash text-primaryStrong text-xl"></i>
-      <span class="text-xs font-medium text-gray-700">Retrait</span>
-    </div>
-
-    <div class="quick-item">
-      <i class="bi bi-phone text-primaryStrong text-xl"></i>
-      <span class="text-xs font-medium text-gray-700">Mobile</span>
-    </div>
-
-    <div class="quick-item">
-      <i class="bi bi-receipt text-primaryStrong text-xl"></i>
-      <span class="text-xs font-medium text-gray-700">Paiement</span>
-    </div>
-
-    <div class="quick-item">
-      <i class="bi bi-piggy-bank text-primaryStrong text-xl"></i>
-      <span class="text-xs font-medium text-gray-700">Épargne</span>
-    </div>
-
-    <div class="quick-item">
-      <i class="bi bi-credit-card-2-front text-primaryStrong text-xl"></i>
-      <span class="text-xs font-medium text-gray-700">Crédit</span>
-    </div>
-
-    <div class="quick-item">
-      <i class="bi bi-calendar-check text-primaryStrong text-xl"></i>
-      <span class="text-xs font-medium text-gray-700">Historique</span>
-    </div>
-
-    <div class="quick-item">
-      <i class="bi bi-person text-primaryStrong text-xl"></i>
-      <span class="text-xs font-medium text-gray-700">Bénéficiaire</span>
+    <div id="transactionsList"
+         class="space-y-3">
     </div>
 
   </div>
 
 </div>
 
+<!-- NAVBAR LOAD -->
+<div id="navbar-container"></div>
 
-<!-- NAVIGATION BAS -->
-<div class="fixed bottom-6 left-0 right-0 flex justify-center">
-  <div class="bottom-nav">
-    <i class="bi bi-house-door-fill text-primaryStrong text-xl"></i>
-    <i class="bi bi-search text-gray-400 text-xl"></i>
-    <i class="bi bi-envelope text-gray-400 text-xl"></i>
-    <i class="bi bi-gear text-gray-400 text-xl"></i>
-  </div>
-</div>
-
-
-<!-- ANIMATION SOLDE -->
-<script>
-function animateBalance(id, value, duration) {
-  const el = document.getElementById(id);
-  let start = null;
-
-  function step(timestamp) {
-    if (!start) start = timestamp;
-    const progress = Math.min((timestamp - start) / duration, 1);
-    el.textContent = "$" + Math.floor(progress * value).toLocaleString();
-    if (progress < 1) requestAnimationFrame(step);
-  }
-
-  requestAnimationFrame(step);
+<script type="module">
+async function loadNavbar() {
+  const res = await fetch("/trustlink_app/partials/nav.html");
+  const data = await res.text();
+  document.getElementById("navbar-container").innerHTML = data;
 }
-
-document.addEventListener("DOMContentLoaded", function() {
-  animateBalance("balanceUSD", 395267, 1200);
-  animateBalance("balanceCDF", 980000000, 1400);
-});
+loadNavbar();
 </script>
 
 </body>
