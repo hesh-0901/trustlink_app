@@ -35,48 +35,42 @@ function updateHeaderUI(user) {
   const usernameEl = document.getElementById("headerUsername");
   const avatarImg = document.getElementById("headerAvatar");
 
+  // Nom complet
   if (fullNameEl) {
     fullNameEl.textContent =
       `${user.firstName ?? ""} ${user.lastName ?? ""}`.trim();
   }
 
+  // Username
   if (usernameEl) {
     usernameEl.textContent = user.username ?? "";
     usernameEl.classList.remove("opacity-0");
     usernameEl.classList.add("opacity-100");
   }
 
+  // Avatar selon genre
   if (avatarImg) {
 
     const seed = user.username || user.firstName || "user";
-    const gender = user.gender || "neutral";
 
-    let extraOptions = "";
+    // Sécurisation du gender
+    const rawGender = (user.gender || "").toString().trim().toLowerCase();
 
-    if (gender === "Homme") {
-      extraOptions =
-        "&clothes=blazerShirt" +
-        "&hair=short01,short02,short03" +
-        "&facialHairProbability=50";
-    }
-    else if (gender === "Femme") {
-      extraOptions =
-        "&clothes=blazerShirt" +
-        "&hair=long01,long02,long03" +
-        "&facialHairProbability=0";
-    }
-    else {
-      extraOptions =
-        "&clothes=blazerShirt";
+    let style = "personas"; // fallback neutre
+
+    if (rawGender === "homme") {
+      style = "micah";      // masculin
+    } 
+    else if (rawGender === "femme") {
+      style = "lorelei";    // féminin
     }
 
     const avatarUrl =
-      "https://api.dicebear.com/7.x/personas/png" +
+      "https://api.dicebear.com/7.x/" + style + "/png" +
       "?seed=" + encodeURIComponent(seed) +
       "&backgroundColor=f3f4f6" +
       "&radius=50" +
-      "&size=256" +
-      extraOptions;
+      "&size=256";
 
     avatarImg.onerror = () => {
       avatarImg.src =
