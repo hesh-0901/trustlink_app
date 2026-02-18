@@ -34,53 +34,94 @@ function updateHeaderUI(user) {
   const fullNameEl = document.getElementById("headerFullName");
   const usernameEl = document.getElementById("headerUsername");
   const avatarImg = document.getElementById("headerAvatar");
+  const adminBadge = document.getElementById("adminBadge");
 
-  // Nom complet
+  // =========================
+  // NOM
+  // =========================
+
   if (fullNameEl) {
     fullNameEl.textContent =
       `${user.firstName ?? ""} ${user.lastName ?? ""}`.trim();
   }
 
-  // Username
   if (usernameEl) {
     usernameEl.textContent = user.username ?? "";
     usernameEl.classList.remove("opacity-0");
     usernameEl.classList.add("opacity-100");
   }
 
-  // Avatar selon genre
-  if (avatarImg) {
+  if (!avatarImg) return;
 
-    const seed = user.username || user.firstName || "user";
+  // =========================
+  // GENRE + ROLE
+  // =========================
 
-    // Sécurisation du gender
-    const rawGender = (user.gender || "").toString().trim().toLowerCase();
+  const seed = user.username || user.firstName || "user";
+  const rawGender = (user.gender || "").toString().trim().toLowerCase();
+  const role = (user.role || "").toString().trim().toLowerCase();
 
-    let style = "personas"; // fallback neutre
+  let style = "personas";
 
-    if (rawGender === "homme") {
-      style = "micah";      // masculin
-    } 
-    else if (rawGender === "femme") {
-      style = "lorelei";    // féminin
+  if (rawGender === "homme") {
+    style = "micah";
+  } else if (rawGender === "femme") {
+    style = "lorelei";
+  }
+
+  // =========================
+  // TEINT AFRIQUE (plus foncé)
+  // =========================
+
+  const africanSkinTones =
+    "tanned,darkBrown,brown";
+
+  // =========================
+  // URL AVATAR
+  // =========================
+
+  const avatarUrl =
+    "https://api.dicebear.com/7.x/" + style + "/png" +
+    "?seed=" + encodeURIComponent(seed) +
+    "&backgroundColor=f3f4f6" +
+    "&radius=50" +
+    "&size=256" +
+    "&skinColor=" + africanSkinTones;
+
+  avatarImg.src = avatarUrl;
+
+  // =========================
+  // ROLE STYLING
+  // =========================
+
+  avatarImg.classList.remove("border-yellow-500", "border-blue-500");
+
+  if (role === "super_admin") {
+
+    // Anneau doré
+    avatarImg.classList.add("border-yellow-500");
+
+    if (adminBadge) {
+      adminBadge.classList.remove("hidden");
+      adminBadge.textContent = "ADMIN";
     }
 
-    const avatarUrl =
-      "https://api.dicebear.com/7.x/" + style + "/png" +
-      "?seed=" + encodeURIComponent(seed) +
-      "&backgroundColor=f3f4f6" +
-      "&radius=50" +
-      "&size=256";
+  } else if (role === "business") {
 
-    avatarImg.onerror = () => {
-      avatarImg.src =
-        "https://api.dicebear.com/7.x/personas/png?seed=fallback";
-    };
+    // Anneau bleu corporate
+    avatarImg.classList.add("border-blue-500");
 
-    avatarImg.src = avatarUrl;
+    if (adminBadge) {
+      adminBadge.classList.add("hidden");
+    }
+
+  } else {
+
+    if (adminBadge) {
+      adminBadge.classList.add("hidden");
+    }
   }
 }
-
 
 /* ==========================================
    REALTIME USER LISTENER
