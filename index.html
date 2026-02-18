@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>TrustLink</title>
 
 <!-- Tailwind -->
@@ -82,7 +82,9 @@ tailwind.config = {
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
-
+input, select, textarea {
+  font-size: 16px !important;
+}
 </style>
 
 </head>
@@ -102,7 +104,7 @@ tailwind.config = {
       TrustLink
     </h1>
 
-    <p class="text-textMuted text-sm mt-1">
+    <p class="text-textMuted text-base mt-1">
       Accédez à votre espace sécurisé
     </p>
 
@@ -113,7 +115,7 @@ tailwind.config = {
 
     <!-- Phone -->
     <div>
-      <label class="block text-sm font-medium text-textDark mb-1">
+      <label class="block text-base font-medium text-textDark mb-1">
         Numéro de téléphone
       </label>
       <div class="relative">
@@ -124,14 +126,14 @@ tailwind.config = {
           autocomplete="off"
           required
           placeholder="+243..."
-          class="w-full border border-borderLight rounded-xl pl-10 pr-4 py-3 text-sm focus:ring-2 focus:ring-primary focus:outline-none transition"
+          class="w-full border border-borderLight rounded-xl pl-10 pr-4 py-3 text-base focus:ring-2 focus:ring-primary focus:outline-none transition"
         />
       </div>
     </div>
 
     <!-- Password -->
     <div>
-      <label class="block text-sm font-medium text-textDark mb-1">
+      <label class="block text-base font-medium text-textDark mb-1">
         Mot de passe
       </label>
       <div class="relative">
@@ -143,7 +145,7 @@ tailwind.config = {
           autocomplete="new-password"
           required
           placeholder="••••••••"
-          class="w-full border border-borderLight rounded-xl pl-10 pr-10 py-3 text-sm focus:ring-2 focus:ring-primary focus:outline-none transition"
+          class="w-full border border-borderLight rounded-xl pl-10 pr-10 py-3 text-base focus:ring-2 focus:ring-primary focus:outline-none transition"
         />
 
         <button
@@ -157,7 +159,7 @@ tailwind.config = {
     </div>
 
     <!-- Remember -->
-    <div class="flex items-center justify-between text-sm">
+    <div class="flex items-center justify-between text-base">
       <label class="flex items-center gap-2 cursor-pointer">
         <input type="checkbox" id="rememberMe" class="w-4 h-4 accent-primary">
         <span class="text-textMuted">Se souvenir de moi</span>
@@ -177,7 +179,7 @@ tailwind.config = {
       <span id="btnText">Se connecter</span>
     </button>
 
-    <p id="errorMsg" class="text-red-500 text-sm text-center hidden"></p>
+    <p id="errorMsg" class="text-red-500 text-base text-center hidden"></p>
 
   </form>
 
