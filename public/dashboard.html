@@ -3,94 +3,72 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
-<title>TrustLink</title>
 
-<!-- Tailwind -->
+<title>TrustLink Wallet</title>
+
+<!-- Tailwind CDN -->
 <script src="https://cdn.tailwindcss.com"></script>
 
 <!-- Bootstrap Icons -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 
 <script>
+/* ===============================
+   TAILWIND CUSTOM COLORS
+================================ */
 tailwind.config = {
   theme: {
     extend: {
       colors: {
         primary: "#2F3DD8",
-        primaryDark: "#1F2AA6",
+        primaryLight: "#4F6BFF",
         background: "#F5F7FB",
-        success: "#16A34A",
-        danger: "#DC2626"
+        success: "#16A34A"
       }
     }
   }
 }
 </script>
 
-<script type="module" src="/trustlink_app/js/firebase-init.js"></script>
-<script type="module" src="/trustlink_app/public/js/dashboard.js"></script>
-
 <style>
 
 /* ===============================
-   SCROLL INERTIA (iOS style)
+   GLOBAL STYLE
 ================================ */
-html {
-  scroll-behavior: smooth;
-}
 
-.overflow-x-auto {
-  -webkit-overflow-scrolling: touch;
-  scroll-snap-type: x mandatory;
+body {
+  background: #F5F7FB;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
 /* ===============================
-   AUTO DARK MODE
+   WALLET CARD STYLE
 ================================ */
-@media (prefers-color-scheme: dark) {
-  body {
-    background: #0F172A;
-    color: #F1F5F9;
-  }
 
-  .transactions-card {
-    background: #1E293B;
-  }
-
-  .bottom-nav {
-    background: rgba(30,41,59,0.8);
-  }
+.wallet-card {
+  border-radius: 28px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 25px 60px rgba(0,0,0,0.12);
 }
 
-/* ===============================
-   PREMIUM GLASS CARD
-================================ */
-.premium-shadow {
-  box-shadow:
-    0 25px 50px rgba(0,0,0,0.15),
-    0 10px 25px rgba(0,0,0,0.08);
-}
-
-.glass-card::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
+/* Gradient based on your primary */
+.gradient-wallet {
   background: linear-gradient(
     135deg,
-    rgba(255,255,255,0.25),
-    rgba(255,255,255,0.05)
+    #2F3DD8,
+    #4F6BFF
   );
-  pointer-events: none;
 }
 
-.glass-card::after {
+/* Light overlay for premium feel */
+.wallet-card::after {
   content: "";
   position: absolute;
   top: -40%;
-  left: -20%;
-  width: 140%;
-  height: 140%;
+  left: -30%;
+  width: 150%;
+  height: 150%;
   background: radial-gradient(
     circle at 30% 20%,
     rgba(255,255,255,0.25),
@@ -100,196 +78,161 @@ html {
 }
 
 /* ===============================
-   BALANCE STYLE
+   QUICK ACTION GRID
 ================================ */
-.balance-text {
-  font-size: 30px;
-  font-weight: 800;
-  letter-spacing: -0.8px;
-}
 
-/* ===============================
-   GRADIENT BUTTONS
-================================ */
-.action-pill {
-  height: 50px;
-  border-radius: 999px;
-  font-weight: 600;
-  transition: all 0.2s ease;
-}
-
-.action-pill.primary-btn {
-  background: linear-gradient(135deg, #2F3DD8, #4F6BFF);
-}
-
-.action-pill.success-btn {
-  background: linear-gradient(135deg, #10B981, #34D399);
-}
-
-.action-pill:active {
-  transform: scale(0.96);
-}
-
-/* ===============================
-   CRYPTO ICON STYLE
-================================ */
-.crypto-icon {
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
+.quick-item {
+  background: white;
+  border-radius: 18px;
+  padding: 18px 12px;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-weight: 600;
-  font-size: 14px;
+  gap: 8px;
+  transition: 0.2s ease;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.05);
 }
 
-.crypto-eth { background: rgba(99,102,241,0.15); color:#4F46E5; }
-.crypto-btc { background: rgba(251,191,36,0.15); color:#D97706; }
-.crypto-xrp { background: rgba(59,130,246,0.15); color:#2563EB; }
-
-/* ===============================
-   TRANSACTION CARD
-================================ */
-.transactions-card {
-  background: white;
-  border-radius: 24px;
-  padding: 18px;
-  box-shadow: 0 15px 40px rgba(0,0,0,0.05);
+.quick-item:active {
+  transform: scale(0.95);
 }
 
 /* ===============================
    BOTTOM NAV
 ================================ */
+
 .bottom-nav {
-  backdrop-filter: blur(20px);
-  background: rgba(255,255,255,0.9);
+  background: white;
   border-radius: 999px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  padding: 14px 40px;
+  display: flex;
+  gap: 60px;
+  box-shadow: 0 15px 30px rgba(0,0,0,0.08);
 }
 
 </style>
 
 </head>
+<body class="min-h-screen">
 
-<body class="min-h-screen font-sans text-gray-800 antialiased bg-background">
+<div class="max-w-md mx-auto px-6 pt-10 pb-28">
 
-<div class="max-w-md mx-auto px-5 pt-8 pb-32">
+  <!-- ===============================
+       HEADER
+  ================================= -->
 
-  <!-- HEADER -->
   <div class="flex justify-between items-center mb-8">
 
-    <div class="flex items-center gap-3">
-      <div id="userAvatar"
-           class="w-10 h-10 bg-primary text-white rounded-full flex items-center justify-center text-xs font-semibold premium-shadow">
-        --
-      </div>
+    <div>
+      <h1 class="text-xl font-semibold text-gray-800">My Wallet</h1>
+    </div>
+
+    <i class="bi bi-bell text-xl text-primary"></i>
+
+  </div>
+
+
+  <!-- ===============================
+       WALLET CARD USD
+  ================================= -->
+
+  <div class="wallet-card gradient-wallet text-white p-6 mb-6">
+
+    <!-- Available Balance -->
+    <p class="text-sm opacity-80 mb-2">Available balance</p>
+
+    <!-- Balance animated -->
+    <h2 id="balanceUSD" class="text-3xl font-bold tracking-tight mb-4">$0</h2>
+
+    <!-- Card number -->
+    <div class="flex justify-between items-end">
+
       <div>
-        <p class="text-[11px] text-gray-400 leading-none">Bienvenue</p>
-        <h1 id="userName" class="text-base font-semibold leading-tight">
-          Chargement...
-        </h1>
+        <p class="text-xs opacity-70 mb-1">Account number</p>
+        <p class="tracking-widest text-sm">**** **** 1234</p>
       </div>
-    </div>
 
-    <i class="bi bi-bell text-lg text-gray-500"></i>
+      <p class="font-semibold text-sm opacity-80">USD</p>
 
-  </div>
-
-
-  <!-- WALLET SWIPE (USD / CDF) -->
-  <div class="mb-8 overflow-x-auto flex gap-4 snap-x snap-mandatory scroll-smooth">
-
-    <!-- USD CARD -->
-    <div class="snap-center shrink-0 w-full">
-      <div class="relative w-full aspect-[1.6] rounded-3xl p-6 text-white overflow-hidden premium-shadow glass-card">
-
-        <div class="absolute inset-0 gradient-usd rounded-3xl"></div>
-
-        <div class="relative">
-
-          <div class="flex justify-between items-center mb-6">
-            <span class="text-sm opacity-80">USD Balance</span>
-            <span class="text-xs bg-white/20 px-3 py-1 rounded-full">USD</span>
-          </div>
-
-          <h2 id="balanceUSD" class="balance-text mb-6">$0</h2>
-
-          <div>
-            <p class="text-xs opacity-70 mb-1">Wallet address</p>
-            <p id="walletAddressUSD" class="text-xs opacity-90 break-all"></p>
-          </div>
-
-        </div>
-
-      </div>
-    </div>
-
-
-    <!-- CDF CARD -->
-    <div class="snap-center shrink-0 w-full">
-      <div class="relative w-full aspect-[1.6] rounded-3xl p-6 text-white overflow-hidden premium-shadow glass-card">
-
-        <div class="absolute inset-0 gradient-cdf rounded-3xl"></div>
-
-        <div class="relative">
-
-          <div class="flex justify-between items-center mb-6">
-            <span class="text-sm opacity-80">CDF Balance</span>
-            <span class="text-xs bg-white/20 px-3 py-1 rounded-full">CDF</span>
-          </div>
-
-          <h2 id="balanceCDF" class="balance-text mb-6">$0</h2>
-
-          <div>
-            <p class="text-xs opacity-70 mb-1">Wallet address</p>
-            <p id="walletAddressCDF" class="text-xs opacity-90 break-all"></p>
-          </div>
-
-        </div>
-
-      </div>
     </div>
 
   </div>
 
 
-  <!-- MENUS RAPIDES -->
-  <div class="grid grid-cols-4 gap-4 mb-10">
+  <!-- ===============================
+       WALLET CARD CDF
+  ================================= -->
 
-    <button class="action-pill primary-btn text-white flex flex-col items-center justify-center gap-1">
-      <i class="bi bi-arrow-up-right text-lg"></i>
-      <span class="text-[11px]">Envoyer</span>
-    </button>
+  <div class="wallet-card gradient-wallet text-white p-6 mb-10 opacity-90">
 
-    <button class="action-pill success-btn text-white flex flex-col items-center justify-center gap-1">
-      <i class="bi bi-arrow-down-left text-lg"></i>
-      <span class="text-[11px]">Recevoir</span>
-    </button>
+    <p class="text-sm opacity-80 mb-2">Available balance</p>
 
-    <button class="action-pill bg-white text-primary premium-shadow flex flex-col items-center justify-center gap-1">
-      <i class="bi bi-plus-circle text-lg"></i>
-      <span class="text-[11px]">Ajouter</span>
-    </button>
+    <h2 id="balanceCDF" class="text-3xl font-bold tracking-tight mb-4">$0</h2>
 
-    <button class="action-pill bg-white text-gray-700 premium-shadow flex flex-col items-center justify-center gap-1">
-      <i class="bi bi-clock-history text-lg"></i>
-      <span class="text-[11px]">Historique</span>
-    </button>
+    <div class="flex justify-between items-end">
+
+      <div>
+        <p class="text-xs opacity-70 mb-1">Account number</p>
+        <p class="tracking-widest text-sm">**** **** 5678</p>
+      </div>
+
+      <p class="font-semibold text-sm opacity-80">CDF</p>
+
+    </div>
 
   </div>
 
 
-  <!-- TRANSACTIONS -->
-  <div>
+  <!-- ===============================
+       QUICK ACTION GRID 3x3
+  ================================= -->
 
-    <div class="flex justify-between items-center mb-4">
-      <h3 class="text-base font-semibold">Activité récente</h3>
-      <span class="text-xs text-primary font-medium">Voir tout</span>
+  <div class="grid grid-cols-3 gap-4 mb-10">
+
+    <div class="quick-item">
+      <i class="bi bi-credit-card text-primary text-xl"></i>
+      <span class="text-xs font-medium text-gray-700">Account Card</span>
     </div>
 
-    <div class="transactions-card">
-      <div id="transactionsList" class="space-y-4"></div>
+    <div class="quick-item">
+      <i class="bi bi-arrow-left-right text-primary text-xl"></i>
+      <span class="text-xs font-medium text-gray-700">Transfer</span>
+    </div>
+
+    <div class="quick-item">
+      <i class="bi bi-cash text-primary text-xl"></i>
+      <span class="text-xs font-medium text-gray-700">Withdraw</span>
+    </div>
+
+    <div class="quick-item">
+      <i class="bi bi-phone text-primary text-xl"></i>
+      <span class="text-xs font-medium text-gray-700">Mobile</span>
+    </div>
+
+    <div class="quick-item">
+      <i class="bi bi-receipt text-primary text-xl"></i>
+      <span class="text-xs font-medium text-gray-700">Pay Bill</span>
+    </div>
+
+    <div class="quick-item">
+      <i class="bi bi-piggy-bank text-primary text-xl"></i>
+      <span class="text-xs font-medium text-gray-700">Save</span>
+    </div>
+
+    <div class="quick-item">
+      <i class="bi bi-credit-card-2-front text-primary text-xl"></i>
+      <span class="text-xs font-medium text-gray-700">Credit</span>
+    </div>
+
+    <div class="quick-item">
+      <i class="bi bi-calendar-check text-primary text-xl"></i>
+      <span class="text-xs font-medium text-gray-700">History</span>
+    </div>
+
+    <div class="quick-item">
+      <i class="bi bi-person text-primary text-xl"></i>
+      <span class="text-xs font-medium text-gray-700">Beneficiary</span>
     </div>
 
   </div>
@@ -297,44 +240,67 @@ html {
 </div>
 
 
-<!-- BOTTOM NAV -->
+<!-- ===============================
+     BOTTOM NAVIGATION
+================================ -->
+
 <div class="fixed bottom-6 left-0 right-0 flex justify-center">
-  <div class="bottom-nav px-12 py-3 flex gap-10 items-center">
-    <i class="bi bi-house-door-fill text-lg text-primary"></i>
-    <i class="bi bi-bar-chart text-lg text-gray-400"></i>
-    <i class="bi bi-person text-lg text-gray-400"></i>
+
+  <div class="bottom-nav">
+
+    <i class="bi bi-house-door-fill text-primary text-xl"></i>
+    <i class="bi bi-search text-gray-400 text-xl"></i>
+    <i class="bi bi-envelope text-gray-400 text-xl"></i>
+    <i class="bi bi-gear text-gray-400 text-xl"></i>
+
   </div>
+
 </div>
 
 
+<!-- ===============================
+     BALANCE ANIMATION SCRIPT
+================================ -->
 
-<!-- BALANCE ANIMATION SCRIPT -->
 <script>
-function animateValue(id, start, end, duration) {
-  let startTimestamp = null;
-  const element = document.getElementById(id);
 
-  function step(timestamp) {
-    if (!startTimestamp) startTimestamp = timestamp;
-    const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-    const value = progress * (end - start) + start;
-    element.textContent = formatMoney(value);
+/* 
+  Animate balance from 0 to target value
+  Smooth financial app style
+*/
+
+function animateBalance(id, value, duration) {
+
+  const element = document.getElementById(id);
+  let start = 0;
+  let startTime = null;
+
+  function animate(time) {
+
+    if (!startTime) startTime = time;
+
+    const progress = Math.min((time - startTime) / duration, 1);
+
+    const current = Math.floor(progress * value);
+
+    element.textContent = "$" + current.toLocaleString();
+
     if (progress < 1) {
-      window.requestAnimationFrame(step);
+      requestAnimationFrame(animate);
     }
   }
 
-  window.requestAnimationFrame(step);
+  requestAnimationFrame(animate);
 }
 
-function formatMoney(value) {
-  return "$" + Math.floor(value).toLocaleString();
-}
+/* Launch animation */
+document.addEventListener("DOMContentLoaded", function() {
 
-document.addEventListener("DOMContentLoaded", function () {
-  animateValue("balanceUSD", 0, 395267, 1200);
-  animateValue("balanceCDF", 0, 980000000, 1200);
+  animateBalance("balanceUSD", 123456, 1200);
+  animateBalance("balanceCDF", 980000000, 1400);
+
 });
+
 </script>
 
 </body>
