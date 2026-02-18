@@ -2,35 +2,39 @@ import { db } from "../js/firebase-init.js";
 import {
   doc,
   setDoc,
-  getDoc
+  getDoc,
+  serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 /* ===============================
-   HASH
+   HASH PASSWORD + SALT
 ================================ */
 async function hashPassword(password, salt) {
   const encoder = new TextEncoder();
   const data = encoder.encode(password + salt);
   const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+
   return Array.from(new Uint8Array(hashBuffer))
     .map(b => b.toString(16).padStart(2, "0"))
     .join("");
 }
 
 /* ===============================
-   RANDOM STRING
+   RANDOM BLOCK GENERATOR
 ================================ */
 function randomBlock(length = 4) {
   const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
   let result = "";
+
   for (let i = 0; i < length; i++) {
     result += chars[Math.floor(Math.random() * chars.length)];
   }
+
   return result;
 }
 
 /* ===============================
-   REMOVE ACCENTS
+   REMOVE ACCENTS + CLEAN
 ================================ */
 function cleanString(str) {
   return str
@@ -40,7 +44,7 @@ function cleanString(str) {
 }
 
 /* ===============================
-   REGISTER
+   FORM HANDLER
 ================================ */
 const form = document.getElementById("registerForm");
 const errorMsg = document.getElementById("errorMsg");
@@ -56,8 +60,11 @@ form.addEventListener("submit", async (e) => {
   const confirmPassword = document.getElementById("confirmPassword").value.trim();
   const gender = document.querySelector('input[name="gender"]:checked')?.value;
 
+  /* ===============================
+     VALIDATION
+  ================================= */
 
-  if (!firstName || !lastName || !birthDate || !phone || !password || !confirmPassword| !gender) {
+  if (!firstName || !lastName || !birthDate || !phone || !password || !confirmPassword || !gender) {
     return showError("Tous les champs sont obligatoires.");
   }
 
@@ -67,32 +74,49 @@ form.addEventListener("submit", async (e) => {
 
   try {
 
-    // Vérifie si user existe déjà
+    /* ===============================
+       CHECK EXISTING USER
+    ================================= */
+
     const existingUser = await getDoc(doc(db, "users", phone));
+
     if (existingUser.exists()) {
       return showError("Ce numéro est déjà enregistré.");
     }
 
+    /* ===============================
+       SECURITY
+    ================================= */
+
     const salt = randomBlock(16);
     const passwordHash = await hashPassword(password, salt);
 
-    // USERNAME
+    /* ===============================
+       USERNAME GENERATION
+       TL + 2 letters first + 2 letters last + day
+    ================================= */
+
     const cleanFirst = cleanString(firstName);
     const cleanLast = cleanString(lastName);
 
-    const partFirst = (cleanFirst.slice(0,2) || "XX").padEnd(2,"X");
-    const partLast = (cleanLast.slice(0,2) || "XX").padEnd(2,"X");
+    const partFirst = (cleanFirst.slice(0, 2) || "XX").padEnd(2, "X");
+    const partLast = (cleanLast.slice(0, 2) || "XX").padEnd(2, "X");
 
     const day = birthDate.split("-")[2];
 
     const username = `TL-${partFirst}${partLast}${day}`;
 
-    // WALLET BASE
+    /* ===============================
+       WALLET BASE
+       Exemple: TL-AB12-CD34
+    ================================= */
+
     const walletBase = `TL-${randomBlock()}-${randomBlock()}`;
 
     /* ===============================
-       CREATE USER
+       CREATE USER DOCUMENT
     ================================= */
+
     await setDoc(doc(db, "users", phone), {
       firstName,
       lastName,
@@ -103,50 +127,64 @@ form.addEventListener("submit", async (e) => {
       walletBase,
       role: "user",
       isActive: true,
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
       passwordHash,
       salt
     });
 
     /* ===============================
-       CREATE USD WALLET
+       CREATE DEFAULT WALLETS
     ================================= */
-    await setDoc(doc(db, "wallets", `${walletBase}-01`), {
-      userId: phone,
-      walletBase,
-      walletAddress: `${walletBase}-01`,
-      currency: "USD",
-      currencyCode: "01",
-      balance: 0,
-      isActive: true,
-      createdAt: new Date(),
-      updatedAt: new Date()
-    });
+
+    // USD Wallet
+    await setDoc(
+      doc(db, "wallets", walletBase + "-01"),
+      {
+        userId: phone,
+        currency: "USD",
+        currencyCode: "01",
+        balance: 0,
+        isActive: true,
+        walletAddress: walletBase + "-01",
+        walletBase: walletBase,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
+      }
+    );
+
+    // CDF Wallet
+    await setDoc(
+      doc(db, "wallets", walletBase + "-02"),
+      {
+        userId: phone,
+        currency: "CDF",
+        currencyCode: "02",
+        balance: 0,
+        isActive: true,
+        walletAddress: walletBase + "-02",
+        walletBase: walletBase,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
+      }
+    );
 
     /* ===============================
-       CREATE CDF WALLET
+       REDIRECT
     ================================= */
-    await setDoc(doc(db, "wallets", `${walletBase}-02`), {
-      userId: phone,
-      walletBase,
-      walletAddress: `${walletBase}-02`,
-      currency: "CDF",
-      currencyCode: "02",
-      balance: 0,
-      isActive: true,
-      createdAt: new Date(),
-      updatedAt: new Date()
-    });
 
     window.location.href = "/trustlink_app/index.html";
 
   } catch (error) {
     console.error(error);
-    showError("Erreur lors de la création.");
+    showError("Erreur lors de la création du compte.");
   }
 
 });
+
+/* ===============================
+   ERROR DISPLAY
+================================ */
 
 function showError(message) {
   errorMsg.textContent = message;
