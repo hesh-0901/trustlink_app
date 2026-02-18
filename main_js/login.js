@@ -1,20 +1,25 @@
 import { db } from "../js/firebase-init.js";
 import {
-  collection,
-  query,
-  where,
-  getDocs
+  doc,
+  getDoc
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const loginForm = document.getElementById("loginForm");
 const errorMsg = document.getElementById("errorMsg");
+const rememberCheckbox = document.getElementById("rememberMe");
 
 /* ===============================
-   SHA-256 Hash
+   DISABLE BROWSER AUTOFILL
 ================================ */
-async function hashPassword(password) {
+document.getElementById("phone").setAttribute("autocomplete", "off");
+document.getElementById("password").setAttribute("autocomplete", "new-password");
+
+/* ===============================
+   HASH WITH SALT
+================================ */
+async function hashPassword(password, salt) {
   const encoder = new TextEncoder();
-  const data = encoder.encode(password);
+  const data = encoder.encode(password + salt);
   const hashBuffer = await crypto.subtle.digest("SHA-256", data);
   return Array.from(new Uint8Array(hashBuffer))
     .map(b => b.toString(16).padStart(2, "0"))
@@ -29,57 +34,55 @@ loginForm.addEventListener("submit", async (e) => {
 
   const phoneNumber = document.getElementById("phone").value.trim();
   const password = document.getElementById("password").value.trim();
+  const rememberMe = rememberCheckbox.checked;
 
   if (!phoneNumber || !password) {
-    showError("Veuillez remplir tous les champs.");
-    return;
+    return showError("Veuillez remplir tous les champs.");
   }
 
   try {
 
-    const passwordHash = await hashPassword(password);
+    const userRef = doc(db, "users", phoneNumber);
+    const userSnap = await getDoc(userRef);
 
-    const q = query(
-      collection(db, "users"),
-      where("phoneNumber", "==", phoneNumber)
-    );
-
-    const querySnapshot = await getDocs(q);
-
-    if (querySnapshot.empty) {
-      showError("Utilisateur introuvable.");
-      return;
+    if (!userSnap.exists()) {
+      return showError("Utilisateur introuvable.");
     }
 
-    const userDoc = querySnapshot.docs[0];
-    const userData = userDoc.data();
+    const userData = userSnap.data();
 
     if (!userData.isActive) {
-      showError("Compte désactivé.");
-      return;
+      return showError("Compte désactivé.");
     }
 
-    if (userData.passwordHash !== passwordHash) {
-      showError("Mot de passe incorrect.");
-      return;
+    const hashedInput = await hashPassword(password, userData.salt);
+
+    if (hashedInput !== userData.passwordHash) {
+      return showError("Mot de passe incorrect.");
     }
 
-    // ✅ SESSION
-    localStorage.setItem("userId", userDoc.id);
-    localStorage.setItem("role", userData.role);
-    localStorage.setItem("phoneNumber", userData.phoneNumber);
+    // ===============================
+    // SESSION CONTROL
+    // ===============================
 
-    // ✅ Redirect
+    if (rememberMe) {
+      localStorage.setItem("userId", phoneNumber);
+      localStorage.setItem("role", userData.role);
+    } else {
+      sessionStorage.setItem("userId", phoneNumber);
+      sessionStorage.setItem("role", userData.role);
+    }
+
     window.location.href = "/trustlink_app/public/dashboard.html";
 
-  } catch (error) {
-    console.error(error);
+  } catch (err) {
+    console.error(err);
     showError("Erreur interne.");
   }
 });
 
 /* ===============================
-   ERROR
+   ERROR DISPLAY
 ================================ */
 function showError(message) {
   errorMsg.textContent = message;
