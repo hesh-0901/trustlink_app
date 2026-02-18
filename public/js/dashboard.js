@@ -51,9 +51,17 @@ onSnapshot(userRef, (docSnap) => {
     return;
   }
 
-  // Nom
+  // Nom complet
   const fullName = `${user.firstName ?? ""} ${user.lastName ?? ""}`;
+
   document.getElementById("userName").textContent = fullName;
+
+  // Nom sur les cartes
+  const cardUserNameUSD = document.getElementById("cardUserNameUSD");
+  const cardUserNameCDF = document.getElementById("cardUserNameCDF");
+
+  if (cardUserNameUSD) cardUserNameUSD.textContent = fullName.toUpperCase();
+  if (cardUserNameCDF) cardUserNameCDF.textContent = fullName.toUpperCase();
 
   // Avatar
   const initials =
@@ -62,9 +70,34 @@ onSnapshot(userRef, (docSnap) => {
 
   document.getElementById("userAvatar").textContent =
     initials.toUpperCase();
+});
 
-  // Balance
- animateBalance(user.balance || 0, user.currency);
+/* ===============================
+   LOAD WALLETS (USD + CDF)
+================================ */
+const walletsRef = collection(db, "wallets");
+
+const walletQuery = query(
+  walletsRef,
+  where("userId", "==", userId)
+);
+
+onSnapshotCollection(walletQuery, (snapshot) => {
+
+  snapshot.forEach((doc) => {
+
+    const wallet = doc.data();
+
+    if (wallet.currency === "USD") {
+      animateBalance("balanceUSD", wallet.balance, "USD");
+    }
+
+    if (wallet.currency === "CDF") {
+      animateBalance("balanceCDF", wallet.balance, "CDF");
+    }
+
+  });
+
 });
 
 /* ===============================
@@ -72,14 +105,14 @@ onSnapshot(userRef, (docSnap) => {
 ================================ */
 const transactionsRef = collection(db, "transactions");
 
-const q = query(
+const txQuery = query(
   transactionsRef,
   where("participants", "array-contains", userId),
   orderBy("createdAt", "desc"),
   limit(5)
 );
 
-onSnapshotCollection(q, (snapshot) => {
+onSnapshotCollection(txQuery, (snapshot) => {
 
   const container = document.getElementById("transactionsList");
 
@@ -90,7 +123,6 @@ onSnapshotCollection(q, (snapshot) => {
   snapshot.forEach((doc) => {
 
     const tx = doc.data();
-
     const isSender = tx.fromUserId === userId;
 
     const div = document.createElement("div");
@@ -102,20 +134,11 @@ onSnapshotCollection(q, (snapshot) => {
       <div class="flex items-center gap-3">
 
         <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
-          <svg xmlns="http://www.w3.org/2000/svg"
-               fill="none"
-               viewBox="0 0 24 24"
-               stroke-width="1.8"
-               stroke="currentColor"
-               class="w-5 h-5 text-gray-500">
-            <path stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M12 6v6l4 2"/>
-          </svg>
+          <i class="bi bi-clock-history text-gray-500"></i>
         </div>
 
         <div>
-          <p class="text-sm font-medium text-textDark">
+          <p class="text-sm font-medium">
             ${isSender ? "Transfert envoyé" : "Paiement reçu"}
           </p>
           <p class="text-xs text-gray-400">
@@ -140,15 +163,14 @@ onSnapshotCollection(q, (snapshot) => {
 });
 
 /* ===============================
-  STYLE CARD
+   3D TILT EFFECT (ALL CARDS)
 ================================ */
-/* ===============================
-   3D TILT EFFECT
-================================ */
-const card = document.getElementById("bankCard");
+const cards = document.querySelectorAll(".card-3d");
 
-if (card) {
+cards.forEach(card => {
+
   card.addEventListener("mousemove", (e) => {
+
     const rect = card.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
@@ -163,32 +185,43 @@ if (card) {
   card.addEventListener("mouseleave", () => {
     card.style.transform = "rotateX(0deg) rotateY(0deg)";
   });
-}
+
+});
 
 /* ===============================
    BALANCE COUNTER ANIMATION
 ================================ */
-function animateBalance(targetValue, currency) {
+function animateBalance(elementId, targetValue, currency) {
 
-  const element = document.getElementById("balanceAmount");
+  const element = document.getElementById(elementId);
+  if (!element) return;
+
   let start = 0;
-  const duration = 1000;
+  const duration = 800;
   const increment = targetValue / (duration / 16);
 
   const counter = setInterval(() => {
+
     start += increment;
+
     if (start >= targetValue) {
       start = targetValue;
       clearInterval(counter);
     }
-    element.textContent =
-      new Intl.NumberFormat("fr-FR", {
-        style: "currency",
-        currency: currency || "USD"
-      }).format(start);
+
+    if (currency === "CDF") {
+      element.textContent =
+        new Intl.NumberFormat("fr-FR").format(start) + " CDF";
+    } else {
+      element.textContent =
+        new Intl.NumberFormat("en-US", {
+          style: "currency",
+          currency: currency || "USD"
+        }).format(start);
+    }
+
   }, 16);
 }
-
 
 /* ===============================
    LOGOUT
