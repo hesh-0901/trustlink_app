@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Transférer - TrustLink</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
+<script type="module" src="/trustlink_app/js/firebase-init.js"></script>
+<script type="module" src="/trustlink_app/js/transferer.js"></script>
+<script type="module" src="/trustlink_app/main_js/layout.js"></script>
+
+</head>
+
+<body class="bg-gray-50 min-h-screen">
+
+<div id="header-container"></div>
+
+<div class="max-w-md mx-auto px-6 py-6 pb-24">
+
+  <h1 class="text-xl font-semibold mb-6">Transférer des fonds</h1>
+
+  <form id="transferForm" class="space-y-6">
+
+    <!-- WALLET SOURCE -->
+    <div>
+      <label class="block text-sm font-medium mb-2">Depuis</label>
+      <select id="walletSelect"
+              class="w-full border rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-600">
+        <option value="">Sélectionner</option>
+      </select>
+    </div>
+
+    <!-- BENEFICIAIRE -->
+    <div>
+      <label class="block text-sm font-medium mb-2">Numéro bénéficiaire</label>
+      <input type="text"
+             id="recipientPhone"
+             class="w-full border rounded-xl px-4 py-3"
+             placeholder="+243..." />
+    </div>
+
+    <!-- AMOUNT -->
+    <div>
+      <label class="block text-sm font-medium mb-2">Montant</label>
+      <input type="number"
+             id="amount"
+             min="1"
+             class="w-full border rounded-xl px-4 py-3"
+             placeholder="0" />
+    </div>
+
+    <!-- MOTIF -->
+    <div>
+      <label class="block text-sm font-medium mb-2">Motif</label>
+      <input type="text"
+             id="motif"
+             class="w-full border rounded-xl px-4 py-3"
+             placeholder="Ex: Paiement service" />
+    </div>
+
+    <p id="errorMsg" class="text-red-500 text-sm hidden"></p>
+
+    <button type="submit"
+            id="submitBtn"
+            class="w-full bg-primaryStrong text-white py-3 rounded-xl font-semibold flex items-center justify-center gap-2">
+      <span id="btnText">Confirmer transfert</span>
+      <i id="btnSpinner" class="bi bi-arrow-repeat animate-spin hidden"></i>
+    </button>
+
+  </form>
+
+</div>
+
+<div id="navbar-container"></div>
+
+</body>
+</html>
