@@ -48,10 +48,16 @@ function updateHeaderUI(user) {
   }
 
   if (avatarImg) {
+  
+    const style =
+      user.gender === "Homme"
+        ? "adventurer"
+        : "adventurer-neutral";
+  
     avatarImg.src =
-      `https://api.dicebear.com/7.x/avataaars/png?seed=${user.username}&backgroundColor=b6e3f4,c0aede,d1d4f9`;
+      `https://api.dicebear.com/7.x/${style}/png?seed=${user.avatarSeed || user.username}&backgroundColor=b6e3f4,c0aede,d1d4f9`;
   }
-}
+
 
 /* ==========================================
    REALTIME USER LISTENER
