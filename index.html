@@ -30,7 +30,10 @@
 
   <!-- Firebase -->
   <script type="module" src="./js/firebase-init.js"></script>
-  <script type="module" src="./js/auth.js"></script>
+
+  <!-- Login Script -->
+  <script type="module" src="./main_js/login.js"></script>
+
 </head>
 
 <body class="min-h-screen bg-background flex items-center justify-center px-4">
@@ -40,7 +43,6 @@
     <!-- Logo -->
     <div class="text-center mb-10">
       <div class="w-14 h-14 mx-auto mb-4 rounded-xl bg-primary flex items-center justify-center shadow-lg">
-        <!-- Shield Icon -->
         <svg xmlns="http://www.w3.org/2000/svg"
              fill="none"
              viewBox="0 0 24 24"
@@ -62,22 +64,21 @@
       </p>
     </div>
 
-    <!-- Form -->
-    <div class="space-y-5">
+    <!-- LOGIN FORM -->
+    <form id="loginForm" class="space-y-5">
 
       <!-- Phone -->
       <div>
         <label class="block text-sm font-medium text-textDark">
           Numéro de téléphone
         </label>
-        <div class="mt-2 relative">
-          <input 
-            id="phone"
-            type="text"
-            placeholder="+33 6 12 34 56 78"
-            class="w-full border border-borderLight rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary focus:outline-none transition"
-          />
-        </div>
+        <input 
+          id="phone"
+          type="text"
+          required
+          placeholder="+243 ..."
+          class="mt-2 w-full border border-borderLight rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary focus:outline-none transition"
+        />
       </div>
 
       <!-- Password -->
@@ -85,37 +86,36 @@
         <label class="block text-sm font-medium text-textDark">
           Mot de passe
         </label>
-        <div class="mt-2 relative">
-          <input 
-            id="password"
-            type="password"
-            placeholder="••••••••"
-            class="w-full border border-borderLight rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary focus:outline-none transition"
-          />
-        </div>
+        <input 
+          id="password"
+          type="password"
+          required
+          placeholder="••••••••"
+          class="mt-2 w-full border border-borderLight rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary focus:outline-none transition"
+        />
       </div>
 
-      <!-- Button -->
+      <!-- Submit -->
       <button 
-        id="authBtn"
+        type="submit"
         class="w-full bg-primary hover:bg-primaryDark text-white font-semibold py-3 rounded-xl transition duration-300 shadow-md"
       >
         Connexion
       </button>
 
-      <!-- Toggle -->
-      <p class="text-center text-textMuted text-sm">
-        <span id="toggleText">Pas encore de compte ?</span>
-          <a href="public/register.html"
-             class="text-primary font-medium hover:underline">
-            Créer un compte
-          </a>
-      </p>
-
       <!-- Error -->
       <p id="errorMsg" class="text-red-500 text-sm text-center hidden"></p>
 
-    </div>
+    </form>
+
+    <!-- Redirect -->
+    <p class="text-center text-textMuted text-sm mt-6">
+      Pas encore de compte ?
+      <a href="./public/register.html"
+         class="text-primary font-medium hover:underline">
+        Créer un compte
+      </a>
+    </p>
 
     <!-- Footer -->
     <div class="mt-8 flex items-center justify-center gap-2 text-xs text-textMuted">
