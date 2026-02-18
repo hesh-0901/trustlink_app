@@ -3,14 +3,22 @@
   <div class="max-w-md mx-auto px-6 py-4 flex items-center justify-between">
 
     <!-- LEFT -->
-    <div class="flex items-center gap-3">
-
       <div class="relative">
-
+      
         <img id="headerAvatar"
              alt="Avatar"
-             class="w-12 h-12 rounded-full shadow-lg border border-white/40
-                    transition-all duration-300 hover:scale-105 hover:shadow-xl">
+             class="w-12 h-12 rounded-full shadow-lg border-2 border-transparent
+                    transition-all duration-300 hover:scale-105">
+      
+        <!-- Badge admin -->
+        <div id="adminBadge"
+             class="hidden absolute -bottom-1 -right-1 bg-yellow-500 text-white 
+                    text-[10px] px-1.5 py-[2px] rounded-full shadow-md">
+          ADMIN
+        </div>
+      
+      </div>
+
 
         <!-- subtle ring -->
         <div class="absolute inset-0 rounded-full ring-2 ring-primary/20 pointer-events-none"></div>
