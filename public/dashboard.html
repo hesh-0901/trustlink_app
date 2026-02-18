@@ -16,7 +16,9 @@ tailwind.config = {
         primaryDark: "#1F2AA6",
         background: "#F3F4F6",
         textDark: "#111827",
-        textMuted: "#6B7280"
+        textMuted: "#6B7280",
+        success: "#16A34A",
+        danger: "#DC2626"
       }
     }
   }
@@ -57,7 +59,7 @@ tailwind.config = {
               stroke-linejoin="round"
               d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0018 9.75v-.563a6 6 0 10-12 0v.563c0 2.49-.987 4.764-2.311 6.022a23.848 23.848 0 005.454 1.31"/>
       </svg>
-      <span class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] px-1 rounded-full">
+      <span class="absolute -top-1 -right-1 bg-danger text-white text-[10px] px-1 rounded-full">
         2
       </span>
     </div>
@@ -68,20 +70,16 @@ tailwind.config = {
   <div class="bg-primaryDark rounded-3xl p-6 text-white shadow-xl mb-6">
 
     <div class="flex justify-between items-start mb-6">
-      <span class="text-sm opacity-80">Crédit</span>
+      <span class="text-sm opacity-80">Solde disponible</span>
       <span class="text-sm font-semibold">TrustLink</span>
     </div>
 
-    <h2 id="balanceAmount" class="text-2xl font-bold tracking-wide mb-4">
+    <h2 id="balanceAmount" class="text-2xl font-bold tracking-wide mb-2">
       0.00
     </h2>
 
     <div class="text-sm opacity-80 mb-1" id="userName">
-      Nom Utilisateur
-    </div>
-
-    <div class="text-xs opacity-60">
-      **** **** **** 0987
+      Utilisateur
     </div>
 
   </div>
@@ -89,6 +87,7 @@ tailwind.config = {
   <!-- ACTIONS -->
   <div class="grid grid-cols-4 gap-4 text-center mb-8">
 
+    <!-- Transfert -->
     <div class="flex flex-col items-center gap-2">
       <div class="w-14 h-14 bg-white rounded-2xl shadow flex items-center justify-center">
         <svg xmlns="http://www.w3.org/2000/svg"
@@ -105,6 +104,7 @@ tailwind.config = {
       <span class="text-xs text-textDark">Transfert</span>
     </div>
 
+    <!-- Recevoir -->
     <div class="flex flex-col items-center gap-2">
       <div class="w-14 h-14 bg-white rounded-2xl shadow flex items-center justify-center">
         <svg xmlns="http://www.w3.org/2000/svg"
@@ -115,12 +115,13 @@ tailwind.config = {
              class="w-6 h-6 text-primary">
           <path stroke-linecap="round"
                 stroke-linejoin="round"
-                d="M3 7.5h18M3 12h18m-18 4.5h18"/>
+                d="M19.5 4.5l-15 15M4.5 9V19.5H15"/>
         </svg>
       </div>
-      <span class="text-xs text-textDark">QR Pay</span>
+      <span class="text-xs text-textDark">Recevoir</span>
     </div>
 
+    <!-- Recharger -->
     <div class="flex flex-col items-center gap-2">
       <div class="w-14 h-14 bg-white rounded-2xl shadow flex items-center justify-center">
         <svg xmlns="http://www.w3.org/2000/svg"
@@ -137,6 +138,7 @@ tailwind.config = {
       <span class="text-xs text-textDark">Recharger</span>
     </div>
 
+    <!-- Historique -->
     <div class="flex flex-col items-center gap-2">
       <div class="w-14 h-14 bg-white rounded-2xl shadow flex items-center justify-center">
         <svg xmlns="http://www.w3.org/2000/svg"
@@ -147,10 +149,10 @@ tailwind.config = {
              class="w-6 h-6 text-primary">
           <path stroke-linecap="round"
                 stroke-linejoin="round"
-                d="M15.75 6v.008h.008V6h-.008zm0 6v.008h.008V12h-.008zm0 6v.008h.008V18h-.008z"/>
+                d="M12 6v6l4 2"/>
         </svg>
       </div>
-      <span class="text-xs text-textDark">Compte</span>
+      <span class="text-xs text-textDark">Historique</span>
     </div>
 
   </div>
@@ -178,6 +180,7 @@ tailwind.config = {
 
   <div class="bg-white rounded-full shadow-lg px-10 py-3 flex gap-10">
 
+    <!-- Home -->
     <svg xmlns="http://www.w3.org/2000/svg"
          fill="none"
          viewBox="0 0 24 24"
@@ -189,6 +192,7 @@ tailwind.config = {
             d="M3 9.75L12 4.5l9 5.25V19.5a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 19.5V9.75z"/>
     </svg>
 
+    <!-- Stats -->
     <svg xmlns="http://www.w3.org/2000/svg"
          fill="none"
          viewBox="0 0 24 24"
@@ -197,9 +201,10 @@ tailwind.config = {
          class="w-6 h-6 text-textMuted">
       <path stroke-linecap="round"
             stroke-linejoin="round"
-            d="M12 6v6l4 2"/>
+            d="M3 3v18h18"/>
     </svg>
 
+    <!-- Profile -->
     <svg xmlns="http://www.w3.org/2000/svg"
          fill="none"
          viewBox="0 0 24 24"
@@ -208,7 +213,7 @@ tailwind.config = {
          class="w-6 h-6 text-textMuted">
       <path stroke-linecap="round"
             stroke-linejoin="round"
-            d="M16.5 3.75h3.75v3.75"/>
+            d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.5 19.5a7.5 7.5 0 0115 0"/>
     </svg>
 
   </div>
