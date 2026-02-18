@@ -7,49 +7,184 @@ content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable
 
 <title>Créer un compte - TrustLink</title>
 
+<!-- Tailwind -->
 <script src="https://cdn.tailwindcss.com"></script>
 
+<!-- Bootstrap Icons -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        primary: "#1E2BE0",
+        primaryDark: "#0F1ACD",
+        accent: "#3D4BFF",
+        background: "#EEF2FF",
+        textDark: "#111827",
+        textMuted: "#6B7280",
+        borderLight: "#E5E7EB"
+      }
+    }
+  }
+}
+</script>
 
 <script type="module" src="/trustlink_app/js/firebase-init.js"></script>
 <script type="module" src="/trustlink_app/main_js/register.js"></script>
 
+<style>
+.glass-card {
+  backdrop-filter: blur(20px);
+  background: rgba(255,255,255,0.97);
+}
+
+input, select {
+  font-size: 16px;
+}
+
+.btn-primary {
+  transition: all 0.25s ease;
+}
+
+.btn-primary:active {
+  transform: scale(0.97);
+}
+</style>
+
 </head>
 
-<body class="min-h-screen bg-[#EEF2FF] flex items-center justify-center px-4">
+<body class="min-h-screen bg-background flex items-center justify-center px-4 py-6">
 
-<div class="w-full max-w-sm bg-white rounded-3xl shadow-2xl p-7">
+<div class="w-full max-w-sm glass-card rounded-3xl shadow-2xl p-7 border border-borderLight">
 
+  <!-- Logo -->
   <div class="text-center mb-6">
-    <img src="/trustlink_app/assets/white.logo.png"
-         class="h-8 mx-auto mb-3 bg-primary p-2 rounded-xl">
-    <h1 class="text-2xl font-bold text-[#1E2BE0]">
+    <div class="w-14 h-14 mx-auto mb-3 rounded-2xl bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-lg">
+      <img src="/trustlink_app/assets/white.logo.png" class="h-6" alt="TrustLink">
+    </div>
+
+    <h1 class="text-2xl font-bold text-primary tracking-tight">
       Créer un compte
     </h1>
+
+    <p class="text-textMuted text-sm mt-1">
+      Rejoignez TrustLink en toute sécurité
+    </p>
   </div>
 
-  <form id="registerForm" class="space-y-4">
+  <!-- FORM -->
+  <form id="registerForm" class="space-y-4" autocomplete="off">
 
-    <input id="firstName" required
-      placeholder="Prénom"
-      class="w-full border rounded-xl px-4 py-3 text-base">
+    <!-- Prénom -->
+    <div class="relative">
+      <i class="bi bi-person absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+      <input
+        id="firstName"
+        required
+        placeholder="Prénom"
+        class="w-full border border-borderLight rounded-xl pl-10 pr-4 py-3 focus:ring-2 focus:ring-primary focus:outline-none transition"
+      />
+    </div>
 
-    <input id="lastName" required
-      placeholder="Nom"
-      class="w-full border rounded-xl px-4 py-3 text-base">
+    <!-- Nom -->
+    <div class="relative">
+      <i class="bi bi-person-badge absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+      <input
+        id="lastName"
+        required
+        placeholder="Nom"
+        class="w-full border border-borderLight rounded-xl pl-10 pr-4 py-3 focus:ring-2 focus:ring-primary focus:outline-none transition"
+      />
+    </div>
 
-    <input id="phone" required
-      placeholder="+243..."
-      class="w-full border rounded-xl px-4 py-3 text-base">
+    <!-- Date de naissance -->
+    <div class="relative">
+      <i class="bi bi-calendar-date absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+      <input
+        id="birthDate"
+        type="date"
+        required
+        class="w-full border border-borderLight rounded-xl pl-10 pr-4 py-3 focus:ring-2 focus:ring-primary focus:outline-none transition"
+      />
+    </div>
 
-    <input id="password" type="password" required
-      placeholder="Mot de passe"
-      class="w-full border rounded-xl px-4 py-3 text-base">
+    <!-- Genre (2 choix) -->
+    <div>
+      <label class="block text-sm text-textMuted mb-2">
+        Genre
+      </label>
 
-    <button type="submit"
-      class="w-full bg-gradient-to-r from-[#1E2BE0] to-[#3D4BFF]
-             text-white font-semibold py-3 rounded-xl">
-      Créer le compte
+      <div class="flex gap-4">
+
+        <label class="flex items-center gap-2 cursor-pointer">
+          <input type="radio" name="gender" value="Homme" required class="accent-primary">
+          <span class="text-sm text-textDark">Homme</span>
+        </label>
+
+        <label class="flex items-center gap-2 cursor-pointer">
+          <input type="radio" name="gender" value="Femme" required class="accent-primary">
+          <span class="text-sm text-textDark">Femme</span>
+        </label>
+
+      </div>
+    </div>
+
+    <!-- Téléphone -->
+    <div class="relative">
+      <i class="bi bi-phone absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+      <input
+        id="phone"
+        required
+        placeholder="+243..."
+        autocomplete="off"
+        class="w-full border border-borderLight rounded-xl pl-10 pr-4 py-3 focus:ring-2 focus:ring-primary focus:outline-none transition"
+      />
+    </div>
+
+    <!-- Mot de passe -->
+    <div class="relative">
+      <i class="bi bi-lock absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+
+      <input
+        id="password"
+        type="password"
+        required
+        placeholder="Mot de passe"
+        autocomplete="new-password"
+        class="w-full border border-borderLight rounded-xl pl-10 pr-10 py-3 focus:ring-2 focus:ring-primary focus:outline-none transition"
+      />
+
+      <button
+        type="button"
+        id="togglePassword"
+        class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-primary"
+      >
+        <i class="bi bi-eye"></i>
+      </button>
+    </div>
+
+    <!-- Confirmer mot de passe -->
+    <div class="relative">
+      <i class="bi bi-shield-lock absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+
+      <input
+        id="confirmPassword"
+        type="password"
+        required
+        placeholder="Confirmer mot de passe"
+        autocomplete="new-password"
+        class="w-full border border-borderLight rounded-xl pl-10 pr-10 py-3 focus:ring-2 focus:ring-primary focus:outline-none transition"
+      />
+    </div>
+
+    <!-- Submit -->
+    <button
+      type="submit"
+      class="btn-primary w-full bg-gradient-to-r from-primary to-accent hover:from-primaryDark hover:to-primary text-white font-semibold py-3 rounded-xl shadow-lg"
+    >
+      Créer mon compte
     </button>
 
     <p id="errorMsg"
@@ -57,15 +192,34 @@ content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable
 
   </form>
 
-  <p class="text-center text-sm mt-4">
+  <!-- Redirect -->
+  <p class="text-center text-sm mt-5 text-textMuted">
     Déjà inscrit ?
     <a href="/trustlink_app/index.html"
-       class="text-[#1E2BE0] font-medium">
+       class="text-primary font-medium hover:underline">
       Se connecter
     </a>
   </p>
 
 </div>
+
+<script>
+
+/* Toggle password */
+const togglePassword = document.getElementById("togglePassword");
+const passwordInput = document.getElementById("password");
+
+togglePassword.addEventListener("click", () => {
+  const type = passwordInput.type === "password" ? "text" : "password";
+  passwordInput.type = type;
+
+  togglePassword.innerHTML =
+    type === "password"
+      ? '<i class="bi bi-eye"></i>'
+      : '<i class="bi bi-eye-slash"></i>';
+});
+
+</script>
 
 </body>
 </html>
