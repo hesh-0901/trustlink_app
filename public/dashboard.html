@@ -44,6 +44,69 @@ tailwind.config = {
   from { opacity:0; transform: translateY(10px); }
   to { opacity:1; transform: translateY(0); }
 }
+  /* Perspective */
+.perspective {
+  perspective: 1200px;
+}
+
+.card-3d {
+  transform-style: preserve-3d;
+}
+
+/* Emboss effect */
+.emboss {
+  text-shadow:
+    0 1px 0 rgba(255,255,255,0.3),
+    0 2px 4px rgba(0,0,0,0.6);
+}
+
+/* Carbon texture */
+.carbon-texture {
+  background-image:
+    repeating-linear-gradient(
+      45deg,
+      rgba(255,255,255,0.03) 0px,
+      rgba(255,255,255,0.03) 2px,
+      transparent 2px,
+      transparent 4px
+    );
+}
+
+/* Animated gradient */
+.animated-gradient {
+  background: linear-gradient(
+    135deg,
+    #1F2AA6,
+    #2F3DD8,
+    #4F6BFF,
+    #1F2AA6
+  );
+  background-size: 400% 400%;
+  animation: gradientMove 12s ease infinite;
+}
+
+@keyframes gradientMove {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Shimmer */
+.shimmer {
+  background: linear-gradient(
+    110deg,
+    transparent 25%,
+    rgba(255,255,255,0.15) 50%,
+    transparent 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmerMove 5s infinite;
+}
+
+@keyframes shimmerMove {
+  from { background-position: 200% 0; }
+  to { background-position: -200% 0; }
+}
 </style>
 
 </head>
