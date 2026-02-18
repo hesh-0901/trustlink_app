@@ -1,9 +1,18 @@
 import { db } from "../../js/firebase-init.js";
-import { doc, getDoc }
-from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+import {
+  doc,
+  onSnapshot,
+  collection,
+  query,
+  where,
+  orderBy,
+  limit,
+  onSnapshot as onSnapshotCollection
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 /* ===============================
-   ROUTE PROTECTION
+   SESSION CHECK
 ================================ */
 const userId = localStorage.getItem("userId");
 
@@ -12,84 +21,134 @@ if (!userId) {
 }
 
 /* ===============================
-   LOAD USER
+   FORMAT MONEY
 ================================ */
-async function loadUser() {
-
-  try {
-
-    const userRef = doc(db, "users", userId);
-    const userSnap = await getDoc(userRef);
-
-    if (!userSnap.exists()) {
-      localStorage.clear();
-      window.location.href = "/trustlink_app/index.html";
-      return;
-    }
-
-    const user = userSnap.data();
-
-    if (!user.isActive) {
-      localStorage.clear();
-      window.location.href = "/trustlink_app/index.html";
-      return;
-    }
-
-    // Nom
-    document.getElementById("userName").textContent =
-      `${user.firstName ?? ""} ${user.lastName ?? ""}`;
-
-    // Avatar
-    const initials =
-      (user.firstName?.[0] || "") +
-      (user.lastName?.[0] || "");
-
-    document.getElementById("userAvatar").textContent =
-      initials.toUpperCase();
-
-    // Badge admin
-    if (user.role === "super_admin") {
-      document.getElementById("adminBadge").classList.remove("hidden");
-    }
-
-    // Balance animée
-    animateBalance(user.balance || 0, user.currency || "USD");
-
-  } catch (error) {
-    console.error(error);
-  }
+function formatMoney(amount, currency) {
+  return new Intl.NumberFormat("fr-FR", {
+    style: "currency",
+    currency: currency || "USD"
+  }).format(amount);
 }
 
 /* ===============================
-   BALANCE ANIMATION
+   LOAD USER (REALTIME)
 ================================ */
-function animateBalance(amount, currency) {
+const userRef = doc(db, "users", userId);
 
-  const element = document.getElementById("balanceAmount");
-  const currencyLabel = document.getElementById("currencyLabel");
+onSnapshot(userRef, (docSnap) => {
 
-  let start = 0;
-  const duration = 800;
-  const increment = amount / (duration / 16);
+  if (!docSnap.exists()) {
+    localStorage.clear();
+    window.location.href = "/trustlink_app/index.html";
+    return;
+  }
 
-  const counter = setInterval(() => {
-    start += increment;
-    if (start >= amount) {
-      start = amount;
-      clearInterval(counter);
-    }
-    element.textContent = start.toFixed(2);
-  }, 16);
+  const user = docSnap.data();
 
-  currencyLabel.textContent = currency;
-}
+  if (!user.isActive) {
+    localStorage.clear();
+    window.location.href = "/trustlink_app/index.html";
+    return;
+  }
+
+  // Nom
+  const fullName = `${user.firstName ?? ""} ${user.lastName ?? ""}`;
+  document.getElementById("userName").textContent = fullName;
+
+  // Avatar
+  const initials =
+    (user.firstName?.[0] || "") +
+    (user.lastName?.[0] || "");
+
+  document.getElementById("userAvatar").textContent =
+    initials.toUpperCase();
+
+  // Balance
+  document.getElementById("balanceAmount").textContent =
+    formatMoney(user.balance || 0, user.currency);
+
+});
+
+/* ===============================
+   LOAD TRANSACTIONS
+================================ */
+const transactionsRef = collection(db, "transactions");
+
+const q = query(
+  transactionsRef,
+  where("participants", "array-contains", userId),
+  orderBy("createdAt", "desc"),
+  limit(5)
+);
+
+onSnapshotCollection(q, (snapshot) => {
+
+  const container = document.getElementById("transactionsList");
+
+  if (!container) return;
+
+  container.innerHTML = "";
+
+  snapshot.forEach((doc) => {
+
+    const tx = doc.data();
+
+    const isSender = tx.fromUserId === userId;
+
+    const div = document.createElement("div");
+
+    div.className =
+      "bg-white rounded-2xl p-4 shadow flex justify-between items-center";
+
+    div.innerHTML = `
+      <div class="flex items-center gap-3">
+
+        <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
+          <svg xmlns="http://www.w3.org/2000/svg"
+               fill="none"
+               viewBox="0 0 24 24"
+               stroke-width="1.8"
+               stroke="currentColor"
+               class="w-5 h-5 text-gray-500">
+            <path stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M12 6v6l4 2"/>
+          </svg>
+        </div>
+
+        <div>
+          <p class="text-sm font-medium text-textDark">
+            ${isSender ? "Transfert envoyé" : "Paiement reçu"}
+          </p>
+          <p class="text-xs text-gray-400">
+            ${new Date(tx.createdAt?.seconds * 1000).toLocaleString()}
+          </p>
+        </div>
+
+      </div>
+
+      <span class="text-sm font-semibold ${
+        isSender ? "text-red-500" : "text-green-600"
+      }">
+        ${isSender ? "-" : "+"}
+        ${formatMoney(tx.amount, tx.currency)}
+      </span>
+    `;
+
+    container.appendChild(div);
+
+  });
+
+});
 
 /* ===============================
    LOGOUT
 ================================ */
-document.getElementById("logoutBtn").addEventListener("click", () => {
-  localStorage.clear();
-  window.location.href = "/trustlink_app/index.html";
-});
+const logoutBtn = document.getElementById("logoutBtn");
 
-loadUser();
+if (logoutBtn) {
+  logoutBtn.addEventListener("click", () => {
+    localStorage.clear();
+    window.location.href = "/trustlink_app/index.html";
+  });
+}
