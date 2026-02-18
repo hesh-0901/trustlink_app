@@ -121,6 +121,23 @@ function updateHeaderUI(user) {
 
   }
 }
+if (avatarImg) {
+
+  const seed = user.username || "user";
+
+  avatarImg.src =
+    `https://api.dicebear.com/7.x/personas/png
+    ?seed=${seed}
+    &backgroundColor=f3f4f6
+    &radius=50
+    &size=256
+    &face=smile
+    &mouth=smile
+    &eyes=variant12
+    &clothes=blazerShirt
+    `;
+}
+
 
 /* ==========================================
    REALTIME USER LISTENER
