@@ -23,6 +23,27 @@ async function loadNavbar() {
 
   navContainer.innerHTML = html;
 }
+/* ===============================
+   NOUVEAU
+================================ */
+
+function setActiveNav() {
+
+  const links = document.querySelectorAll(".nav-link");
+  const currentPath = window.location.pathname;
+
+  links.forEach(link => {
+
+    if (link.getAttribute("href") === currentPath) {
+      link.classList.add("text-primaryStrong");
+    }
+
+  });
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  setActiveNav();
+});
 
 /* ===============================
    INIT
