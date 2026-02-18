@@ -2,29 +2,33 @@
 
   <div class="max-w-md mx-auto px-6 py-4 flex items-center justify-between">
 
-    <!-- LEFT -->
+    <!-- LEFT SECTION -->
+    <div class="flex items-center gap-3">
+
+      <!-- Avatar Wrapper -->
       <div class="relative">
-      
+
         <img id="headerAvatar"
              alt="Avatar"
-             class="w-12 h-12 rounded-full shadow-lg border-2 border-transparent
+             class="w-12 h-12 rounded-full shadow-md border-2 border-transparent
                     transition-all duration-300 hover:scale-105">
-      
-        <!-- Badge admin -->
-        <div id="adminBadge"
-             class="hidden absolute -bottom-1 -right-1 bg-yellow-500 text-white 
-                    text-[10px] px-1.5 py-[2px] rounded-full shadow-md">
-          ADMIN
-        </div>
-      
-      </div>
 
-
-        <!-- subtle ring -->
+        <!-- Ring subtle -->
         <div class="absolute inset-0 rounded-full ring-2 ring-primary/20 pointer-events-none"></div>
 
+        <!-- Badge Admin -->
+        <div id="adminBadge"
+             class="hidden absolute -bottom-1 -right-1 
+                    bg-yellow-500 text-white 
+                    text-[9px] font-semibold 
+                    px-1.5 py-[2px] 
+                    rounded-full shadow-md">
+          ADMIN
+        </div>
+
       </div>
 
+      <!-- Text Info -->
       <div class="leading-tight">
 
         <div class="text-[11px] text-gray-400">
@@ -37,14 +41,14 @@
         </div>
 
         <div id="headerUsername"
-             class="text-[11px] text-gray-400 opacity-0 transition-opacity duration-700">
+             class="text-[11px] text-gray-400 opacity-0 transition-opacity duration-500">
         </div>
 
       </div>
 
     </div>
 
-    <!-- RIGHT -->
+    <!-- RIGHT SECTION -->
     <div class="flex items-center gap-5 text-lg text-gray-600">
 
       <button id="headerNotification"
