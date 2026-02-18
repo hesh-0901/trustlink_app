@@ -70,7 +70,7 @@ loginForm.addEventListener("submit", async (e) => {
     localStorage.setItem("phoneNumber", userData.phoneNumber);
 
     // ✅ Redirect
-    window.location.href = "dashboard.html";
+    window.location.href = "/trustlink_app/public/dashboard.html";
 
   } catch (error) {
     console.error(error);
