@@ -244,16 +244,25 @@ async function loadNavbar() {
 }
 loadNavbar();
 </script>
-  <script type="module">
+<script type="module">
 async function loadHeader() {
-  const res = await fetch("../partials/header.html");
-  const data = await res.text();
-  document.getElementById("header-container").innerHTML = data;
 
-  import("../main_js/header.js");
+  const res = await fetch("../partials/header.html");
+  const html = await res.text();
+
+  const container = document.getElementById("header-container");
+  container.innerHTML = html;
+
+  // IMPORTANT : attendre que le DOM soit réellement injecté
+  await new Promise(resolve => setTimeout(resolve, 50));
+
+  // Ensuite seulement charger le JS
+  const module = await import("../main_js/header.js");
 }
+
 loadHeader();
 </script>
+
 
 
 </body>
