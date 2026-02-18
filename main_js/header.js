@@ -114,30 +114,16 @@ function updateHeaderUI(user) {
     const seed = user.username || user.firstName || "user";
 
     avatarImg.src =
-      `https://api.dicebear.com/7.x/personas/png?seed=${seed}
-      &backgroundColor=f3f4f6
-      &radius=50
-      &size=256`;
+      `https://api.dicebear.com/7.x/personas/png` +
+      `?seed=${encodeURIComponent(seed)}` +
+      `&backgroundColor=f3f4f6` +
+      `&radius=50` +
+      `&size=256` +
+      `&clothes=blazerShirt` +
+      `&mouth=smile`;
 
   }
 }
-if (avatarImg) {
-
-  const seed = user.username || "user";
-
-  avatarImg.src =
-    `https://api.dicebear.com/7.x/personas/png
-    ?seed=${seed}
-    &backgroundColor=f3f4f6
-    &radius=50
-    &size=256
-    &face=smile
-    &mouth=smile
-    &eyes=variant12
-    &clothes=blazerShirt
-    `;
-}
-
 
 /* ==========================================
    REALTIME USER LISTENER
