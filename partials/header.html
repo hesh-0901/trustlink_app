@@ -1,28 +1,24 @@
-<!-- ==========================================
-     TRUSTLINK PREMIUM MOBILE HEADER
-========================================== -->
-
 <header class="sticky top-0 z-50 backdrop-blur-xl bg-white/80 border-b border-gray-100">
 
   <div class="max-w-md mx-auto px-6 py-4 flex items-center justify-between">
 
-    <!-- LEFT SECTION -->
+    <!-- LEFT -->
     <div class="flex items-center gap-3">
 
-      <!-- Avatar -->
       <div class="relative">
 
         <img id="headerAvatar"
-             src="https://api.dicebear.com/7.x/avataaars/png?seed=trustlink"
              alt="Avatar"
-             class="w-12 h-12 rounded-full object-cover shadow-md border border-white transition-all duration-300">
+             class="w-12 h-12 rounded-full 
+                    shadow-lg border border-white/40
+                    transition-all duration-300 
+                    hover:scale-105 hover:shadow-xl">
 
         <!-- subtle ring -->
         <div class="absolute inset-0 rounded-full ring-2 ring-primary/20 pointer-events-none"></div>
 
       </div>
 
-      <!-- Text -->
       <div class="leading-tight">
 
         <div class="text-[11px] text-gray-400">
@@ -42,16 +38,14 @@
 
     </div>
 
-    <!-- RIGHT SECTION -->
+    <!-- RIGHT -->
     <div class="flex items-center gap-5 text-lg text-gray-600">
 
-      <!-- Notification -->
       <button id="headerNotification"
               class="hover:text-primaryStrong transition active:scale-90">
         <i class="bi bi-bell"></i>
       </button>
 
-      <!-- Logout -->
       <button id="headerLogout"
               class="hover:text-red-500 transition active:scale-90">
         <i class="bi bi-box-arrow-right"></i>
@@ -62,3 +56,5 @@
   </div>
 
 </header>
+
+<script type="module" src="../js/header.js"></script>
