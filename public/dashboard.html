@@ -255,7 +255,8 @@ async function loadHeader() {
 
   await new Promise(resolve => setTimeout(resolve, 50));
 
-  await import("/trustlink_app/main_js/header.js");
+  await import("../main_js/header.js");
+
 }
 
 loadHeader();
