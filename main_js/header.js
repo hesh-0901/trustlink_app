@@ -36,20 +36,17 @@ function updateHeaderUI(user) {
   const usernameEl = document.getElementById("headerUsername");
   const avatarImg = document.getElementById("headerAvatar");
 
-  // Nom complet
   if (fullNameEl) {
     fullNameEl.textContent =
       `${user.firstName ?? ""} ${user.lastName ?? ""}`.trim();
   }
 
-  // Username
   if (usernameEl) {
     usernameEl.textContent = user.username ?? "";
     usernameEl.classList.remove("opacity-0");
     usernameEl.classList.add("opacity-100");
   }
 
-  // Avatar réaliste stable
   if (avatarImg) {
 
     const seed = user.username || user.firstName || "user";
@@ -63,7 +60,6 @@ function updateHeaderUI(user) {
       "&clothes=blazerShirt" +
       "&mouth=smile";
 
-    // Fallback si erreur réseau
     avatarImg.onerror = () => {
       avatarImg.src =
         "https://api.dicebear.com/7.x/personas/png?seed=fallback";
