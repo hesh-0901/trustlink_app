@@ -27,68 +27,6 @@ function forceLogout() {
 }
 
 /* ==========================================
-   PREMIUM AVATAR GENERATOR
-========================================== */
-
-function generatePremiumAvatar(user) {
-
-  const size = 256;
-  const canvas = document.createElement("canvas");
-  canvas.width = size;
-  canvas.height = size;
-
-  const ctx = canvas.getContext("2d");
-
-  const first = user.firstName?.[0] || "";
-  const last = user.lastName?.[0] || "";
-  const initials = (first + last).toUpperCase() || "U";
-
-  const seed = user.username || "user";
-
-  // Cache performance
-  const cacheKey = "avatar_" + seed;
-  const cached = localStorage.getItem(cacheKey);
-  if (cached) return cached;
-
-  // Hash → Hue
-  function stringToHue(str) {
-    let hash = 0;
-    for (let i = 0; i < str.length; i++) {
-      hash = str.charCodeAt(i) + ((hash << 5) - hash);
-    }
-    return Math.abs(hash % 360);
-  }
-
-  const hue = stringToHue(seed);
-  const color1 = `hsl(${hue}, 70%, 45%)`;
-  const color2 = `hsl(${(hue + 40) % 360}, 70%, 35%)`;
-
-  // Gradient
-  const gradient = ctx.createLinearGradient(0, 0, size, size);
-  gradient.addColorStop(0, color1);
-  gradient.addColorStop(1, color2);
-
-  ctx.fillStyle = gradient;
-  ctx.fillRect(0, 0, size, size);
-
-  // Glass overlay
-  ctx.fillStyle = "rgba(255,255,255,0.05)";
-  ctx.fillRect(0, 0, size, size);
-
-  // Initiales
-  ctx.fillStyle = "#ffffff";
-  ctx.font = "600 96px Inter, sans-serif";
-  ctx.textAlign = "center";
-  ctx.textBaseline = "middle";
-  ctx.fillText(initials, size / 2, size / 2);
-
-  const image = canvas.toDataURL("image/png");
-  localStorage.setItem(cacheKey, image);
-
-  return image;
-}
-
-/* ==========================================
    UPDATE HEADER UI
 ========================================== */
 
@@ -98,30 +36,40 @@ function updateHeaderUI(user) {
   const usernameEl = document.getElementById("headerUsername");
   const avatarImg = document.getElementById("headerAvatar");
 
+  // Nom complet
   if (fullNameEl) {
     fullNameEl.textContent =
       `${user.firstName ?? ""} ${user.lastName ?? ""}`.trim();
   }
 
+  // Username
   if (usernameEl) {
     usernameEl.textContent = user.username ?? "";
     usernameEl.classList.remove("opacity-0");
     usernameEl.classList.add("opacity-100");
   }
 
+  // Avatar réaliste stable
   if (avatarImg) {
 
     const seed = user.username || user.firstName || "user";
 
-    avatarImg.src =
-      `https://api.dicebear.com/7.x/personas/png` +
-      `?seed=${encodeURIComponent(seed)}` +
-      `&backgroundColor=f3f4f6` +
-      `&radius=50` +
-      `&size=256` +
-      `&clothes=blazerShirt` +
-      `&mouth=smile`;
+    const avatarUrl =
+      "https://api.dicebear.com/7.x/personas/png" +
+      "?seed=" + encodeURIComponent(seed) +
+      "&backgroundColor=f3f4f6" +
+      "&radius=50" +
+      "&size=256" +
+      "&clothes=blazerShirt" +
+      "&mouth=smile";
 
+    // Fallback si erreur réseau
+    avatarImg.onerror = () => {
+      avatarImg.src =
+        "https://api.dicebear.com/7.x/personas/png?seed=fallback";
+    };
+
+    avatarImg.src = avatarUrl;
   }
 }
 
