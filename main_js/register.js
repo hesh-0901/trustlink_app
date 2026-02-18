@@ -54,8 +54,10 @@ form.addEventListener("submit", async (e) => {
   const phone = document.getElementById("phone").value.trim();
   const password = document.getElementById("password").value.trim();
   const confirmPassword = document.getElementById("confirmPassword").value.trim();
+  const gender = document.querySelector('input[name="gender"]:checked')?.value;
 
-  if (!firstName || !lastName || !birthDate || !phone || !password || !confirmPassword) {
+
+  if (!firstName || !lastName || !birthDate || !phone || !password || !confirmPassword| !gender) {
     return showError("Tous les champs sont obligatoires.");
   }
 
