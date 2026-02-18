@@ -1,18 +1,18 @@
 import { db } from "../../js/firebase-init.js";
-import { doc, getDoc } 
+import { doc, getDoc }
 from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 /* ===============================
-   PROTECTION ROUTE
+   ROUTE PROTECTION
 ================================ */
 const userId = localStorage.getItem("userId");
 
 if (!userId) {
-  window.location.href = "../index.html";
+  window.location.href = "/trustlink_app/index.html";
 }
 
 /* ===============================
-   LOAD USER DATA
+   LOAD USER
 ================================ */
 async function loadUser() {
 
@@ -23,17 +23,23 @@ async function loadUser() {
 
     if (!userSnap.exists()) {
       localStorage.clear();
-      window.location.href = "../index.html";
+      window.location.href = "/trustlink_app/index.html";
       return;
     }
 
     const user = userSnap.data();
 
-    // Nom affiché
+    if (!user.isActive) {
+      localStorage.clear();
+      window.location.href = "/trustlink_app/index.html";
+      return;
+    }
+
+    // Nom
     document.getElementById("userName").textContent =
       `${user.firstName ?? ""} ${user.lastName ?? ""}`;
 
-    // Avatar initiales
+    // Avatar
     const initials =
       (user.firstName?.[0] || "") +
       (user.lastName?.[0] || "");
@@ -41,16 +47,49 @@ async function loadUser() {
     document.getElementById("userAvatar").textContent =
       initials.toUpperCase();
 
-    // Balance
-    document.getElementById("balanceAmount").textContent =
-      `${user.balance?.toFixed(2) || "0.00"}`;
+    // Badge admin
+    if (user.role === "super_admin") {
+      document.getElementById("adminBadge").classList.remove("hidden");
+    }
 
-    document.getElementById("currencyLabel").textContent =
-      user.currency || "USD";
+    // Balance animée
+    animateBalance(user.balance || 0, user.currency || "USD");
 
   } catch (error) {
     console.error(error);
   }
 }
+
+/* ===============================
+   BALANCE ANIMATION
+================================ */
+function animateBalance(amount, currency) {
+
+  const element = document.getElementById("balanceAmount");
+  const currencyLabel = document.getElementById("currencyLabel");
+
+  let start = 0;
+  const duration = 800;
+  const increment = amount / (duration / 16);
+
+  const counter = setInterval(() => {
+    start += increment;
+    if (start >= amount) {
+      start = amount;
+      clearInterval(counter);
+    }
+    element.textContent = start.toFixed(2);
+  }, 16);
+
+  currencyLabel.textContent = currency;
+}
+
+/* ===============================
+   LOGOUT
+================================ */
+document.getElementById("logoutBtn").addEventListener("click", () => {
+  localStorage.clear();
+  window.location.href = "/trustlink_app/index.html";
+});
 
 loadUser();
