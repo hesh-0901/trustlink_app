@@ -247,23 +247,18 @@ loadNavbar();
 <script type="module">
 async function loadHeader() {
 
-  const res = await fetch("../partials/header.html");
+  const res = await fetch("/trustlink_app/partials/header.html");
   const html = await res.text();
 
   const container = document.getElementById("header-container");
   container.innerHTML = html;
 
-  // IMPORTANT : attendre que le DOM soit réellement injecté
   await new Promise(resolve => setTimeout(resolve, 50));
 
-  // Ensuite seulement charger le JS
-  const module = await import("../main_js/header.js");
+  await import("/trustlink_app/main_js/header.js");
 }
 
 loadHeader();
 </script>
-
-
-
 </body>
 </html>
