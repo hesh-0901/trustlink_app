@@ -34,29 +34,22 @@ function updateHeaderUI(user) {
 
   const fullNameEl = document.getElementById("headerFullName");
   const usernameEl = document.getElementById("headerUsername");
-  const avatarContainer = document.getElementById("headerAvatar");
+  const avatarImg = document.getElementById("headerAvatar");
 
   if (fullNameEl) {
     fullNameEl.textContent =
-      `${user.firstName} ${user.lastName}`;
+      `${user.firstName ?? ""} ${user.lastName ?? ""}`;
   }
 
   if (usernameEl) {
-    usernameEl.textContent = user.username;
+    usernameEl.textContent = user.username ?? "";
     usernameEl.classList.remove("opacity-0");
     usernameEl.classList.add("opacity-100");
   }
 
-  if (avatarContainer) {
-
-    // On injecte une vraie image avatar
-    avatarContainer.innerHTML = `
-      <img
-        src="https://api.dicebear.com/7.x/avataaars/png?seed=${user.username}&backgroundColor=b6e3f4,c0aede,d1d4f9"
-        class="w-full h-full rounded-full object-cover"
-        alt="avatar"
-      />
-    `;
+  if (avatarImg) {
+    avatarImg.src =
+      `https://api.dicebear.com/7.x/avataaars/png?seed=${user.username}&backgroundColor=b6e3f4,c0aede,d1d4f9`;
   }
 }
 
@@ -99,15 +92,13 @@ function initLogout() {
 
   if (!logoutBtn) return;
 
-  logoutBtn.addEventListener("click", () => {
-    forceLogout();
-  });
+  logoutBtn.addEventListener("click", forceLogout);
 }
 
 /* ==========================================
-   INIT DIRECT (PAS DOMContentLoaded)
+   INIT (IMPORTANT: direct execution)
 ========================================== */
 
-// ⚠️ IMPORTANT : exécuter directement
+// ⚠️ PAS DOMContentLoaded car header injecté dynamiquement
 initRealtimeUser();
 initLogout();
