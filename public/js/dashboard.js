@@ -94,11 +94,13 @@ async function loadUser() {
     return;
   }
 
-      const header = document.getElementById("userName");
-    
-    if (header) {
-      header.textContent = user.username || `${user.firstName} ${user.lastName}`;
-    }
+  const header = document.getElementById("userName");
+
+  if (header) {
+    header.textContent =
+      user.username || `${user.firstName} ${user.lastName}`;
+  }
+}
 
 /* ===============================
    LOAD WALLETS REALTIME
