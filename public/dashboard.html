@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>TrustLink – Dashboard</title>
+<title>TrustLink Dashboard</title>
 
 <script src="https://cdn.tailwindcss.com"></script>
 
@@ -12,10 +12,13 @@ tailwind.config = {
   theme: {
     extend: {
       colors: {
-        darkBg: "#0F172A",
-        cardGlass: "rgba(255,255,255,0.05)",
-        primary: "#4F6BFF",
-        accent: "#7C3AED",
+        primary: "#2F3DD8",
+        primaryDark: "#1F2AA6",
+        accent: "#3F5BFF",
+        softBg: "#F3F6FF",
+        cardBg: "#FFFFFF",
+        textDark: "#111827",
+        textMuted: "#6B7280",
         success: "#22C55E",
         danger: "#EF4444"
       }
@@ -26,117 +29,116 @@ tailwind.config = {
 
 <script type="module" src="/trustlink_app/js/firebase-init.js"></script>
 <script type="module" src="/trustlink_app/public/js/dashboard.js"></script>
+
 </head>
 
-<body class="bg-darkBg text-white min-h-screen overflow-x-hidden">
+<body class="bg-softBg min-h-screen text-textDark">
 
-<!-- Background Glow -->
-<div class="absolute -top-32 -left-32 w-96 h-96 bg-primary opacity-20 blur-3xl rounded-full"></div>
-<div class="absolute bottom-0 right-0 w-96 h-96 bg-accent opacity-20 blur-3xl rounded-full"></div>
-
-<div class="relative max-w-md mx-auto px-5 pt-8 pb-28">
+<div class="max-w-md mx-auto px-5 pt-8 pb-28">
 
   <!-- HEADER -->
-  <div class="flex justify-between items-center mb-10">
+  <div class="flex justify-between items-center mb-8">
 
     <div>
-      <p class="text-sm text-gray-400">Bienvenue</p>
-      <h2 id="userName" class="text-2xl font-bold tracking-tight">
+      <p class="text-sm text-textMuted">Bienvenue</p>
+      <h2 id="userName" class="text-xl font-bold">
         Chargement...
       </h2>
     </div>
 
     <div id="userAvatar"
-         class="w-12 h-12 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center font-semibold shadow-lg">
+         class="w-12 h-12 bg-primary text-white rounded-full flex items-center justify-center font-semibold shadow-md">
       --
     </div>
 
   </div>
 
-  <!-- CREDIT CARD -->
-  <div class="relative mb-10">
+  <!-- WALLET CARD -->
+  <div class="bg-gradient-to-r from-primary to-accent rounded-3xl p-6 text-white shadow-xl mb-8">
 
-    <div class="bg-gradient-to-br from-primary to-accent rounded-3xl p-6 shadow-2xl relative overflow-hidden">
+    <p class="text-sm opacity-80 mb-2">
+      Votre solde
+    </p>
 
-      <div class="absolute inset-0 bg-white/10 backdrop-blur-xl"></div>
+    <h1 id="balanceAmount"
+        class="text-3xl font-bold tracking-tight mb-1">
+      0.00
+    </h1>
 
-      <div class="relative">
+    <div id="currencyLabel" class="text-sm opacity-80 mb-6">
+      USD
+    </div>
 
-        <p class="text-xs opacity-70 mb-1">Balance disponible</p>
+    <!-- ACTION ICONS -->
+    <div class="flex justify-between">
 
-        <h1 id="balanceAmount"
-            class="text-4xl font-bold tracking-tight mb-2">
-          0.00
-        </h1>
+      <button class="walletAction">
+        <div class="walletIcon bg-white/20">↑</div>
+        <span>Envoyer</span>
+      </button>
 
-        <div id="currencyLabel" class="text-sm opacity-70">
-          USD
-        </div>
+      <button class="walletAction">
+        <div class="walletIcon bg-white/20">↓</div>
+        <span>Recevoir</span>
+      </button>
 
-        <div class="mt-8 flex justify-between items-end">
-          <span class="text-sm opacity-80">TrustLink</span>
-          <div class="w-10 h-7 bg-white/30 rounded-md"></div>
-        </div>
+      <button class="walletAction">
+        <div class="walletIcon bg-white/20">+</div>
+        <span>Ajouter</span>
+      </button>
 
+      <button class="walletAction">
+        <div class="walletIcon bg-white/20">⟳</div>
+        <span>Historique</span>
+      </button>
+
+    </div>
+
+  </div>
+
+  <!-- SERVICES -->
+  <div class="bg-cardBg rounded-3xl p-6 shadow-sm mb-8">
+
+    <h3 class="text-sm font-semibold mb-4">
+      Autres services
+    </h3>
+
+    <div class="grid grid-cols-4 gap-4 text-center text-xs">
+
+      <div class="serviceItem">
+        <div class="serviceIcon bg-primary/10 text-primary">💡</div>
+        Électricité
+      </div>
+
+      <div class="serviceItem">
+        <div class="serviceIcon bg-green-100 text-green-600">📱</div>
+        Recharge
+      </div>
+
+      <div class="serviceItem">
+        <div class="serviceIcon bg-purple-100 text-purple-600">🏦</div>
+        Banque
+      </div>
+
+      <div class="serviceItem">
+        <div class="serviceIcon bg-yellow-100 text-yellow-600">💰</div>
+        Épargne
       </div>
 
     </div>
 
   </div>
 
-  <!-- QUICK ACTIONS -->
-  <div class="grid grid-cols-3 gap-4 mb-10">
-
-    <button class="glassBtn">
-      <div class="iconCircle bg-primary/20">↑</div>
-      <span>Envoyer</span>
-    </button>
-
-    <button class="glassBtn">
-      <div class="iconCircle bg-success/20">+</div>
-      <span>Recharger</span>
-    </button>
-
-    <button class="glassBtn">
-      <div class="iconCircle bg-accent/20">⇄</div>
-      <span>Échanger</span>
-    </button>
-
-  </div>
-
-  <!-- ANALYTICS CARD -->
-  <div class="bg-cardGlass backdrop-blur-xl border border-white/10 rounded-3xl p-6 shadow-xl mb-8">
-
-    <div class="flex justify-between mb-4">
-      <h3 class="text-sm font-semibold">Statistiques</h3>
-      <span class="text-xs text-gray-400">30 jours</span>
-    </div>
-
-    <!-- Circular Chart Fake -->
-    <div class="flex justify-center items-center">
-
-      <div class="relative w-40 h-40">
-
-        <div class="absolute inset-0 rounded-full border-8 border-white/10"></div>
-
-        <div class="absolute inset-0 rounded-full border-8 border-primary border-t-transparent rotate-45"></div>
-
-        <div class="absolute inset-6 bg-darkBg rounded-full flex items-center justify-center text-lg font-bold">
-          78%
-        </div>
-
-      </div>
-
-    </div>
-
-  </div>
-
-  <!-- RECENT TRANSACTIONS -->
+  <!-- TRANSACTIONS -->
   <div>
 
-    <div class="flex justify-between mb-4">
-      <h3 class="text-sm font-semibold">Transactions récentes</h3>
-      <span class="text-xs text-primary">Voir tout</span>
+    <div class="flex justify-between items-center mb-4">
+      <h3 class="text-sm font-semibold">
+        Transactions
+      </h3>
+      <span class="text-xs text-primary font-medium">
+        Voir tout
+      </span>
     </div>
 
     <div id="transactionsList" class="space-y-3"></div>
@@ -145,29 +147,24 @@ tailwind.config = {
 
 </div>
 
-<!-- BOTTOM NAV -->
-<div class="fixed bottom-0 left-0 right-0 bg-cardGlass backdrop-blur-xl border-t border-white/10 px-6 py-4">
+<!-- BOTTOM NAVIGATION -->
+<div class="fixed bottom-0 left-0 right-0 bg-white border-t shadow-md py-3">
 
-  <div class="max-w-md mx-auto flex justify-between text-sm text-gray-400">
+  <div class="max-w-md mx-auto flex justify-around text-xs">
 
     <div class="flex flex-col items-center text-primary">
-      <span>🏠</span>
-      <span class="text-xs mt-1">Home</span>
+      🏠
+      <span>Accueil</span>
     </div>
 
-    <div class="flex flex-col items-center">
-      <span>📊</span>
-      <span class="text-xs mt-1">Stats</span>
+    <div class="flex flex-col items-center text-textMuted">
+      📊
+      <span>Stats</span>
     </div>
 
-    <div class="flex flex-col items-center">
-      <span>💳</span>
-      <span class="text-xs mt-1">Cartes</span>
-    </div>
-
-    <div class="flex flex-col items-center">
-      <span>⚙️</span>
-      <span class="text-xs mt-1">Profil</span>
+    <div class="flex flex-col items-center text-textMuted">
+      👤
+      <span>Profil</span>
     </div>
 
   </div>
@@ -175,31 +172,42 @@ tailwind.config = {
 </div>
 
 <style>
-.glassBtn{
-  background: rgba(255,255,255,0.05);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 20px;
-  padding: 16px 10px;
+
+.walletAction{
   display:flex;
   flex-direction:column;
   align-items:center;
-  gap:8px;
-  font-size:12px;
-  transition:0.3s;
+  gap:4px;
+  font-size:11px;
 }
-.glassBtn:hover{
-  transform: translateY(-4px);
-}
-.iconCircle{
+
+.walletIcon{
   width:40px;
   height:40px;
   border-radius:14px;
   display:flex;
   align-items:center;
   justify-content:center;
-  font-size:18px;
+  font-size:16px;
 }
+
+.serviceItem{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:6px;
+}
+
+.serviceIcon{
+  width:40px;
+  height:40px;
+  border-radius:12px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:16px;
+}
+
 </style>
 
 </body>
