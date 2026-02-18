@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Dashboard - TrustLink</title>
 
-  <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
 
   <script>
@@ -15,7 +14,6 @@
           colors: {
             primary: "#2F3DD8",
             primaryDark: "#1F2AA6",
-            accent: "#3F5BFF",
             background: "#F4F6FA",
             card: "#FFFFFF",
             textDark: "#1E1E2D",
@@ -27,13 +25,8 @@
     }
   </script>
 
-  <!-- Firebase -->
   <script type="module" src="/trustlink_app/js/firebase-init.js"></script>
-
-  <!-- Dashboard Logic -->
-<script type="module" src="/trustlink_app/public/js/dashboard.js"></script>
-
-
+  <script type="module" src="/trustlink_app/public/js/dashboard.js"></script>
 </head>
 
 <body class="bg-background min-h-screen">
@@ -45,16 +38,30 @@
 
       <div>
         <p class="text-sm text-textMuted">Bienvenue</p>
-        <h2 id="userName" class="text-lg font-semibold text-textDark">
-          Chargement...
-        </h2>
+        <div class="flex items-center gap-2">
+          <h2 id="userName" class="text-lg font-semibold text-textDark">
+            Chargement...
+          </h2>
+          <span id="adminBadge"
+                class="hidden text-xs bg-primary text-white px-2 py-1 rounded-full">
+            ADMIN
+          </span>
+        </div>
       </div>
 
-      <div id="userAvatar"
-           class="w-11 h-11 bg-primary text-white rounded-full flex items-center justify-center font-semibold shadow-md">
-        --
-      </div>
+      <div class="flex items-center gap-3">
 
+        <div id="userAvatar"
+             class="w-11 h-11 bg-primary text-white rounded-full flex items-center justify-center font-semibold shadow-md">
+          --
+        </div>
+
+        <button id="logoutBtn"
+                class="text-xs text-red-500 hover:underline">
+          Logout
+        </button>
+
+      </div>
     </div>
 
     <!-- BALANCE -->
@@ -78,26 +85,12 @@
 
     <!-- ACTIONS -->
     <div class="grid grid-cols-2 gap-4 mb-10">
-
-      <button class="bg-card border border-borderLight rounded-xl py-5 flex flex-col items-center shadow-sm hover:shadow-md transition">
-        <span class="text-sm font-medium text-textDark">Envoyer</span>
+      <button class="bg-card border border-borderLight rounded-xl py-5 shadow-sm hover:shadow-md transition">
+        Envoyer
       </button>
-
-      <button class="bg-card border border-borderLight rounded-xl py-5 flex flex-col items-center shadow-sm hover:shadow-md transition">
-        <span class="text-sm font-medium text-textDark">Recharger</span>
+      <button class="bg-card border border-borderLight rounded-xl py-5 shadow-sm hover:shadow-md transition">
+        Recharger
       </button>
-
-    </div>
-
-    <!-- TRANSACTIONS -->
-    <div>
-      <h3 class="text-sm font-semibold text-textDark mb-4">
-        Transactions récentes
-      </h3>
-
-      <div id="transactionsList" class="space-y-3">
-        <!-- Dynamique plus tard -->
-      </div>
     </div>
 
   </div>
