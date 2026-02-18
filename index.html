@@ -1,138 +1,184 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>TrustLink</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>TrustLink</title>
 
-  <!-- Tailwind CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
+<!-- Tailwind CDN -->
+<script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- Tailwind Config -->
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            primary: "#2F3DD8",
-            primaryDark: "#1F2AA6",
-            accent: "#3F5BFF",
-            background: "#F4F6FA",
-            card: "#FFFFFF",
-            textDark: "#1E1E2D",
-            textMuted: "#6B7280",
-            borderLight: "#E5E7EB"
-          }
-        }
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        primary: "#1E2BE0",
+        primaryDark: "#0F1ACD",
+        accent: "#3D4BFF",
+        background: "#EEF2FF",
+        card: "#FFFFFF",
+        textDark: "#111827",
+        textMuted: "#6B7280",
+        borderLight: "#E5E7EB"
       }
     }
-  </script>
+  }
+}
+</script>
 
-  <!-- Firebase -->
-  <script type="module" src="/trustlink_app/js/firebase-init.js"></script>
-  <!-- Login Script -->
-  <script type="module" src="/trustlink_app/main_js/login.js"></script>
+<!-- Firebase -->
+<script type="module" src="/trustlink_app/js/firebase-init.js"></script>
+<script type="module" src="/trustlink_app/main_js/login.js"></script>
 
+<style>
+
+/* Glass premium effect */
+.glass-card {
+  backdrop-filter: blur(20px);
+  background: rgba(255,255,255,0.95);
+}
+
+/* Smooth focus animation */
+.input-focus:focus {
+  box-shadow: 0 0 0 3px rgba(30,43,224,0.2);
+}
+
+/* Button animation */
+.btn-primary {
+  transition: all 0.25s ease;
+}
+
+.btn-primary:active {
+  transform: scale(0.97);
+}
+
+</style>
 
 </head>
 
 <body class="min-h-screen bg-background flex items-center justify-center px-4">
 
-  <div class="w-full max-w-md bg-card rounded-2xl shadow-xl p-8 border border-borderLight">
+<div class="w-full max-w-sm glass-card rounded-3xl shadow-2xl p-7 border border-borderLight">
 
-    <!-- Logo -->
-    <div class="text-center mb-10">
-      <div class="w-14 h-14 mx-auto mb-4 rounded-xl bg-primary flex items-center justify-center shadow-lg">
-        <svg xmlns="http://www.w3.org/2000/svg"
-             fill="none"
-             viewBox="0 0 24 24"
-             stroke-width="1.8"
-             stroke="white"
-             class="w-6 h-6">
-          <path stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M12 3l7.5 4.5v6c0 5.25-3.75 8.25-7.5 9-3.75-.75-7.5-3.75-7.5-9v-6L12 3z"/>
-        </svg>
-      </div>
+  <!-- LOGO -->
+  <div class="text-center mb-8">
 
-      <h1 class="text-3xl font-bold text-primary">
-        TrustLink
-      </h1>
-
-      <p class="text-textMuted text-sm mt-2">
-        Plateforme de transfert sécurisée
-      </p>
+    <div class="w-14 h-14 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-lg">
+      <img src="/trustlink_app/assets/white.logo.png" class="h-6" alt="TrustLink">
     </div>
 
-    <!-- LOGIN FORM -->
-    <form id="loginForm" class="space-y-5">
+    <h1 class="text-2xl font-bold text-primary tracking-tight">
+      TrustLink
+    </h1>
 
-      <!-- Phone -->
-      <div>
-        <label class="block text-sm font-medium text-textDark">
-          Numéro de téléphone
-        </label>
-        <input 
-          id="phone"
-          type="text"
-          required
-          placeholder="+243 ..."
-          class="mt-2 w-full border border-borderLight rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary focus:outline-none transition"
-        />
-      </div>
-
-      <!-- Password -->
-      <div>
-        <label class="block text-sm font-medium text-textDark">
-          Mot de passe
-        </label>
-        <input 
-          id="password"
-          type="password"
-          required
-          placeholder="••••••••"
-          class="mt-2 w-full border border-borderLight rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary focus:outline-none transition"
-        />
-      </div>
-
-      <!-- Submit -->
-      <button 
-        type="submit"
-        class="w-full bg-primary hover:bg-primaryDark text-white font-semibold py-3 rounded-xl transition duration-300 shadow-md"
-      >
-        Connexion
-      </button>
-
-      <!-- Error -->
-      <p id="errorMsg" class="text-red-500 text-sm text-center hidden"></p>
-
-    </form>
-
-    <!-- Redirect -->
-    <p class="text-center text-textMuted text-sm mt-6">
-      Pas encore de compte ?
-      <a href="./public/register.html"
-         class="text-primary font-medium hover:underline">
-        Créer un compte
-      </a>
+    <p class="text-textMuted text-sm mt-1">
+      Accédez à votre espace sécurisé
     </p>
 
-    <!-- Footer -->
-    <div class="mt-8 flex items-center justify-center gap-2 text-xs text-textMuted">
-      <svg xmlns="http://www.w3.org/2000/svg"
-           fill="none"
-           viewBox="0 0 24 24"
-           stroke-width="1.5"
-           stroke="currentColor"
-           class="w-4 h-4 text-primary">
-        <path stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M12 3l7.5 4.5v6c0 5.25-3.75 8.25-7.5 9-3.75-.75-7.5-3.75-7.5-9v-6L12 3z"/>
-      </svg>
-      Connexion sécurisée SSL
+  </div>
+
+  <!-- FORM -->
+  <form id="loginForm" class="space-y-5" autocomplete="off">
+
+    <!-- PHONE -->
+    <div>
+      <label class="block text-sm font-medium text-textDark mb-1">
+        Numéro de téléphone
+      </label>
+
+      <input
+        id="phone"
+        type="text"
+        autocomplete="off"
+        required
+        placeholder="+243..."
+        class="input-focus w-full border border-borderLight rounded-xl px-4 py-3 text-sm focus:outline-none transition"
+      />
     </div>
 
+    <!-- PASSWORD -->
+    <div>
+      <label class="block text-sm font-medium text-textDark mb-1">
+        Mot de passe
+      </label>
+
+      <div class="relative">
+
+        <input
+          id="password"
+          type="password"
+          autocomplete="new-password"
+          required
+          placeholder="••••••••"
+          class="input-focus w-full border border-borderLight rounded-xl px-4 py-3 text-sm pr-12 focus:outline-none transition"
+        />
+
+        <!-- Toggle Password -->
+        <button
+          type="button"
+          id="togglePassword"
+          class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-primary transition"
+        >
+          👁
+        </button>
+
+      </div>
+    </div>
+
+    <!-- REMEMBER ME -->
+    <div class="flex items-center justify-between text-sm">
+
+      <label class="flex items-center gap-2 cursor-pointer">
+        <input type="checkbox" id="rememberMe" class="w-4 h-4 accent-primary">
+        <span class="text-textMuted">Se souvenir de moi</span>
+      </label>
+
+      <a href="#" class="text-primary font-medium text-xs hover:underline">
+        Mot de passe oublié ?
+      </a>
+
+    </div>
+
+    <!-- SUBMIT -->
+    <button
+      type="submit"
+      class="btn-primary w-full bg-gradient-to-r from-primary to-accent hover:from-primaryDark hover:to-primary text-white font-semibold py-3 rounded-xl shadow-lg"
+    >
+      Se connecter
+    </button>
+
+    <!-- ERROR -->
+    <p id="errorMsg" class="text-red-500 text-sm text-center hidden"></p>
+
+  </form>
+
+  <!-- REGISTER -->
+  <p class="text-center text-textMuted text-sm mt-6">
+    Pas encore inscrit ?
+    <a href="./public/register.html" class="text-primary font-medium hover:underline">
+      Créer un compte
+    </a>
+  </p>
+
+  <!-- FOOTER -->
+  <div class="mt-6 text-center text-xs text-textMuted flex items-center justify-center gap-2">
+    🔒 Connexion sécurisée SSL
   </div>
+
+</div>
+
+
+<!-- PASSWORD TOGGLE SCRIPT -->
+<script>
+const togglePassword = document.getElementById("togglePassword");
+const passwordInput = document.getElementById("password");
+
+togglePassword.addEventListener("click", () => {
+  const type = passwordInput.getAttribute("type") === "password" ? "text" : "password";
+  passwordInput.setAttribute("type", type);
+});
+</script>
 
 </body>
 </html>
