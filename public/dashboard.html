@@ -32,145 +32,85 @@ tailwind.config = {
 
 <style>
 /* ===============================
-   GLOBAL SHADOW SYSTEM
+   BACKGROUND REFINEMENT
 ================================ */
 
-/* Premium card shadow (banking grade) */
-.premium-shadow {
-  box-shadow:
-    0 15px 35px rgba(0, 0, 0, 0.08),
-    0 5px 15px rgba(0, 0, 0, 0.04);
-}
-
-/* Soft inner light effect */
-.inner-soft-light {
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,0.2),
-    inset 0 -1px 8px rgba(0,0,0,0.15);
+body {
+  background: #F3F4F6;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
 /* ===============================
-   INTERACTION FEEDBACK
+   PREMIUM CARD STYLE (NeoBank)
 ================================ */
 
-.soft-press {
-  transition: transform 0.12s ease, box-shadow 0.12s ease;
+.premium-shadow {
+  box-shadow:
+    0 20px 40px rgba(0, 0, 0, 0.08),
+    0 8px 16px rgba(0, 0, 0, 0.05);
 }
 
-.soft-press:active {
+.card-glass {
+  backdrop-filter: blur(20px);
+}
+
+/* ===============================
+   BALANCE TYPOGRAPHY
+================================ */
+
+.balance-text {
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+/* ===============================
+   QUICK ACTION PILLS
+================================ */
+
+.action-pill {
+  height: 48px;
+  border-radius: 999px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.action-pill:active {
   transform: scale(0.97);
 }
 
 /* ===============================
-   SCROLL IMPROVEMENT
+   TRANSACTION CARD BLOCK
 ================================ */
 
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-
-.no-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
+.transactions-card {
+  background: white;
+  border-radius: 20px;
+  padding: 16px;
+  box-shadow:
+    0 10px 25px rgba(0,0,0,0.05);
 }
 
 /* ===============================
-   CARD TEXTURE (SUBTLE)
+   BOTTOM NAV STYLE
 ================================ */
 
-.carbon-texture {
-  background-image:
-    repeating-linear-gradient(
-      45deg,
-      rgba(255,255,255,0.015) 0px,
-      rgba(255,255,255,0.015) 2px,
-      transparent 2px,
-      transparent 4px
-    );
-}
-
-/* ===============================
-   GRADIENT SYSTEM (STATIC)
-================================ */
-
-/* USD Gradient */
-.gradient-usd {
-  background: linear-gradient(
-    135deg,
-    #1B26A6 0%,
-    #2F3DD8 50%,
-    #4F6BFF 100%
-  );
-}
-
-/* CDF Gradient (slightly darker) */
-.gradient-cdf {
-  background: linear-gradient(
-    135deg,
-    #101552 0%,
-    #1C2490 50%,
-    #141B6E 100%
-  );
-}
-
-/* ===============================
-   LIGHT SPOT EFFECT
-================================ */
-
-.soft-light-spot {
-  position: absolute;
-  top: -40px;
-  right: -40px;
-  width: 140px;
-  height: 140px;
-  background: rgba(255,255,255,0.08);
-  border-radius: 50%;
-  filter: blur(40px);
-  pointer-events: none;
-}
-
-/* ===============================
-   TYPOGRAPHY REFINEMENT
-================================ */
-
-.balance-text {
-  letter-spacing: -0.5px;
-}
-
-.wallet-address {
-  letter-spacing: 2px;
-  font-size: 10px;
-  opacity: 0.75;
-}
-
-/* ===============================
-   FADE-IN ENTRY (SUBTLE)
-================================ */
-
-.fade-in {
-  animation: fadeIn 0.4s ease-out;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(6px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.bottom-nav {
+  backdrop-filter: blur(18px);
+  background: rgba(255,255,255,0.9);
+  border-radius: 999px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
 }
 
 </style>
 </head>
 
-<body class="bg-background min-h-screen font-sans text-gray-800 antialiased">
+<body class="min-h-screen font-sans text-gray-800 antialiased">
 
-<div class="max-w-md mx-auto px-4 pt-6 pb-28">
+<div class="max-w-md mx-auto px-5 pt-8 pb-28">
 
   <!-- HEADER -->
-  <div class="flex justify-between items-center mb-6">
+  <div class="flex justify-between items-center mb-8">
 
     <div class="flex items-center gap-3">
       <div id="userAvatar"
@@ -178,8 +118,8 @@ tailwind.config = {
         --
       </div>
       <div>
-        <p class="text-[11px] text-gray-400 leading-none">Bienvenue</p>
-        <h1 id="userName" class="text-sm font-semibold leading-tight">
+        <p class="text-[11px] text-gray-400 leading-none">Welcome to</p>
+        <h1 id="userName" class="text-base font-semibold leading-tight">
           Chargement...
         </h1>
       </div>
@@ -189,155 +129,41 @@ tailwind.config = {
 
   </div>
 
-  <!-- WALLET SWIPE -->
+  <!-- WALLET CARD -->
   <div class="mb-6">
+    <div class="relative w-full rounded-3xl p-6 text-white overflow-hidden premium-shadow">
 
-    <div class="flex gap-4 overflow-x-auto snap-x snap-mandatory scroll-smooth no-scrollbar">
+      <div class="absolute inset-0 gradient-usd rounded-3xl"></div>
 
-      <!-- USD CARD -->
-      <div class="snap-center shrink-0 w-full">
-        <div class="relative w-full aspect-[1.58] rounded-2xl px-4 py-4 text-white overflow-hidden premium-shadow">
+      <div class="relative">
 
-          <div class="absolute inset-0 gradient-usd rounded-2xl"></div>
-          <div class="soft-light-spot"></div>
-          <div class="absolute inset-0 carbon-texture rounded-2xl opacity-10"></div>
-
-          <div class="relative flex flex-col justify-between h-full">
-
-            <!-- Top -->
-            <div class="flex justify-between items-center">
-              <img src="/trustlink_app/assets/white.logo.png"
-                   class="h-4 opacity-90"
-                   alt="TrustLink"/>
-              <span class="text-[10px] tracking-wide opacity-70 font-medium">
-                USD
-              </span>
-            </div>
-
-            <!-- Balance -->
-            <div class="mt-2">
-              <p class="text-[10px] opacity-70 mb-1">
-                Solde disponible
-              </p>
-              <h2 id="balanceUSD"
-                  class="text-2xl font-bold balance-text leading-tight">
-              </h2>
-            </div>
-
-            <!-- Bottom -->
-            <div class="flex justify-between items-end mt-2">
-
-              <div>
-                <p class="text-[9px] opacity-60">
-                  Titulaire
-                </p>
-                <p id="cardUserNameUSD"
-                   class="text-[11px] font-semibold uppercase tracking-wide">
-                </p>
-              </div>
-
-              <div class="text-right">
-                <p id="walletAddressUSD"
-                   class="wallet-address">
-                </p>
-              </div>
-
-            </div>
-
-          </div>
+        <div class="flex justify-between items-center mb-6">
+          <span class="text-sm opacity-80">Balance</span>
+          <span class="text-xs bg-white/20 px-3 py-1 rounded-full">10%</span>
         </div>
-      </div>
 
-      <!-- CDF CARD -->
-      <div class="snap-center shrink-0 w-full">
-        <div class="relative w-full aspect-[1.58] rounded-2xl px-4 py-4 text-white overflow-hidden premium-shadow">
+        <h2 id="balanceUSD" class="balance-text mb-6"></h2>
 
-          <div class="absolute inset-0 gradient-cdf rounded-2xl"></div>
-          <div class="soft-light-spot"></div>
-          <div class="absolute inset-0 carbon-texture rounded-2xl opacity-15"></div>
-
-          <div class="relative flex flex-col justify-between h-full">
-
-            <div class="flex justify-between items-center">
-              <img src="/trustlink_app/assets/white.logo.png"
-                   class="h-4 opacity-90"
-                   alt="TrustLink"/>
-              <span class="text-[10px] tracking-wide opacity-70 font-medium">
-                CDF
-              </span>
-            </div>
-
-            <div class="mt-2">
-              <p class="text-[10px] opacity-70 mb-1">
-                Solde disponible
-              </p>
-              <h2 id="balanceCDF"
-                  class="text-2xl font-bold balance-text leading-tight">
-              </h2>
-            </div>
-
-            <div class="flex justify-between items-end mt-2">
-
-              <div>
-                <p class="text-[9px] opacity-60">
-                  Titulaire
-                </p>
-                <p id="cardUserNameCDF"
-                   class="text-[11px] font-semibold uppercase tracking-wide">
-                </p>
-              </div>
-
-              <div class="text-right">
-                <p id="walletAddressCDF"
-                   class="wallet-address">
-                </p>
-              </div>
-
-            </div>
-
-          </div>
+        <div>
+          <p class="text-xs opacity-70 mb-1">Wallet address:</p>
+          <p id="walletAddressUSD" class="text-xs opacity-90 break-all"></p>
         </div>
+
       </div>
-
     </div>
-
-    <!-- Minimal Swipe Indicator -->
-    <div class="flex justify-center gap-1.5 mt-3">
-      <div class="w-1.5 h-1.5 bg-primary rounded-full"></div>
-      <div class="w-1.5 h-1.5 bg-gray-300 rounded-full"></div>
-    </div>
-
   </div>
 
-  <!-- QUICK ACTIONS -->
-  <div class="grid grid-cols-4 gap-4 text-center mb-10">
+  <!-- ACTION BUTTONS -->
+  <div class="flex gap-4 mb-8">
 
-    <button class="soft-press flex flex-col items-center gap-2">
-      <div class="w-14 h-14 bg-white rounded-xl premium-shadow flex items-center justify-center">
-        <i class="bi bi-arrow-up-right text-lg text-primary"></i>
-      </div>
-      <span class="text-[11px] font-medium">Envoyer</span>
+    <button class="action-pill flex-1 bg-primary text-white flex items-center justify-center gap-2">
+      <i class="bi bi-arrow-up-right"></i>
+      Send
     </button>
 
-    <button class="soft-press flex flex-col items-center gap-2">
-      <div class="w-14 h-14 bg-white rounded-xl premium-shadow flex items-center justify-center">
-        <i class="bi bi-arrow-down-left text-lg text-primary"></i>
-      </div>
-      <span class="text-[11px] font-medium">Recevoir</span>
-    </button>
-
-    <button class="soft-press flex flex-col items-center gap-2">
-      <div class="w-14 h-14 bg-white rounded-xl premium-shadow flex items-center justify-center">
-        <i class="bi bi-plus-circle text-lg text-primary"></i>
-      </div>
-      <span class="text-[11px] font-medium">Ajouter</span>
-    </button>
-
-    <button class="soft-press flex flex-col items-center gap-2">
-      <div class="w-14 h-14 bg-white rounded-xl premium-shadow flex items-center justify-center">
-        <i class="bi bi-clock-history text-lg text-primary"></i>
-      </div>
-      <span class="text-[11px] font-medium">Historique</span>
+    <button class="action-pill flex-1 bg-emerald-500 text-white flex items-center justify-center gap-2">
+      <i class="bi bi-arrow-down-left"></i>
+      Receive
     </button>
 
   </div>
@@ -345,20 +171,19 @@ tailwind.config = {
   <!-- TRANSACTIONS -->
   <div>
 
-    <div class="flex justify-between items-center mb-4">
-      <h3 class="text-sm font-semibold">Activité récente</h3>
-      <span class="text-xs text-primary font-medium">Voir tout</span>
-    </div>
+    <h3 class="text-base font-semibold mb-4">Transactions</h3>
 
-    <div id="transactionsList" class="space-y-3"></div>
+    <div class="transactions-card">
+      <div id="transactionsList" class="space-y-4"></div>
+    </div>
 
   </div>
 
 </div>
 
 <!-- BOTTOM NAV -->
-<div class="fixed bottom-4 left-0 right-0 flex justify-center">
-  <div class="bg-white/95 backdrop-blur-md rounded-full shadow-lg px-12 py-3 flex gap-10 items-center">
+<div class="fixed bottom-6 left-0 right-0 flex justify-center">
+  <div class="bottom-nav px-12 py-3 flex gap-10 items-center">
     <i class="bi bi-house-door-fill text-lg text-primary"></i>
     <i class="bi bi-bar-chart text-lg text-gray-400"></i>
     <i class="bi bi-person text-lg text-gray-400"></i>
@@ -366,4 +191,5 @@ tailwind.config = {
 </div>
 
 </body>
+
 </html>
