@@ -117,49 +117,59 @@ tailwind.config = {
 
   </div>
 
- <!-- WALLET CARDS -->
-<div class="mb-8">
+ <!-- WALLET SWIPE ULTRA COMPACT -->
+<div class="mb-6">
 
-  <div class="flex gap-5 overflow-x-auto snap-x snap-mandatory scroll-smooth no-scrollbar">
+  <div class="flex gap-4 overflow-x-auto snap-x snap-mandatory scroll-smooth no-scrollbar">
 
     <!-- USD CARD -->
     <div class="snap-center shrink-0 w-full">
-      <div class="relative w-full aspect-[1.6] rounded-3xl p-6 text-white overflow-hidden shadow-2xl">
+      <div class="relative w-full aspect-[1.58] rounded-2xl px-5 py-5 text-white overflow-hidden shadow-xl">
 
-        <!-- Gradient profond -->
+        <!-- Gradient -->
         <div class="absolute inset-0 bg-gradient-to-br from-[#1B26A6] via-[#2F3DD8] to-[#4F6BFF]"></div>
 
-        <!-- Soft Light -->
-        <div class="absolute top-[-40px] right-[-40px] w-40 h-40 bg-white/10 rounded-full blur-3xl"></div>
+        <!-- Light Spot -->
+        <div class="absolute -top-10 -right-10 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
 
         <!-- Texture -->
-        <div class="absolute inset-0 opacity-20 carbon-texture"></div>
+        <div class="absolute inset-0 opacity-15 carbon-texture"></div>
 
         <div class="relative flex flex-col justify-between h-full">
 
+          <!-- Top -->
           <div class="flex justify-between items-center">
-            <img src="/trustlink_app/assets/white.logo.png" class="h-5 opacity-90"/>
-            <span class="text-xs opacity-70 font-medium tracking-wide">USD</span>
+            <img src="/trustlink_app/assets/white.logo.png" class="h-4 opacity-90"/>
+            <span class="text-[10px] tracking-wide opacity-70 font-medium">
+              USD
+            </span>
           </div>
 
-          <div>
-            <p class="text-xs opacity-70 mb-1">Solde disponible</p>
-            <h2 id="balanceUSD" class="text-3xl font-bold tracking-tight">
-              $0.00
+          <!-- Balance -->
+          <div class="mt-2">
+            <p class="text-[11px] opacity-70 mb-1">
+              Solde disponible
+            </p>
+            <h2 id="balanceUSD"
+                class="text-2xl font-bold tracking-tight leading-tight">
             </h2>
           </div>
 
-          <div class="flex justify-between items-end">
+          <!-- Bottom -->
+          <div class="flex justify-between items-end mt-3">
 
             <div>
-              <p class="text-[10px] opacity-60">Titulaire</p>
-              <p id="cardUserNameUSD" class="text-sm font-semibold uppercase tracking-wide">
+              <p class="text-[9px] opacity-60">
+                Titulaire
+              </p>
+              <p id="cardUserNameUSD"
+                 class="text-xs font-semibold uppercase tracking-wide">
               </p>
             </div>
 
             <div class="text-right">
-              <p class="text-[10px] opacity-60">Adresse</p>
-              <p id="walletAddressUSD" class="text-xs tracking-widest opacity-80">
+              <p id="walletAddressUSD"
+                 class="text-[9px] tracking-widest opacity-70">
               </p>
             </div>
 
@@ -171,37 +181,44 @@ tailwind.config = {
 
     <!-- CDF CARD -->
     <div class="snap-center shrink-0 w-full">
-      <div class="relative w-full aspect-[1.6] rounded-3xl p-6 text-white overflow-hidden shadow-2xl">
+      <div class="relative w-full aspect-[1.58] rounded-2xl px-5 py-5 text-white overflow-hidden shadow-xl">
 
         <div class="absolute inset-0 bg-gradient-to-br from-[#111764] via-[#1C2490] to-[#141B6E]"></div>
-        <div class="absolute top-[-40px] right-[-40px] w-40 h-40 bg-white/10 rounded-full blur-3xl"></div>
-        <div class="absolute inset-0 opacity-25 carbon-texture"></div>
+        <div class="absolute -top-10 -right-10 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
+        <div class="absolute inset-0 opacity-20 carbon-texture"></div>
 
         <div class="relative flex flex-col justify-between h-full">
 
           <div class="flex justify-between items-center">
-            <img src="/trustlink_app/assets/white.logo.png" class="h-5 opacity-90"/>
-            <span class="text-xs opacity-70 font-medium tracking-wide">CDF</span>
+            <img src="/trustlink_app/assets/white.logo.png" class="h-4 opacity-90"/>
+            <span class="text-[10px] tracking-wide opacity-70 font-medium">
+              CDF
+            </span>
           </div>
 
-          <div>
-            <p class="text-xs opacity-70 mb-1">Solde disponible</p>
-            <h2 id="balanceCDF" class="text-3xl font-bold tracking-tight">
-              0 CDF
+          <div class="mt-2">
+            <p class="text-[11px] opacity-70 mb-1">
+              Solde disponible
+            </p>
+            <h2 id="balanceCDF"
+                class="text-2xl font-bold tracking-tight leading-tight">
             </h2>
           </div>
 
-          <div class="flex justify-between items-end">
+          <div class="flex justify-between items-end mt-3">
 
             <div>
-              <p class="text-[10px] opacity-60">Titulaire</p>
-              <p id="cardUserNameCDF" class="text-sm font-semibold uppercase tracking-wide">
+              <p class="text-[9px] opacity-60">
+                Titulaire
+              </p>
+              <p id="cardUserNameCDF"
+                 class="text-xs font-semibold uppercase tracking-wide">
               </p>
             </div>
 
             <div class="text-right">
-              <p class="text-[10px] opacity-60">Adresse</p>
-              <p id="walletAddressCDF" class="text-xs tracking-widest opacity-80">
+              <p id="walletAddressCDF"
+                 class="text-[9px] tracking-widest opacity-70">
               </p>
             </div>
 
@@ -212,6 +229,14 @@ tailwind.config = {
     </div>
 
   </div>
+
+  <!-- Swipe Indicator Minimal -->
+  <div class="flex justify-center gap-1.5 mt-3">
+    <div class="w-1.5 h-1.5 bg-primary rounded-full"></div>
+    <div class="w-1.5 h-1.5 bg-gray-300 rounded-full"></div>
+  </div>
+
+</div>
 
   <!-- Swipe indicator -->
   <div class="flex justify-center gap-2 mt-4">
