@@ -241,67 +241,120 @@ if (logoutBtn) {
 /* ===============================
    NOUVEAU
 ================================ */
-      async function approveTransfer(txId) {
-      
-        try {
-      
-          const txRef = doc(db, "transactions", txId);
-      
-          await runTransaction(db, async (transaction) => {
-      
-            const txDoc = await transaction.get(txRef);
-      
-            if (!txDoc.exists()) throw "Transaction introuvable";
-      
-            const tx = txDoc.data();
-      
-            if (tx.status !== "pending")
-              throw "Transaction déjà traitée";
-      
-            const fromWalletRef = doc(db, "wallets", tx.fromWalletId);
-            const toWalletRef = doc(db, "wallets", tx.toWalletId);
-      
-            const fromWalletDoc = await transaction.get(fromWalletRef);
-            const toWalletDoc = await transaction.get(toWalletRef);
-      
-            if (!fromWalletDoc.exists() || !toWalletDoc.exists())
-              throw "Wallet introuvable";
-      
-            const fromWallet = fromWalletDoc.data();
-            const toWallet = toWalletDoc.data();
-      
-            if (fromWallet.balance < tx.amount)
-              throw "Solde insuffisant";
-      
-            transaction.update(fromWalletRef, {
-              balance: fromWallet.balance - tx.amount,
-              updatedAt: serverTimestamp()
-            });
-      
-            transaction.update(toWalletRef, {
-              balance: toWallet.balance + tx.amount,
-              updatedAt: serverTimestamp()
-            });
-      
-            transaction.update(txRef, {
-              status: "completed",
-              updatedAt: serverTimestamp()
-            });
-      
-          });
-      
-          alert("Transfert approuvé ✔️");
-      
-        } catch (error) {
-          console.error(error);
-          alert("Erreur lors de l'approbation");
-        }
-      }
-      
-      window.approveTransfer = approveTransfer;
+async function approveTransfer(txId) {
 
+  try {
 
+    const txRef = doc(db, "transactions", txId);
 
+    await runTransaction(db, async (transaction) => {
+
+      const txDoc = await transaction.get(txRef);
+      if (!txDoc.exists())
+        throw "Transaction introuvable";
+
+      const tx = txDoc.data();
+
+      if (tx.status !== "pending")
+        throw "Déjà traité";
+
+      const fromWalletRef = doc(db, "wallets", tx.fromWalletId);
+      const toWalletRef = doc(db, "wallets", tx.toWalletId);
+
+      const fromDoc = await transaction.get(fromWalletRef);
+      const toDoc = await transaction.get(toWalletRef);
+
+      if (!fromDoc.exists() || !toDoc.exists())
+        throw "Wallet introuvable";
+
+      const fromWallet = fromDoc.data();
+      const toWallet = toDoc.data();
+
+      /* Vérification sécurité */
+      if (fromWallet.reservedBalance < tx.amount)
+        throw "Incohérence réserve";
+
+      /* Débit réel */
+      transaction.update(fromWalletRef, {
+        balance: fromWallet.balance - tx.amount,
+        reservedBalance: fromWallet.reservedBalance - tx.amount,
+        updatedAt: serverTimestamp()
+      });
+
+      /* Crédit */
+      transaction.update(toWalletRef, {
+        balance: toWallet.balance + tx.amount,
+        updatedAt: serverTimestamp()
+      });
+
+      /* Update status */
+      transaction.update(txRef, {
+        status: "completed",
+        updatedAt: serverTimestamp()
+      });
+
+    });
+
+    alert("Transfert approuvé ✔️");
+
+  } catch (error) {
+    console.error(error);
+    alert(error);
+  }
+}
+
+window.approveTransfer = approveTransfer;
+
+/* ===============================
+   REJECT TRANSFER
+================================ */
+async function rejectTransfer(txId) {
+
+  try {
+
+    const txRef = doc(db, "transactions", txId);
+
+    await runTransaction(db, async (transaction) => {
+
+      const txDoc = await transaction.get(txRef);
+      if (!txDoc.exists())
+        throw "Transaction introuvable";
+
+      const tx = txDoc.data();
+
+      if (tx.status !== "pending")
+        throw "Déjà traité";
+
+      const fromWalletRef = doc(db, "wallets", tx.fromWalletId);
+      const fromDoc = await transaction.get(fromWalletRef);
+
+      if (!fromDoc.exists())
+        throw "Wallet introuvable";
+
+      const fromWallet = fromDoc.data();
+
+      /* Libération des fonds */
+      transaction.update(fromWalletRef, {
+        reservedBalance: fromWallet.reservedBalance - tx.amount,
+        updatedAt: serverTimestamp()
+      });
+
+      transaction.update(txRef, {
+        status: "rejected",
+        updatedAt: serverTimestamp()
+      });
+
+    });
+
+    alert("Transfert refusé ❌");
+
+  } catch (error) {
+    console.error(error);
+    alert(error);
+  }
+}
+
+window.rejectTransfer = rejectTransfer;
 
 /* ===============================
    INIT
