@@ -36,6 +36,8 @@ const form = document.getElementById("transferForm");
 const submitBtn = document.getElementById("submitBtn");
 const btnText = document.getElementById("btnText");
 const btnSpinner = document.getElementById("btnSpinner");
+const friendSelect = document.getElementById("friendSelect");
+
 
 let selectedWallet = null;
 let recipientWalletData = null;
@@ -223,6 +225,81 @@ form.addEventListener("submit", async (e) => {
     setLoading(false);
     showError(error);
   }
+});
+/* ===============================
+   CHARGE FREINDS
+================================ */
+async function loadFriends() {
+
+  const q = query(
+    collection(db, "friends"),
+    where("userId", "==", userId)
+  );
+
+  const snapshot = await getDocs(q);
+
+  snapshot.forEach(async (docSnap) => {
+
+    const friendId = docSnap.data().friendId;
+
+    const userDoc = await getDoc(doc(db, "users", friendId));
+    if (!userDoc.exists()) return;
+
+    const user = userDoc.data();
+
+    const option = document.createElement("option");
+    option.value = friendId;
+    option.textContent =
+      `${user.firstName} ${user.lastName} (${user.username})`;
+
+    friendSelect.appendChild(option);
+  });
+}
+
+loadFriends();
+/* ===============================
+   FREINDS SELECT
+================================ */
+friendSelect.addEventListener("change", async () => {
+
+  const friendId = friendSelect.value;
+  if (!friendId) return;
+
+  /* On récupère son wallet correspondant à la devise sélectionnée */
+  const q = query(
+    collection(db, "wallets"),
+    where("userId", "==", friendId),
+    where("currency", "==", selectedWallet.currency)
+  );
+
+  const snapshot = await getDocs(q);
+
+  if (snapshot.empty) {
+    showError("Ce contact n'a pas de wallet compatible.");
+    return;
+  }
+
+  const walletDoc = snapshot.docs[0];
+  const wallet = walletDoc.data();
+
+  recipientInput.value = wallet.walletAddress;
+  recipientWalletData = wallet;
+
+  /* Simuler preview */
+  const userDoc = await getDoc(doc(db, "users", friendId));
+  const user = userDoc.data();
+
+  recipientAvatar.src =
+    `https://api.dicebear.com/7.x/avataaars/png?seed=${user.username}`;
+
+  recipientName.textContent =
+    `${user.firstName} ${user.lastName}`;
+
+  recipientUsername.textContent =
+    user.username;
+
+  recipientPreview.classList.remove("hidden");
+
 });
 
 /* ===============================
