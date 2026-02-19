@@ -162,10 +162,12 @@ function loadTransactions() {
 
     container.innerHTML = "";
 
-    snapshot.forEach((doc) => {
-
-      const tx = doc.data();
+    snapshot.forEach((docSnap) => {
+    
+      const tx = docSnap.data();
+      const txId = docSnap.id;
       const isSender = tx.fromUserId === userId;
+
 
       const div = document.createElement("div");
 
@@ -190,12 +192,29 @@ function loadTransactions() {
 
         </div>
 
+<div class="flex items-center gap-3">
+
         <span class="text-sm font-semibold ${
           isSender ? "text-red-500" : "text-green-600"
         }">
           ${isSender ? "-" : "+"}
           ${formatMoney(tx.amount, tx.currency)}
         </span>
+      
+        ${
+          tx.status === "pending" && tx.toUserId === userId
+            ? `
+              <button
+                onclick="approveTransfer('${txId}')"
+                class="px-3 py-1 bg-green-500 text-white text-xs rounded-lg">
+                Approuver
+              </button>
+            `
+            : ""
+        }
+      
+      </div>
+
       `;
 
       container.appendChild(div);
@@ -219,6 +238,70 @@ if (logoutBtn) {
     window.location.href = "/trustlink_app/index.html";
   });
 }
+/* ===============================
+   NOUVEAU
+================================ */
+      async function approveTransfer(txId) {
+      
+        try {
+      
+          const txRef = doc(db, "transactions", txId);
+      
+          await runTransaction(db, async (transaction) => {
+      
+            const txDoc = await transaction.get(txRef);
+      
+            if (!txDoc.exists()) throw "Transaction introuvable";
+      
+            const tx = txDoc.data();
+      
+            if (tx.status !== "pending")
+              throw "Transaction déjà traitée";
+      
+            const fromWalletRef = doc(db, "wallets", tx.fromWalletId);
+            const toWalletRef = doc(db, "wallets", tx.toWalletId);
+      
+            const fromWalletDoc = await transaction.get(fromWalletRef);
+            const toWalletDoc = await transaction.get(toWalletRef);
+      
+            if (!fromWalletDoc.exists() || !toWalletDoc.exists())
+              throw "Wallet introuvable";
+      
+            const fromWallet = fromWalletDoc.data();
+            const toWallet = toWalletDoc.data();
+      
+            if (fromWallet.balance < tx.amount)
+              throw "Solde insuffisant";
+      
+            transaction.update(fromWalletRef, {
+              balance: fromWallet.balance - tx.amount,
+              updatedAt: serverTimestamp()
+            });
+      
+            transaction.update(toWalletRef, {
+              balance: toWallet.balance + tx.amount,
+              updatedAt: serverTimestamp()
+            });
+      
+            transaction.update(txRef, {
+              status: "completed",
+              updatedAt: serverTimestamp()
+            });
+      
+          });
+      
+          alert("Transfert approuvé ✔️");
+      
+        } catch (error) {
+          console.error(error);
+          alert("Erreur lors de l'approbation");
+        }
+      }
+      
+      window.approveTransfer = approveTransfer;
+
+
+
 
 /* ===============================
    INIT
