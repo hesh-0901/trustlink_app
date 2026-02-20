@@ -10,37 +10,30 @@ import {
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-/* ===============================
-   SESSION
-================================ */
 const userId =
   localStorage.getItem("userId") ||
   sessionStorage.getItem("userId");
 
-if (!userId) {
+if (!userId)
   window.location.href = "/trustlink_app/index.html";
-}
 
-/* ===============================
-   ELEMENTS
-================================ */
+/* ELEMENTS */
 const walletSelect = document.getElementById("walletSelect");
-const walletInfo = document.getElementById("walletInfo");
-const recipientInput = document.getElementById("recipientWallet");
-const recipientPreview = document.getElementById("recipientPreview");
-const recipientAvatar = document.getElementById("recipientAvatar");
-const recipientName = document.getElementById("recipientName");
-const recipientUsername = document.getElementById("recipientUsername");
+const beneficiarySelect = document.getElementById("beneficiarySelect");
+const manualWallet = document.getElementById("manualWallet");
+const amountInput = document.getElementById("amount");
+const currencyTag = document.getElementById("currencyTag");
+const summaryBox = document.getElementById("summaryBox");
+const confirmBtn = document.getElementById("confirmBtn");
 const errorMsg = document.getElementById("errorMsg");
-const form = document.getElementById("transferForm");
-const submitBtn = document.getElementById("submitBtn");
-const btnText = document.getElementById("btnText");
-const btnSpinner = document.getElementById("btnSpinner");
-const friendSelect = document.getElementById("friendSelect");
 
+const walletBalance = document.getElementById("walletBalance");
+const walletReserved = document.getElementById("walletReserved");
+const walletAvailable = document.getElementById("walletAvailable");
+const walletCurrency = document.getElementById("walletCurrency");
 
 let selectedWallet = null;
-let recipientWalletData = null;
+let selectedRecipient = null;
 
 /* ===============================
    LOAD WALLETS
@@ -56,13 +49,12 @@ async function loadWallets() {
   const snapshot = await getDocs(q);
 
   snapshot.forEach(docSnap => {
-
     const wallet = docSnap.data();
 
     const option = document.createElement("option");
     option.value = docSnap.id;
     option.textContent =
-      `${wallet.walletAddress} (${wallet.currency})`;
+      `${wallet.currency} - ${wallet.walletAddress}`;
 
     walletSelect.appendChild(option);
   });
@@ -71,248 +63,172 @@ async function loadWallets() {
 loadWallets();
 
 /* ===============================
+   LOAD BENEFICIARIES
+================================ */
+async function loadBeneficiaries() {
+
+  const q = query(
+    collection(db, "beneficiaries"),
+    where("userId", "==", userId)
+  );
+
+  const snapshot = await getDocs(q);
+
+  for (const docSnap of snapshot.docs) {
+
+    const beneficiaryId = docSnap.data().beneficiaryId;
+    const userSnap = await getDoc(doc(db, "users", beneficiaryId));
+
+    if (!userSnap.exists()) continue;
+
+    const user = userSnap.data();
+
+    const option = document.createElement("option");
+    option.value = beneficiaryId;
+    option.textContent =
+      `${user.firstName} ${user.lastName}`;
+
+    beneficiarySelect.appendChild(option);
+  }
+}
+
+loadBeneficiaries();
+
+/* ===============================
    WALLET CHANGE
 ================================ */
 walletSelect.addEventListener("change", async () => {
 
-  const walletId = walletSelect.value;
-  if (!walletId) return;
+  const walletDoc =
+    await getDoc(doc(db, "wallets", walletSelect.value));
 
-  const walletDoc = await getDoc(doc(db, "wallets", walletId));
   if (!walletDoc.exists()) return;
 
   selectedWallet = walletDoc.data();
 
-  const available =
-    selectedWallet.balance - (selectedWallet.reservedBalance || 0);
+  const reserved = selectedWallet.reservedBalance || 0;
+  const available = selectedWallet.balance - reserved;
 
-  walletInfo.textContent =
-    `Solde disponible : ${available} ${selectedWallet.currency}`;
+  walletCurrency.textContent = selectedWallet.currency;
+  walletBalance.textContent = selectedWallet.balance;
+  walletReserved.textContent = reserved;
+  walletAvailable.textContent = available;
+  currencyTag.textContent = selectedWallet.currency;
 });
 
 /* ===============================
-   DEST VALIDATION
+   BENEFICIARY SELECT
 ================================ */
-recipientInput.addEventListener("blur", async () => {
+beneficiarySelect.addEventListener("change", async () => {
 
-  const walletAddress = recipientInput.value.trim();
-  if (!walletAddress) return;
+  const beneficiaryId = beneficiarySelect.value;
+  if (!beneficiaryId) return;
 
-  const walletSnap = await getDoc(doc(db, "wallets", walletAddress));
+  const q = query(
+    collection(db, "wallets"),
+    where("userId", "==", beneficiaryId),
+    where("currency", "==", selectedWallet.currency)
+  );
 
-  if (!walletSnap.exists()) {
-    hideRecipient();
-    return showError("Wallet introuvable.");
-  }
+  const snapshot = await getDocs(q);
 
-  const wallet = walletSnap.data();
+  if (snapshot.empty)
+    return showError("Pas de wallet compatible");
 
-  if (wallet.userId === userId) {
-    hideRecipient();
-    return showError("Impossible d'envoyer à soi-même.");
-  }
-
-  if (selectedWallet &&
-      wallet.currency !== selectedWallet.currency) {
-    hideRecipient();
-    return showError("Devise incompatible.");
-  }
-
-  const userSnap =
-    await getDoc(doc(db, "users", wallet.userId));
-
-  if (!userSnap.exists()) return;
-
-  const user = userSnap.data();
-
-  recipientAvatar.src =
-    `https://api.dicebear.com/7.x/avataaars/png?seed=${user.username}`;
-
-  recipientName.textContent =
-    `${user.firstName} ${user.lastName}`;
-
-  recipientUsername.textContent =
-    user.username;
-
-  recipientPreview.classList.remove("hidden");
-  recipientWalletData = wallet;
-  errorMsg.classList.add("hidden");
+  selectedRecipient = snapshot.docs[0].data();
+  manualWallet.value = selectedRecipient.walletAddress;
 });
 
-function hideRecipient() {
-  recipientPreview.classList.add("hidden");
-  recipientWalletData = null;
+/* ===============================
+   SUMMARY UPDATE
+================================ */
+amountInput.addEventListener("input", updateSummary);
+
+function updateSummary() {
+
+  if (!selectedWallet || !amountInput.value) {
+    summaryBox.classList.add("hidden");
+    return;
+  }
+
+  summaryBox.innerHTML = `
+    <div><strong>Montant:</strong> ${amountInput.value} ${selectedWallet.currency}</div>
+    <div><strong>Disponible après:</strong>
+      ${(selectedWallet.balance - (selectedWallet.reservedBalance || 0) - amountInput.value)}
+    </div>
+  `;
+
+  summaryBox.classList.remove("hidden");
 }
 
 /* ===============================
-   SUBMIT
+   CONFIRM
 ================================ */
-form.addEventListener("submit", async (e) => {
+confirmBtn.addEventListener("click", async () => {
 
-  e.preventDefault();
+  const amount = parseFloat(amountInput.value);
+  const recipientAddress = manualWallet.value.trim();
 
-  const walletId = walletSelect.value;
-  const amount = parseFloat(document.getElementById("amount").value);
-  const motifType = document.getElementById("motifType").value;
-  const customMotif =
-    document.getElementById("customMotif").value.trim();
-
-  if (!walletId ||
-      !recipientWalletData ||
-      !amount ||
-      amount <= 0 ||
-      !motifType ||
-      !customMotif) {
-    return showError("Tous les champs sont obligatoires.");
-  }
+  if (!selectedWallet || !recipientAddress || !amount)
+    return showError("Champs requis");
 
   try {
 
-    setLoading(true);
-
-    const fromWalletRef = doc(db, "wallets", walletId);
+    const fromRef = doc(db, "wallets", walletSelect.value);
     const txRef = doc(collection(db, "transactions"));
 
     await runTransaction(db, async (transaction) => {
 
-      const fromDoc = await transaction.get(fromWalletRef);
-      if (!fromDoc.exists())
-        throw "Wallet introuvable";
-
+      const fromDoc = await transaction.get(fromRef);
       const fromWallet = fromDoc.data();
 
-      const reserved =
-        fromWallet.reservedBalance || 0;
-
-      const available =
-        fromWallet.balance - reserved;
+      const reserved = fromWallet.reservedBalance || 0;
+      const available = fromWallet.balance - reserved;
 
       if (amount > available)
         throw "Solde insuffisant";
 
-      /* 🔒 Reserve funds */
-      transaction.update(fromWalletRef, {
+      transaction.update(fromRef, {
         reservedBalance: reserved + amount,
         updatedAt: serverTimestamp()
       });
 
-      /* 📝 Create transaction */
+      const toWalletDoc =
+        await transaction.get(doc(db, "wallets", recipientAddress));
+
+      if (!toWalletDoc.exists())
+        throw "Destinataire introuvable";
+
+      const toWallet = toWalletDoc.data();
+
       transaction.set(txRef, {
         type: "transfer",
         status: "pending",
         fromUserId: userId,
-        toUserId: recipientWalletData.userId,
-        fromWalletId: walletId,
-        toWalletId: recipientWalletData.walletAddress,
-        currency: fromWallet.currency,
+        toUserId: toWallet.userId,
+        fromWalletId: walletSelect.value,
+        toWalletId: recipientAddress,
+        currency: selectedWallet.currency,
         amount,
-        motifType,
-        customMotif,
-        participants: [userId, recipientWalletData.userId],
+        motifType: document.getElementById("motifType").value,
+        customMotif: document.getElementById("customMotif").value,
+        participants: [userId, toWallet.userId],
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp()
       });
 
     });
 
-    form.reset();
-    hideRecipient();
-    setLoading(false);
-    alert("Transfert en attente ✔️");
+    alert("Virement en attente ✔️");
+    location.reload();
 
   } catch (error) {
-    console.error(error);
-    setLoading(false);
     showError(error);
   }
-});
-/* ===============================
-   CHARGE FREINDS
-================================ */
-async function loadFriends() {
-
-  const q = query(
-    collection(db, "friends"),
-    where("userId", "==", userId)
-  );
-
-  const snapshot = await getDocs(q);
-
-  snapshot.forEach(async (docSnap) => {
-
-    const friendId = docSnap.data().friendId;
-
-    const userDoc = await getDoc(doc(db, "users", friendId));
-    if (!userDoc.exists()) return;
-
-    const user = userDoc.data();
-
-    const option = document.createElement("option");
-    option.value = friendId;
-    option.textContent =
-      `${user.firstName} ${user.lastName} (${user.username})`;
-
-    friendSelect.appendChild(option);
-  });
-}
-
-loadFriends();
-/* ===============================
-   FREINDS SELECT
-================================ */
-friendSelect.addEventListener("change", async () => {
-
-  const friendId = friendSelect.value;
-  if (!friendId) return;
-
-  /* On récupère son wallet correspondant à la devise sélectionnée */
-  const q = query(
-    collection(db, "wallets"),
-    where("userId", "==", friendId),
-    where("currency", "==", selectedWallet.currency)
-  );
-
-  const snapshot = await getDocs(q);
-
-  if (snapshot.empty) {
-    showError("Ce contact n'a pas de wallet compatible.");
-    return;
-  }
-
-  const walletDoc = snapshot.docs[0];
-  const wallet = walletDoc.data();
-
-  recipientInput.value = wallet.walletAddress;
-  recipientWalletData = wallet;
-
-  /* Simuler preview */
-  const userDoc = await getDoc(doc(db, "users", friendId));
-  const user = userDoc.data();
-
-  recipientAvatar.src =
-    `https://api.dicebear.com/7.x/avataaars/png?seed=${user.username}`;
-
-  recipientName.textContent =
-    `${user.firstName} ${user.lastName}`;
-
-  recipientUsername.textContent =
-    user.username;
-
-  recipientPreview.classList.remove("hidden");
 
 });
 
-/* ===============================
-   HELPERS
-================================ */
-function showError(message) {
-  errorMsg.textContent = message;
+function showError(msg) {
+  errorMsg.textContent = msg;
   errorMsg.classList.remove("hidden");
-}
-
-function setLoading(state) {
-  submitBtn.disabled = state;
-  btnSpinner.classList.toggle("hidden", !state);
-  btnText.textContent =
-    state ? "Traitement..." : "Confirmer transfert";
 }
