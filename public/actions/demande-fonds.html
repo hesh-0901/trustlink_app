@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Demande de fonds - TrustLink</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
+<script type="module" src="/trustlink_app/js/firebase-init.js"></script>
+<script type="module" src="/trustlink_app/js/demande-fonds.js"></script>
+<script type="module" src="/trustlink_app/main_js/layout.js"></script>
+
+</head>
+
+<body class="bg-gray-50 min-h-screen flex flex-col">
+
+<!-- HEADER -->
+<div class="fixed top-0 left-0 w-full bg-white shadow-sm z-50 px-4 py-4 flex items-center">
+
+<button onclick="history.back()" class="text-gray-700 text-2xl">
+<i class="bi bi-arrow-left"></i>
+</button>
+
+<h1 class="flex-1 text-center font-semibold text-lg">
+Demande de fonds
+</h1>
+
+<div class="w-6"></div>
+
+</div>
+
+<main class="flex-1 pt-24 pb-28 px-5 max-w-md mx-auto w-full space-y-6">
+
+<!-- WALLET SELECT -->
+<select id="walletSelect"
+class="w-full border rounded-xl px-4 py-3 bg-white shadow-sm">
+<option value="">Choisir une devise</option>
+</select>
+
+<!-- BENEFICIAIRE -->
+<select id="beneficiarySelect"
+class="w-full border rounded-xl px-4 py-3 bg-white shadow-sm">
+<option value="">Choisir un bénéficiaire</option>
+</select>
+
+<div class="text-center text-xs text-gray-400">ou</div>
+
+<input type="text"
+id="manualUser"
+placeholder="Username du payeur"
+class="w-full border rounded-xl px-4 py-3 bg-white shadow-sm">
+
+<!-- AMOUNT -->
+<div class="relative">
+<input type="number"
+id="amount"
+placeholder="Montant"
+min="1"
+class="w-full border rounded-xl px-4 py-3 bg-white shadow-sm">
+<span id="currencyTag"
+class="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-gray-500"></span>
+</div>
+
+<!-- MOTIF -->
+<input type="text"
+id="motif"
+placeholder="Motif"
+class="w-full border rounded-xl px-4 py-3 bg-white shadow-sm">
+
+<!-- SUMMARY -->
+<div id="summaryBox"
+class="hidden bg-white p-4 rounded-xl shadow-sm text-sm">
+</div>
+
+<p id="errorMsg"
+class="text-red-500 text-sm hidden"></p>
+
+<button id="confirmBtn"
+class="w-full bg-green-600 text-white py-3 rounded-xl font-semibold active:scale-95 transition">
+Envoyer la demande
+</button>
+
+</main>
+
+<div id="navbar-container"
+class="fixed bottom-0 left-0 w-full z-50 bg-white shadow-inner"></div>
+
+</body>
+</html>
