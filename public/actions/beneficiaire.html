@@ -10,43 +10,68 @@
 
 <script type="module" src="/trustlink_app/js/firebase-init.js"></script>
 <script type="module" src="/trustlink_app/js/beneficiaires.js"></script>
+<script type="module" src="/trustlink_app/main_js/layout.js"></script>
 
 </head>
 
-<body class="bg-background min-h-screen">
+<body class="bg-background min-h-screen flex flex-col">
 
-<div class="max-w-md mx-auto px-6 py-6 pb-28">
+<!-- HEADER FIXE -->
+<div id="header-container" class="fixed top-0 left-0 w-full z-50"></div>
+
+<!-- CONTENU -->
+<div class="flex-1 pt-20 pb-28 max-w-md mx-auto px-6">
 
 <h1 class="text-xl font-semibold mb-6">Mes bénéficiaires</h1>
 
-<!-- ADD BENEFICIARY -->
+<!-- AJOUT -->
 <div class="bg-white p-4 rounded-2xl shadow mb-6">
 
 <label class="block text-sm font-medium mb-2">
-Ajouter par adresse wallet
+Ajouter par username
 </label>
 
 <input type="text"
-id="beneficiaryInput"
-placeholder="TL-XXXX-01"
+id="usernameInput"
+placeholder="@username"
 class="w-full border rounded-xl px-4 py-3 mb-3">
 
-<button id="addBtn"
-class="w-full bg-primaryStrong text-white py-2 rounded-xl">
-Ajouter
-</button>
+<!-- PREVIEW -->
+<div id="previewBox"
+class="hidden p-3 rounded-xl bg-gray-50 flex items-center gap-3 mb-3">
 
-<p id="errorMsg"
-class="text-red-500 text-sm mt-2 hidden"></p>
+<img id="previewAvatar"
+class="w-10 h-10 rounded-full"/>
+
+<div>
+<div id="previewName"
+class="text-sm font-medium"></div>
+<div id="previewUsername"
+class="text-xs text-gray-500"></div>
+</div>
 
 </div>
 
-<!-- LIST -->
+<p id="errorMsg"
+class="text-red-500 text-sm hidden mb-2"></p>
+
+<button id="addBtn"
+class="w-full bg-primaryStrong text-white py-2 rounded-xl hidden">
+Confirmer l'ajout
+</button>
+
+</div>
+
+<!-- LISTE -->
 <div id="beneficiariesList"
 class="space-y-3">
 </div>
 
 </div>
+
+<!-- NAVBAR FIXE -->
+<div id="navbar-container"
+class="fixed bottom-0 left-0 w-full z-50"></div>
 
 </body>
 </html>
