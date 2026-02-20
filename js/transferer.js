@@ -179,45 +179,58 @@ confirmBtn.addEventListener("click", async () => {
 
     await runTransaction(db, async (transaction) => {
 
-      const fromDoc = await transaction.get(fromRef);
-      const fromWallet = fromDoc.data();
+  const fromRef = doc(db, "wallets", walletSelect.value);
+  const toRef = doc(db, "wallets", recipientAddress);
+  const txRef = doc(collection(db, "transactions"));
 
-      const reserved = fromWallet.reservedBalance || 0;
-      const available = fromWallet.balance - reserved;
+  /* =========================
+     🔹 TOUS LES READS D'ABORD
+  ========================= */
 
-      if (amount > available)
-        throw "Solde insuffisant";
+  const fromDoc = await transaction.get(fromRef);
+  const toDoc = await transaction.get(toRef);
 
-      transaction.update(fromRef, {
-        reservedBalance: reserved + amount,
-        updatedAt: serverTimestamp()
-      });
+  if (!fromDoc.exists())
+    throw "Wallet source introuvable";
 
-      const toWalletDoc =
-        await transaction.get(doc(db, "wallets", recipientAddress));
+  if (!toDoc.exists())
+    throw "Destinataire introuvable";
 
-      if (!toWalletDoc.exists())
-        throw "Destinataire introuvable";
+  const fromWallet = fromDoc.data();
+  const toWallet = toDoc.data();
 
-      const toWallet = toWalletDoc.data();
+  const reserved = fromWallet.reservedBalance || 0;
+  const available = fromWallet.balance - reserved;
 
-      transaction.set(txRef, {
-        type: "transfer",
-        status: "pending",
-        fromUserId: userId,
-        toUserId: toWallet.userId,
-        fromWalletId: walletSelect.value,
-        toWalletId: recipientAddress,
-        currency: selectedWallet.currency,
-        amount,
-        motifType: document.getElementById("motifType").value,
-        customMotif: document.getElementById("customMotif").value,
-        participants: [userId, toWallet.userId],
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp()
-      });
+  if (amount > available)
+    throw "Solde insuffisant";
 
-    });
+  /* =========================
+     🔹 ENSUITE LES WRITES
+  ========================= */
+
+  transaction.update(fromRef, {
+    reservedBalance: reserved + amount,
+    updatedAt: serverTimestamp()
+  });
+
+  transaction.set(txRef, {
+    type: "transfer",
+    status: "pending",
+    fromUserId: userId,
+    toUserId: toWallet.userId,
+    fromWalletId: walletSelect.value,
+    toWalletId: recipientAddress,
+    currency: fromWallet.currency,
+    amount,
+    motifType: document.getElementById("motifType").value,
+    customMotif: document.getElementById("customMotif").value,
+    participants: [userId, toWallet.userId],
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp()
+  });
+
+});
 
     alert("Virement en attente ✔️");
     location.reload();
