@@ -84,11 +84,12 @@ body {
 
 <body class="min-h-screen">
 
-<div class="max-w-md mx-auto px-6 pt-10 pb-28">
+<!-- HEADER FIXE -->
+<div id="header-container"
+     class="fixed top-0 left-0 w-full z-50 bg-transparent"></div>
 
-  <!-- HEADER -->
-<div id="header-container"></div>
-
+<!-- CONTENU -->
+<div class="max-w-md mx-auto px-6 pt-28 pb-36">
 
   <!-- SWIPE WALLETS -->
   <div class="swipe-container mb-10">
@@ -143,79 +144,70 @@ body {
 
   </div>
 
-  <!--m TRANSACTIONS -->
-  <!-- ===============================
-     ACTIONS RAPIDES
-================================ -->
-<div class="grid grid-cols-3 gap-4 mb-10">
+  <!-- ACTIONS RAPIDES -->
+  <div class="grid grid-cols-3 gap-4 mb-10">
 
-  <!-- Transférer -->
-  <a href="./actions/transferer.html"
-     class="bg-white rounded-2xl p-4 flex flex-col items-center gap-2 shadow hover:shadow-lg transition active:scale-95">
-    <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-      <i class="bi bi-arrow-left-right text-primaryStrong text-xl"></i>
-    </div>
-    <span class="text-xs font-medium text-gray-700">
-      Transférer
-    </span>
-  </a>
+    <a href="./actions/transferer.html"
+       class="bg-white rounded-2xl p-4 flex flex-col items-center gap-2 shadow hover:shadow-lg transition active:scale-95">
+      <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+        <i class="bi bi-arrow-left-right text-primaryStrong text-xl"></i>
+      </div>
+      <span class="text-xs font-medium text-gray-700">
+        Transférer
+      </span>
+    </a>
 
-  <!-- Recevoir -->
-  <a href="./actions/recevoir.html"
-     class="bg-white rounded-2xl p-4 flex flex-col items-center gap-2 shadow hover:shadow-lg transition active:scale-95">
-    <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-      <i class="bi bi-qr-code text-primaryStrong text-xl"></i>
-    </div>
-    <span class="text-xs font-medium text-gray-700">
-      Recevoir
-    </span>
-  </a>
+    <a href="./actions/recevoir.html"
+       class="bg-white rounded-2xl p-4 flex flex-col items-center gap-2 shadow hover:shadow-lg transition active:scale-95">
+      <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+        <i class="bi bi-qr-code text-primaryStrong text-xl"></i>
+      </div>
+      <span class="text-xs font-medium text-gray-700">
+        Recevoir
+      </span>
+    </a>
 
-  <!-- Déposer -->
-  <a href="./actions/deposer.html"
-     class="bg-white rounded-2xl p-4 flex flex-col items-center gap-2 shadow hover:shadow-lg transition active:scale-95">
-    <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-      <i class="bi bi-plus-circle text-primaryStrong text-xl"></i>
-    </div>
-    <span class="text-xs font-medium text-gray-700">
-      Déposer
-    </span>
-  </a>
+    <a href="./actions/deposer.html"
+       class="bg-white rounded-2xl p-4 flex flex-col items-center gap-2 shadow hover:shadow-lg transition active:scale-95">
+      <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+        <i class="bi bi-plus-circle text-primaryStrong text-xl"></i>
+      </div>
+      <span class="text-xs font-medium text-gray-700">
+        Déposer
+      </span>
+    </a>
 
-  <!-- Emprunter -->
-  <a href="./actions/emprunter.html"
-     class="bg-white rounded-2xl p-4 flex flex-col items-center gap-2 shadow hover:shadow-lg transition active:scale-95">
-    <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-      <i class="bi bi-bank text-primaryStrong text-xl"></i>
-    </div>
-    <span class="text-xs font-medium text-gray-700">
-      Emprunter
-    </span>
-  </a>
+    <a href="./actions/emprunter.html"
+       class="bg-white rounded-2xl p-4 flex flex-col items-center gap-2 shadow hover:shadow-lg transition active:scale-95">
+      <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+        <i class="bi bi-bank text-primaryStrong text-xl"></i>
+      </div>
+      <span class="text-xs font-medium text-gray-700">
+        Emprunter
+      </span>
+    </a>
 
-  <!-- Historique -->
-  <a href="./actions/historique.html"
-     class="bg-white rounded-2xl p-4 flex flex-col items-center gap-2 shadow hover:shadow-lg transition active:scale-95">
-    <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-      <i class="bi bi-clock-history text-primaryStrong text-xl"></i>
-    </div>
-    <span class="text-xs font-medium text-gray-700">
-      Historique
-    </span>
-  </a>
+    <a href="./actions/historique.html"
+       class="bg-white rounded-2xl p-4 flex flex-col items-center gap-2 shadow hover:shadow-lg transition active:scale-95">
+      <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+        <i class="bi bi-clock-history text-primaryStrong text-xl"></i>
+      </div>
+      <span class="text-xs font-medium text-gray-700">
+        Historique
+      </span>
+    </a>
 
-  <!-- Bénéficiaire -->
-  <a href="./actions/beneficiaires.html"
-     class="bg-white rounded-2xl p-4 flex flex-col items-center gap-2 shadow hover:shadow-lg transition active:scale-95">
-    <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-      <i class="bi bi-person-lines-fill text-primaryStrong text-xl"></i>
-    </div>
-    <span class="text-xs font-medium text-gray-700">
-      Bénéficiaire
-    </span>
-  </a>
+    <a href="./actions/beneficiaires.html"
+       class="bg-white rounded-2xl p-4 flex flex-col items-center gap-2 shadow hover:shadow-lg transition active:scale-95">
+      <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+        <i class="bi bi-person-lines-fill text-primaryStrong text-xl"></i>
+      </div>
+      <span class="text-xs font-medium text-gray-700">
+        Bénéficiaire
+      </span>
+    </a>
 
-</div>
+  </div>
 
   <div>
 
@@ -233,8 +225,9 @@ body {
 
 </div>
 
-<!-- NAVBAR LOAD -->
-<div id="navbar-container"></div>
+<!-- NAVBAR FIXE -->
+<div id="navbar-container"
+     class="fixed bottom-0 left-0 w-full z-50 bg-transparent"></div>
 
 <script type="module">
 async function loadNavbar() {
@@ -244,6 +237,7 @@ async function loadNavbar() {
 }
 loadNavbar();
 </script>
+
 <script type="module">
 async function loadHeader() {
 
@@ -256,7 +250,6 @@ async function loadHeader() {
 
   await import("../main_js/header.js");
 }
-
 loadHeader();
 </script>
 
