@@ -12,7 +12,9 @@ import {
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-/* SESSION */
+/* ===============================
+   SESSION
+================================ */
 const userId =
   localStorage.getItem("userId") ||
   sessionStorage.getItem("userId");
@@ -20,7 +22,9 @@ const userId =
 if (!userId)
   window.location.href = "/trustlink_app/index.html";
 
-/* ELEMENTS */
+/* ===============================
+   ELEMENTS
+================================ */
 const usernameInput = document.getElementById("usernameInput");
 const previewBox = document.getElementById("previewBox");
 const previewAvatar = document.getElementById("previewAvatar");
@@ -48,6 +52,7 @@ async function loadBeneficiaries() {
   for (const docSnap of snapshot.docs) {
 
     const data = docSnap.data();
+
     const userSnap =
       await getDoc(doc(db, "users", data.beneficiaryId));
 
@@ -57,24 +62,24 @@ async function loadBeneficiaries() {
 
     const div = document.createElement("div");
     div.className =
-      "bg-white p-4 rounded-2xl shadow flex justify-between items-center";
+      "bg-white p-4 rounded-2xl shadow-sm flex justify-between items-center";
 
     div.innerHTML = `
       <div class="flex items-center gap-3">
         <img src="https://api.dicebear.com/7.x/avataaars/png?seed=${user.username}"
-             class="w-10 h-10 rounded-full"/>
+             class="w-10 h-10 rounded-full object-cover"/>
         <div>
-          <p class="text-sm font-medium">
+          <p class="text-sm font-medium text-gray-800">
             ${user.firstName} ${user.lastName}
           </p>
           <p class="text-xs text-gray-500">
-            ${user.username}
+            @${user.username}
           </p>
         </div>
       </div>
       <button
         onclick="removeBeneficiary('${docSnap.id}')"
-        class="text-red-500 text-sm">
+        class="text-red-500 text-sm font-medium active:scale-95 transition">
         Supprimer
       </button>
     `;
@@ -86,59 +91,72 @@ async function loadBeneficiaries() {
 loadBeneficiaries();
 
 /* ===============================
-   USERNAME SEARCH
+   USERNAME SEARCH (LIVE)
 ================================ */
-usernameInput.addEventListener("blur", async () => {
+let searchTimeout;
 
-  const username =
-    usernameInput.value.trim().replace("@", "");
+usernameInput.addEventListener("input", () => {
 
-  if (!username) return;
+  clearTimeout(searchTimeout);
 
-  const q = query(
-    collection(db, "users"),
-    where("username", "==", username)
-  );
+  searchTimeout = setTimeout(async () => {
 
-  const snapshot = await getDocs(q);
+    const username =
+      usernameInput.value.trim().replace("@", "");
 
-  if (snapshot.empty)
-    return showError("Utilisateur introuvable");
+    if (!username) {
+      resetPreview();
+      return;
+    }
 
-  const userDoc = snapshot.docs[0];
-  const user = userDoc.data();
+    const q = query(
+      collection(db, "users"),
+      where("username", "==", username)
+    );
 
-  if (userDoc.id === userId)
-    return showError("Impossible d'ajouter soi-même");
+    const snapshot = await getDocs(q);
 
-  /* Vérifier doublon */
-  const existingQuery = query(
-    collection(db, "beneficiaries"),
-    where("userId", "==", userId),
-    where("beneficiaryId", "==", userDoc.id)
-  );
+    if (snapshot.empty)
+      return showError("Utilisateur introuvable");
 
-  const existing = await getDocs(existingQuery);
-  if (!existing.empty)
-    return showError("Déjà ajouté");
+    const userDoc = snapshot.docs[0];
 
-  selectedUser = {
-    id: userDoc.id,
-    ...user
-  };
+    if (userDoc.id === userId)
+      return showError("Impossible d'ajouter soi-même");
 
-  previewAvatar.src =
-    `https://api.dicebear.com/7.x/avataaars/png?seed=${user.username}`;
+    /* Vérifier doublon */
+    const existingQuery = query(
+      collection(db, "beneficiaries"),
+      where("userId", "==", userId),
+      where("beneficiaryId", "==", userDoc.id)
+    );
 
-  previewName.textContent =
-    `${user.firstName} ${user.lastName}`;
+    const existing = await getDocs(existingQuery);
 
-  previewUsername.textContent =
-    user.username;
+    if (!existing.empty)
+      return showError("Déjà ajouté");
 
-  previewBox.classList.remove("hidden");
-  addBtn.classList.remove("hidden");
-  errorMsg.classList.add("hidden");
+    const user = userDoc.data();
+
+    selectedUser = {
+      id: userDoc.id,
+      ...user
+    };
+
+    previewAvatar.src =
+      `https://api.dicebear.com/7.x/avataaars/png?seed=${user.username}`;
+
+    previewName.textContent =
+      `${user.firstName} ${user.lastName}`;
+
+    previewUsername.textContent =
+      `@${user.username}`;
+
+    previewBox.classList.remove("hidden");
+    addBtn.classList.remove("hidden");
+    errorMsg.classList.add("hidden");
+
+  }, 400);
 });
 
 /* ===============================
@@ -154,11 +172,7 @@ addBtn.addEventListener("click", async () => {
     createdAt: serverTimestamp()
   });
 
-  usernameInput.value = "";
-  previewBox.classList.add("hidden");
-  addBtn.classList.add("hidden");
-  selectedUser = null;
-
+  resetPreview();
   loadBeneficiaries();
 });
 
@@ -173,11 +187,20 @@ async function removeBeneficiary(docId) {
 window.removeBeneficiary = removeBeneficiary;
 
 /* ===============================
-   ERROR
+   HELPERS
 ================================ */
 function showError(message) {
   errorMsg.textContent = message;
   errorMsg.classList.remove("hidden");
   previewBox.classList.add("hidden");
   addBtn.classList.add("hidden");
+  selectedUser = null;
+}
+
+function resetPreview() {
+  usernameInput.value = "";
+  previewBox.classList.add("hidden");
+  addBtn.classList.add("hidden");
+  errorMsg.classList.add("hidden");
+  selectedUser = null;
 }
