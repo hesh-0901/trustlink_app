@@ -57,17 +57,37 @@ import {
        AVATAR
     ================================= */
 
-    const avatarStyle =
-      userData.gender === "Femme"
-        ? "adventurer-neutral"
-        : "adventurer";
+/* ===============================
+    AVATAR (NOUVEAU - STYLE CORPORATE)
+================================= */
 
-    const avatarUrl =
-      `https://api.dicebear.com/7.x/${avatarStyle}/png?` +
-      `seed=${encodeURIComponent(userData.username)}` +
-      `&backgroundColor=EEF2FF`;
+// On utilise 'avataaars' qui est le standard pour le look professionnel moderne
+const avatarStyle = "avataaars";
 
-    if (avatarEl) avatarEl.src = avatarUrl;
+// Paramètres pour forcer le look "Business/Executive"
+// clothing: blazerShirt (blazer), graphicShirt (plus décontracté chic), shirtCrewNeck
+const businessOptions = [
+  "accessoriesProbability=0", // Moins de gadgets pour rester sérieux
+  "clothing=blazerShirt,shirtCrewNeck,shirtVNeck", // Tenues pro uniquement
+  "clothingColor=262e33,65c9ff,f4f4f4", // Couleurs sobres : gris sombre, bleu ciel, blanc
+  "top=shortHair,longHair,sides,shavedSides", // Coiffures propres
+  "backgroundType=solid,gradientLinear", // Fond propre
+  "backgroundColor=b6e3f4,c0aede,d1d5db" // Couleurs de fond premium/sobres
+].join("&");
+
+// Construction de l'URL avec le seed unique (username)
+const avatarUrl = 
+  `https://api.dicebear.com/7.x/${avatarStyle}/svg?` + 
+  `seed=${encodeURIComponent(userData.username)}&` + 
+  `${businessOptions}`;
+
+// Note : J'utilise .svg pour une netteté parfaite sur mobile (retina/OLED)
+if (avatarEl) {
+  avatarEl.src = avatarUrl;
+  // Optionnel : Ajout d'une bordure fine pour le côté institutionnel
+  avatarEl.style.border = "2px solid #1E2BE015"; 
+  avatarEl.style.borderRadius = "50%";
+}
 
     /* ===============================
        REAL-TIME NOTIFICATIONS
