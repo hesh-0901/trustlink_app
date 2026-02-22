@@ -2,88 +2,98 @@ import { db } from "../js/firebase-init.js";
 import {
   doc,
   getDoc,
-  updateDoc
+  updateDoc,
+  collection,
+  query,
+  where,
+  getDocs,
+  addDoc,
+  deleteDoc,
+  serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+const userId =
+  localStorage.getItem("userId") ||
+  sessionStorage.getItem("userId");
+
+if (!userId)
+  window.location.href = "/trustlink_app/index.html";
 
 (async function initProfile() {
 
-  const userId =
-    localStorage.getItem("userId") ||
-    sessionStorage.getItem("userId");
-
-  if (!userId) {
-    window.location.href = "/trustlink_app/index.html";
-    return;
-  }
-
   const userRef = doc(db, "users", userId);
   const userSnap = await getDoc(userRef);
+  if (!userSnap.exists()) return;
 
-  if (!userSnap.exists()) {
-    window.location.href = "/trustlink_app/index.html";
-    return;
-  }
+  const user = userSnap.data();
 
-  const userData = userSnap.data();
+  /* ===============================
+     USER INFO
+  ================================= */
 
-  const avatarLibraries = [
-    "adventurer","adventurer-neutral","avataaars","avataaars-neutral",
-    "big-ears","big-ears-neutral","big-smile","bottts","bottts-neutral",
-    "croodles","croodles-neutral","fun-emoji","icons","identicon",
-    "initials","lorelei","lorelei-neutral","micah","miniavs",
-    "notionists","notionists-neutral","open-peeps","personas",
-    "pixel-art","pixel-art-neutral","rings","shapes","thumbs"
+  document.getElementById("profile-name")
+    .textContent = `${user.firstName} ${user.lastName}`;
+
+  document.getElementById("profile-username")
+    .textContent = `@${user.username}`;
+
+  document.getElementById("profile-phone")
+    .textContent = user.phoneNumber;
+
+  document.getElementById("profile-gender")
+    .textContent = user.gender;
+
+  document.getElementById("profile-birth")
+    .textContent = user.birthDate;
+
+  document.getElementById("profile-wallet")
+    .textContent = user.walletBase;
+
+  /* ===============================
+     AVATAR SECTION
+  ================================= */
+
+  const avatarStyles = [
+    "micah","personas","avataaars-neutral",
+    "initials","identicon","multiavatar"
   ];
 
-  let selectedStyle = userData.avatarStyle || "micah";
+  let selectedStyle = user.avatarStyle || "micah";
 
-  const avatarEl = document.getElementById("profile-avatar");
-  const nameEl = document.getElementById("profile-name");
-  const usernameEl = document.getElementById("profile-username");
-  const optionsContainer = document.getElementById("avatar-options");
-  const searchInput = document.getElementById("avatar-search");
+  function generateAvatar(style) {
+    if (style === "multiavatar")
+      return `https://api.multiavatar.com/${user.username}.svg`;
 
-  nameEl.textContent = userData.firstName;
-  usernameEl.textContent = userData.username;
-
-  function generateUrl(style) {
-    return `https://api.dicebear.com/7.x/${style}/svg?seed=${encodeURIComponent(userData.username)}&radius=50`;
+    return `https://api.dicebear.com/7.x/${style}/svg?seed=${user.username}&radius=50`;
   }
 
-  function renderAvatars(filter = "") {
-    optionsContainer.innerHTML = "";
+  document.getElementById("profile-avatar")
+    .src = generateAvatar(selectedStyle);
 
-    avatarLibraries
-      .filter(style => style.includes(filter.toLowerCase()))
-      .forEach(style => {
+  const container =
+    document.getElementById("avatar-options");
 
-        const img = document.createElement("img");
-        img.src = generateUrl(style);
-        img.className =
-          "w-16 h-16 rounded-full cursor-pointer border-2 transition";
+  avatarStyles.forEach(style => {
 
-        if (style === selectedStyle) {
-          img.classList.add("border-[#1E2BE0]");
-        } else {
-          img.classList.add("border-transparent");
-        }
+    const img = document.createElement("img");
+    img.src = generateAvatar(style);
+    img.className =
+      "w-16 h-16 rounded-full cursor-pointer border-2";
 
-        img.addEventListener("click", () => {
-          selectedStyle = style;
-          avatarEl.src = generateUrl(style);
-          renderAvatars(searchInput.value);
-        });
+    if (style === selectedStyle)
+      img.classList.add("border-[#1E2BE0]");
+    else
+      img.classList.add("border-transparent");
 
-        optionsContainer.appendChild(img);
+    img.onclick = () => {
+      selectedStyle = style;
+      document.getElementById("profile-avatar")
+        .src = generateAvatar(style);
+      location.reload();
+    };
 
-      });
-  }
+    container.appendChild(img);
 
-  avatarEl.src = generateUrl(selectedStyle);
-  renderAvatars();
-
-  searchInput.addEventListener("input", (e) => {
-    renderAvatars(e.target.value);
   });
 
   document.getElementById("save-avatar")
@@ -91,10 +101,66 @@ import {
 
       await updateDoc(userRef, {
         avatarStyle: selectedStyle,
-        updatedAt: new Date()
+        updatedAt: serverTimestamp()
       });
 
       alert("Avatar mis à jour ✔️");
     });
+
+  /* ===============================
+     FRIENDS (BENEFICIARIES)
+  ================================= */
+
+  async function loadFriends() {
+
+    const q = query(
+      collection(db, "beneficiaries"),
+      where("userId", "==", userId)
+    );
+
+    const snapshot = await getDocs(q);
+    const list =
+      document.getElementById("friendsList");
+
+    list.innerHTML = "";
+
+    for (const docSnap of snapshot.docs) {
+
+      const data = docSnap.data();
+
+      const friendSnap =
+        await getDoc(doc(db, "users", data.beneficiaryId));
+
+      if (!friendSnap.exists()) continue;
+
+      const friend = friendSnap.data();
+
+      const div = document.createElement("div");
+      div.className =
+        "flex items-center justify-between bg-gray-50 p-3 rounded-xl";
+
+      div.innerHTML = `
+        <div class="flex items-center gap-3">
+          <img src="https://api.dicebear.com/7.x/micah/svg?seed=${friend.username}"
+               class="w-10 h-10 rounded-full bg-white">
+          <div>
+            <p class="text-sm font-medium">${friend.firstName} ${friend.lastName}</p>
+            <p class="text-xs text-gray-500">@${friend.username}</p>
+          </div>
+        </div>
+        <button class="text-red-500 text-xs">Supprimer</button>
+      `;
+
+      div.querySelector("button")
+        .addEventListener("click", async () => {
+          await deleteDoc(doc(db, "beneficiaries", docSnap.id));
+          loadFriends();
+        });
+
+      list.appendChild(div);
+    }
+  }
+
+  loadFriends();
 
 })();
