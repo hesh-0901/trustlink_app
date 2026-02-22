@@ -5,7 +5,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 /* ===============================
-   GET USER SESSION
+   GET SESSION USER
 ================================ */
 function getCurrentUserId() {
   return (
@@ -18,6 +18,7 @@ function getCurrentUserId() {
    LOAD USER DATA
 ================================ */
 document.addEventListener("DOMContentLoaded", async () => {
+
   const userId = getCurrentUserId();
 
   if (!userId) {
@@ -26,6 +27,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   try {
+
     const userRef = doc(db, "users", userId);
     const userSnap = await getDoc(userRef);
 
@@ -37,57 +39,59 @@ document.addEventListener("DOMContentLoaded", async () => {
     const data = userSnap.data();
 
     injectUserData(data);
-  } catch (err) {
-    console.error(err);
+
+  } catch (error) {
+    console.error("Header error:", error);
     logout();
   }
+
 });
 
 /* ===============================
-   INJECT DATA
+   INJECT USER DATA
 ================================ */
 function injectUserData(data) {
-  const firstName = data.firstName;
-  const username = data.username;
-  const gender = data.gender;
 
   document.getElementById("greetingDisplay").textContent =
-    `Bonjour ${firstName}`;
+    `Bonjour ${data.firstName}`;
 
   document.getElementById("usernameDisplay").textContent =
-    username;
+    data.username;
 
-  generateAvatar(firstName, gender);
+  generateAvatar(data.firstName, data.gender);
+
 }
 
 /* ===============================
-   AVATAR GENERATOR
+   AVATAR GENERATION
 ================================ */
 function generateAvatar(name, gender) {
-  const baseUrl = "https://api.dicebear.com/7.x/";
 
   const style =
     gender === "Femme"
-      ? "adventurer-neutral"
+      ? "personas"
       : "adventurer";
 
   const avatarUrl =
-    `${baseUrl}${style}/svg?seed=${name}&backgroundColor=0f172a`;
+    `https://api.dicebear.com/7.x/${style}/png?seed=${encodeURIComponent(name)}&size=128`;
 
   document.getElementById("userAvatar").src = avatarUrl;
+
 }
 
 /* ===============================
    LOGOUT
 ================================ */
 function logout() {
+
   localStorage.removeItem("userId");
   localStorage.removeItem("role");
   sessionStorage.clear();
 
   window.location.href = "/trustlink_app/index.html";
+
 }
 
 document
   .getElementById("logoutBtn")
-  .addEventListener("click", logout);
+  ?.addEventListener("click", logout);
