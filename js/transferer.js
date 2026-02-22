@@ -214,21 +214,29 @@ confirmBtn.addEventListener("click", async () => {
     updatedAt: serverTimestamp()
   });
 
-  transaction.set(txRef, {
-    type: "transfer",
-    status: "pending",
-    fromUserId: userId,
-    toUserId: toWallet.userId,
-    fromWalletId: walletSelect.value,
-    toWalletId: recipientAddress,
-    currency: fromWallet.currency,
-    amount,
-    motifType: document.getElementById("motifType").value,
-    customMotif: document.getElementById("customMotif").value,
-    participants: [userId, toWallet.userId],
-    createdAt: serverTimestamp(),
-    updatedAt: serverTimestamp()
-  });
+      transaction.set(txRef, {
+        category: "transfer", // 🔥 OBLIGATOIRE pour les rules
+        type: "transfer",
+      
+        status: "pending",
+      
+        fromUserId: userId,
+        toUserId: toWallet.userId,
+      
+        fromWalletId: walletSelect.value,
+        toWalletId: recipientAddress,
+      
+        currency: fromWallet.currency,
+        amount: amount,
+      
+        motifType: document.getElementById("motifType").value,
+        customMotif: document.getElementById("customMotif").value || "Transfert",
+      
+        participants: [userId, toWallet.userId],
+      
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
+      });
 
 });
 
