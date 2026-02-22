@@ -13,13 +13,13 @@ const userId =
   sessionStorage.getItem("userId");
 
 if (!userId) {
-  window.location.href = "../index.html";
+  window.location.href = "index.html";
 }
 
 function forceLogout() {
   localStorage.clear();
   sessionStorage.clear();
-  window.location.href = "../index.html";
+  window.location.href = "index.html";
 }
 
 /* ==========================================
