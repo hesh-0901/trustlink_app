@@ -1,23 +1,18 @@
 import { db } from "../js/firebase-init.js";
-import { doc, getDoc } 
-from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import {
+  doc,
+  getDoc,
+  collection,
+  query,
+  where,
+  getDocs
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-/* ===============================
-   GET CURRENT SESSION
-================================ */
-function getCurrentUserId() {
-  return (
-    localStorage.getItem("userId") ||
-    sessionStorage.getItem("userId")
-  );
-}
-
-/* ===============================
-   LOAD USER DATA
-================================ */
 document.addEventListener("DOMContentLoaded", async () => {
 
-  const userId = getCurrentUserId();
+  const userId =
+    localStorage.getItem("userId") ||
+    sessionStorage.getItem("userId");
 
   if (!userId) {
     window.location.href = "/trustlink_app/index.html";
@@ -26,71 +21,73 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   try {
 
-    const userRef = doc(db, "users", userId);
-    const userSnap = await getDoc(userRef);
+    const userSnap =
+      await getDoc(doc(db, "users", userId));
 
     if (!userSnap.exists()) {
-      return logout();
+      window.location.href = "/trustlink_app/index.html";
+      return;
     }
 
     const user = userSnap.data();
 
-    displayUser(user);
+    /* ===============================
+       USER INFO
+    ================================= */
+
+    document.getElementById("firstNameText")
+      .textContent = user.firstName;
+
+    document.getElementById("usernameText")
+      .textContent = user.username;
+
+    /* ===============================
+       AVATAR BANQUE PRO
+    ================================= */
+
+    const avatar =
+      `https://api.dicebear.com/7.x/avataaars/png?seed=${user.username}`;
+
+    document.getElementById("userAvatar")
+      .src = avatar;
+
+    /* ===============================
+       NOTIFICATIONS COUNT
+    ================================= */
+
+    const q = query(
+      collection(db, "transactions"),
+      where("participants", "array-contains", userId)
+    );
+
+    const snapshot = await getDocs(q);
+
+    const badge =
+      document.getElementById("notificationBadge");
+
+    badge.textContent =
+      snapshot.empty ? 0 : snapshot.size;
+
+    if (snapshot.empty)
+      badge.classList.add("hidden");
+
+    /* ===============================
+       LOGOUT
+    ================================= */
+
+    document.getElementById("logoutBtn")
+      .addEventListener("click", () => {
+
+        localStorage.clear();
+        sessionStorage.clear();
+
+        window.location.href =
+          "/trustlink_app/index.html";
+      });
 
   } catch (error) {
-    console.error(error);
-    logout();
+    console.error("Header error:", error);
+    window.location.href = "/trustlink_app/index.html";
   }
 
 });
-
-/* ===============================
-   DISPLAY USER
-================================ */
-function displayUser(user) {
-
-  document.getElementById("firstNameDisplay").textContent =
-    user.firstName;
-
-  document.getElementById("usernameDisplay").textContent =
-    user.username;
-
-  generateAvatar(user);
-
-}
-
-/* ===============================
-   DYNAMIC AVATAR
-================================ */
-function generateAvatar(user) {
-
-  const seed = user.firstName + user.username;
-
-  const style =
-    user.gender === "Femme"
-      ? "personas"
-      : "adventurer";
-
-  const avatarUrl =
-    `https://api.dicebear.com/7.x/${style}/png?seed=${encodeURIComponent(seed)}&size=128`;
-
-  document.getElementById("userAvatar").src = avatarUrl;
-
-}
-
-/* ===============================
-   LOGOUT
-================================ */
-function logout() {
-
-  localStorage.removeItem("userId");
-  localStorage.removeItem("role");
-  sessionStorage.clear();
-
-  window.location.href = "/trustlink_app/index.html";
-
-}
-
-document
-  .getElementById("logoutBtn")
-  ?.addEventListener("click", logout);
