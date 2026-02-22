@@ -3,7 +3,7 @@
   <div class="max-w-md mx-auto px-6 py-4 flex items-center justify-between">
 
     <!-- LEFT SECTION -->
-    <div class="flex items-center gap-3">
+    <div class="flex items-center gap-4">
 
       <!-- Avatar -->
       <div class="relative">
@@ -16,16 +16,16 @@
                     transition-all duration-300 hover:scale-105
                     bg-gray-100" />
 
-        <!-- Badge rôle -->
+        <!-- Role Badge -->
         <div id="roleBadge"
-             class="hidden absolute -bottom-1 -right-1 
-                    text-white text-[9px] font-semibold 
+             class="hidden absolute -bottom-1 -right-1
+                    text-white text-[9px] font-semibold
                     px-1.5 py-[2px] rounded-full shadow-md">
         </div>
 
       </div>
 
-      <!-- Text Info -->
+      <!-- User Info -->
       <div class="leading-tight">
 
         <div class="text-[11px] text-gray-400">
@@ -48,11 +48,13 @@
     <!-- RIGHT SECTION -->
     <div class="flex items-center gap-5 text-lg text-gray-600">
 
+      <!-- Notification -->
       <button id="headerNotification"
               class="hover:text-indigo-600 transition active:scale-90">
         <i class="bi bi-bell"></i>
       </button>
 
+      <!-- Logout -->
       <button id="headerLogout"
               class="hover:text-red-500 transition active:scale-90">
         <i class="bi bi-box-arrow-right"></i>
