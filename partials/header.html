@@ -1,55 +1,92 @@
-<header class="bg-gradient-to-r from-[#0F1ACD] via-[#1E2BE0] to-[#3D4BFF] 
+<header class="bg-gradient-to-r 
+               from-[#0F1ACD] via-[#1E2BE0] to-[#3D4BFF]
                text-white px-4 py-3 shadow-sm">
 
   <div class="flex items-center justify-between">
 
-    <!-- LEFT SECTION -->
+    <!-- ===============================
+         LEFT SIDE (Avatar + Identity)
+    ================================= -->
+
     <div class="flex items-center gap-3">
 
-      <!-- Avatar -->
+      <!-- Avatar Wrapper -->
       <div class="relative">
+
         <img
           id="user-avatar"
           src=""
           alt="User Avatar"
-          class="w-11 h-11 rounded-full border border-white/40 
-                 shadow-md object-cover bg-white/20"
+          class="w-12 h-12 object-cover 
+                 rounded-full 
+                 bg-white 
+                 shadow-sm
+                 transition-transform duration-200"
         >
+
+        <!-- Subtle status ring (fintech style) -->
+        <span class="absolute inset-0 rounded-full 
+                     ring-2 ring-white/20"></span>
+
       </div>
 
-      <!-- User Info -->
+      <!-- Identity -->
       <div class="leading-tight">
-        <p class="text-[11px] opacity-70">Bonjour</p>
-        <p id="user-firstname" class="text-sm font-semibold tracking-wide"></p>
-        <p id="user-username" class="text-[11px] opacity-60"></p>
+
+        <p class="text-[11px] tracking-wide opacity-75 uppercase">
+          Bonjour
+        </p>
+
+        <p id="user-firstname"
+           class="text-sm font-semibold tracking-wide">
+        </p>
+
+        <p id="user-username"
+           class="text-[11px] opacity-60 font-medium">
+        </p>
+
       </div>
 
     </div>
 
-    <!-- RIGHT SECTION -->
+    <!-- ===============================
+         RIGHT SIDE (Notifications + Logout)
+    ================================= -->
+
     <div class="flex items-center gap-4">
 
       <!-- Notifications -->
-      <div class="relative cursor-pointer">
-        <i class="bi bi-bell text-lg opacity-90"></i>
+      <div class="relative cursor-pointer group">
 
+        <i class="bi bi-bell text-lg opacity-90 
+                  transition-transform duration-200 
+                  group-hover:scale-110">
+        </i>
+
+        <!-- Dynamic Badge -->
         <span
           id="notification-badge"
-          class="hidden absolute -top-1 -right-2 
-                 min-w-[18px] h-[18px] px-1 
+          class="hidden absolute -top-1.5 -right-2
+                 min-w-[18px] h-[18px]
                  flex items-center justify-center
-                 bg-red-500 text-white text-[10px] 
-                 font-semibold rounded-full shadow-md">
+                 px-1 text-[10px] font-semibold
+                 bg-red-500 text-white
+                 rounded-full shadow-md">
         </span>
+
       </div>
 
       <!-- Logout -->
       <button
         id="logout-btn"
-        class="text-xs px-3 py-1.5 rounded-full 
-               bg-white/15 backdrop-blur-md 
+        class="text-xs px-3 py-1.5
+               rounded-full
+               bg-white/15 backdrop-blur-md
                border border-white/20
-               hover:bg-white/25 transition-all duration-200">
+               font-medium
+               transition-all duration-200
+               hover:bg-white/25
+               active:scale-95">
         Logout
       </button>
 
