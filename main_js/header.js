@@ -1,57 +1,77 @@
-<header class="bg-gradient-to-r from-[#0F1ACD] via-[#1E2BE0] to-[#3D4BFF]
-               px-5 pt-4 pb-4 text-white shadow-md">
+import { db } from "../js/firebase-init.js";
+import {
+  doc,
+  getDoc,
+  collection,
+  query,
+  where,
+  getDocs
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-  <div class="flex items-center justify-between">
+document.addEventListener("DOMContentLoaded", async () => {
 
-    <!-- LEFT -->
-    <div class="flex items-center gap-3">
+  console.log("HEADER LOADED");
 
-      <img id="userAvatar"
-           class="w-10 h-10 rounded-full object-cover
-                  border border-white/40 shadow-sm"/>
+  const userId =
+    localStorage.getItem("userId") ||
+    sessionStorage.getItem("userId");
 
-      <div class="leading-tight">
-        <p class="text-xs opacity-80">
-          GM 👋
-        </p>
+  if (!userId) {
+    console.log("No userId");
+    return;
+  }
 
-        <p id="firstNameText"
-           class="text-sm font-semibold tracking-tight">
-          User
-        </p>
+  try {
 
-        <p id="usernameText"
-           class="text-[10px] opacity-60">
-          @username
-        </p>
-      </div>
+    const userRef = doc(db, "users", userId);
+    const userSnap = await getDoc(userRef);
 
-    </div>
+    if (!userSnap.exists()) {
+      console.log("User not found");
+      return;
+    }
 
-    <!-- RIGHT -->
-    <div class="flex items-center gap-4">
+    const user = userSnap.data();
 
-      <!-- Notification -->
-      <div class="relative cursor-pointer">
-        <i class="bi bi-bell text-lg"></i>
-        <span id="notificationBadge"
-              class="absolute -top-1 -right-2
-                     bg-red-500 text-white
-                     text-[9px] px-1 py-[1px]
-                     rounded-full font-semibold">
-          0
-        </span>
-      </div>
+    document.getElementById("firstNameText").textContent =
+      user.firstName;
 
-      <!-- Logout -->
-      <button id="logoutBtn"
-              class="bg-white/10 hover:bg-white/20
-                     p-2 rounded-lg transition">
-        <i class="bi bi-box-arrow-right text-base"></i>
-      </button>
+    document.getElementById("usernameText").textContent =
+      user.username;
 
-    </div>
+    /* Crypto avatar */
+    document.getElementById("userAvatar").src =
+      `https://api.dicebear.com/7.x/avataaars/png?seed=${user.username}`;
 
-  </div>
+    /* Notifications count */
+    const q = query(
+      collection(db, "transactions"),
+      where("participants", "array-contains", userId)
+    );
 
-</header>
+    const snapshot = await getDocs(q);
+
+    const badge =
+      document.getElementById("notificationBadge");
+
+    badge.textContent = snapshot.size;
+
+    if (snapshot.size === 0)
+      badge.classList.add("hidden");
+
+    /* Logout */
+    document.getElementById("logoutBtn")
+      .addEventListener("click", () => {
+
+        localStorage.clear();
+        sessionStorage.clear();
+
+        window.location.href =
+          "/trustlink_app/index.html";
+      });
+
+  } catch (err) {
+    console.error("HEADER ERROR:", err);
+  }
+
+});
