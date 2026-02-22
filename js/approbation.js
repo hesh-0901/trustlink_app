@@ -1,4 +1,4 @@
-import { db } from "../../js/firebase-init.js";
+import { db } from "/trustlink_app/js/firebase-init.js";
 import {
   collection,
   query,
