@@ -1,11 +1,9 @@
 import { db } from "../js/firebase-init.js";
-import {
-  doc,
-  getDoc
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { doc, getDoc } 
+from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 /* ===============================
-   SESSION
+   GET CURRENT SESSION
 ================================ */
 function getCurrentUserId() {
   return (
@@ -15,7 +13,7 @@ function getCurrentUserId() {
 }
 
 /* ===============================
-   LOAD USER
+   LOAD USER DATA
 ================================ */
 document.addEventListener("DOMContentLoaded", async () => {
 
@@ -32,25 +30,24 @@ document.addEventListener("DOMContentLoaded", async () => {
     const userSnap = await getDoc(userRef);
 
     if (!userSnap.exists()) {
-      logout();
-      return;
+      return logout();
     }
 
     const user = userSnap.data();
 
-    injectUser(user);
+    displayUser(user);
 
   } catch (error) {
-    console.error("Header error:", error);
+    console.error(error);
     logout();
   }
 
 });
 
 /* ===============================
-   INJECT DATA
+   DISPLAY USER
 ================================ */
-function injectUser(user) {
+function displayUser(user) {
 
   document.getElementById("firstNameDisplay").textContent =
     user.firstName;
@@ -63,7 +60,7 @@ function injectUser(user) {
 }
 
 /* ===============================
-   AVATAR DYNAMIQUE
+   DYNAMIC AVATAR
 ================================ */
 function generateAvatar(user) {
 
