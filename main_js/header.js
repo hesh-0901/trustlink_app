@@ -75,15 +75,20 @@ function updateHeaderUI(user) {
 
   const skinTones = "&skinColor=darkBrown,brown,tanned";
 
-  const avatarUrl =
-    "https://api.dicebear.com/7.x/" + style + "/png" +
-    "?seed=" + encodeURIComponent(seed) +
-    skinTones +
-    "&radius=50" +
-    "&size=256" +
-    "&backgroundColor=f3f4f6";
+const skinTones = "&skinColor=darkBrown,brown,tanned";
 
-  avatarImg.src = avatarUrl;
+const avatarUrl =
+  "https://api.dicebear.com/7.x/" + style + "/png" +
+  "?seed=" + encodeURIComponent(seed) +
+  skinTones +
+  "&radius=50" +
+  "&size=256" +
+  "&backgroundType=gradientLinear" +
+  "&backgroundRotation=45" +
+  "&backgroundColor=1E2BE0,3D4BFF" +
+  "&t=" + Date.now(); // anti-cache
+
+avatarImg.src = avatarUrl;
 
   // =====================
   // RESET STYLE
