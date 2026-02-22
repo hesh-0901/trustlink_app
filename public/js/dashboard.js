@@ -204,6 +204,9 @@ window.changePage = changePage;
 ================================ */
 async function openModal(txId) {
 
+  // Empêche double ouverture
+  if (document.getElementById("txModal")) return;
+
   const snap =
     await getDoc(doc(db, "transactions", txId));
 
@@ -228,57 +231,83 @@ async function openModal(txId) {
       ? `https://api.dicebear.com/7.x/avataaars/png?seed=${user.username}`
       : "";
 
+  const fullName =
+    user
+      ? `${user.firstName} ${user.lastName}`
+      : "Utilisateur";
+
   const modal = document.createElement("div");
 
   modal.className =
-    "fixed inset-0 bg-black/40 flex items-end sm:items-center justify-center z-50";
+    "fixed inset-0 bg-black/50 backdrop-blur-sm flex items-end sm:items-center justify-center z-50";
+
+  modal.onclick = (e) => {
+    if (e.target.id === "txModal") closeModal();
+  };
 
   modal.innerHTML = `
-    <div class="bg-white rounded-t-3xl sm:rounded-2xl p-6 w-full sm:w-[90%] max-w-md animate-slideUp">
+    <div class="bg-white rounded-t-3xl sm:rounded-3xl w-full sm:w-[92%] max-w-md p-6 shadow-2xl animate-slideUp">
 
-      <div class="flex justify-center mb-4">
-        <div class="w-14 h-1 bg-gray-300 rounded-full"></div>
+      <!-- Barre drag -->
+      <div class="flex justify-center mb-5">
+        <div class="w-12 h-1.5 bg-gray-300 rounded-full"></div>
       </div>
 
+      <!-- Avatar + Nom -->
       <div class="flex flex-col items-center mb-6">
 
-        <img src="${avatar}"
-             class="w-16 h-16 rounded-full mb-3"/>
+        <div class="relative">
+          <img src="${avatar}"
+               class="w-20 h-20 rounded-full shadow-md border-4 border-white"/>
+          <div class="absolute inset-0 rounded-full ring-2 ring-primary/20"></div>
+        </div>
 
-        <h3 class="text-lg font-semibold">
-          ${getTitle(tx)}
+        <h3 class="text-lg font-semibold mt-4 text-gray-800">
+          ${fullName}
         </h3>
 
-        <p class="text-sm text-gray-400">
+        <p class="text-sm text-gray-500">
+          ${getTitle(tx)}
+        </p>
+
+        <p class="text-xs text-gray-400 mt-1">
           ${formatDate(tx.createdAt)}
         </p>
       </div>
 
-      <div class="space-y-3 text-sm mb-6">
+      <!-- Carte détails -->
+      <div class="bg-gray-50 rounded-2xl p-4 space-y-4 text-sm mb-6">
 
         <div class="flex justify-between">
-          <span>Montant</span>
-          <span class="font-semibold">
+          <span class="text-gray-500">Montant</span>
+          <span class="font-semibold text-primaryStrong text-base">
             ${formatMoney(tx.amount, tx.currency)}
           </span>
         </div>
 
         <div class="flex justify-between">
-          <span>Status</span>
-          <span class="capitalize">
+          <span class="text-gray-500">Statut</span>
+          <span class="capitalize font-medium ${
+            tx.status === "completed"
+              ? "text-green-600"
+              : tx.status === "rejected"
+              ? "text-red-500"
+              : "text-yellow-500"
+          }">
             ${tx.status}
           </span>
         </div>
 
         <div class="flex justify-between">
-          <span>Type</span>
-          <span>
+          <span class="text-gray-500">Type</span>
+          <span class="font-medium">
             ${tx.type || tx.category}
           </span>
         </div>
 
       </div>
 
+      <!-- Boutons -->
       ${
         tx.status === "pending" &&
         tx.toUserId === userId
@@ -286,12 +315,12 @@ async function openModal(txId) {
           <div class="flex gap-3">
             <button
               onclick="executeAction('${txId}','approve')"
-              class="flex-1 bg-green-500 text-white py-3 rounded-xl">
+              class="flex-1 bg-green-500 hover:bg-green-600 text-white py-3 rounded-xl font-medium transition">
               Approuver
             </button>
             <button
               onclick="executeAction('${txId}','reject')"
-              class="flex-1 bg-red-500 text-white py-3 rounded-xl">
+              class="flex-1 bg-red-500 hover:bg-red-600 text-white py-3 rounded-xl font-medium transition">
               Refuser
             </button>
           </div>
@@ -299,7 +328,7 @@ async function openModal(txId) {
           : `
           <button
             onclick="closeModal()"
-            class="w-full bg-gray-200 py-3 rounded-xl">
+            class="w-full bg-gray-200 hover:bg-gray-300 py-3 rounded-xl font-medium transition">
             Fermer
           </button>
           `
@@ -311,9 +340,9 @@ async function openModal(txId) {
   modal.id = "txModal";
   document.body.appendChild(modal);
 }
-    function closeModal() {
-  const modal =
-    document.getElementById("txModal");
+
+function closeModal() {
+  const modal = document.getElementById("txModal");
   if (modal) modal.remove();
 }
 
