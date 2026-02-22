@@ -27,8 +27,21 @@ function forceLogout() {
 }
 
 /* ==========================================
+   HASH GENERATOR (avatar stable)
+========================================== */
+
+function generateHash(str) {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = str.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  return Math.abs(hash);
+}
+
+/* ==========================================
    UPDATE HEADER UI
 ========================================== */
+
 function updateHeaderUI(user) {
 
   const fullNameEl = document.getElementById("headerFullName");
@@ -54,34 +67,26 @@ function updateHeaderUI(user) {
   if (!avatarImg) return;
 
   // =====================
-  // GENRE
+  // AVATAR 3D HUMANOÏDE
   // =====================
 
   const seed = user.username || user.firstName || "user";
   const gender = (user.gender || "").toLowerCase().trim();
   const role = (user.role || "").toLowerCase().trim();
 
-  let style = "avataaars";
-
-  if (gender === "homme") {
-    style = "avataaars";
-  } else if (gender === "femme") {
-    style = "micah";
+  let bodyType = "male";
+  if (gender === "femme") {
+    bodyType = "female";
   }
 
-  // =====================
-  // AVATAR STYLE (Cartoon moderne rond)
-  // =====================
+  const hash = generateHash(seed);
 
+  // ReadyPlayerMe render endpoint (PNG 2D render of 3D avatar)
   const avatarUrl =
-    "https://api.dicebear.com/7.x/" + style + "/png" +
-    "?seed=" + encodeURIComponent(seed) +
-    "&size=256" +
-    "&radius=50" +
-    "&backgroundColor=3D4BFF,E0E7FF,F3F4F6" +
-    "&backgroundType=gradientLinear" +
-    "&backgroundRotation=45" +
-    "&t=" + Date.now(); // anti-cache
+    `https://api.readyplayer.me/avatar?` +
+    `seed=${hash}&` +
+    `bodyType=${bodyType}&` +
+    `size=256`;
 
   avatarImg.src = avatarUrl;
 
