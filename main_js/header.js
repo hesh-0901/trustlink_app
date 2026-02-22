@@ -1,93 +1,57 @@
-import { db } from "../js/firebase-init.js";
-import {
-  doc,
-  getDoc,
-  collection,
-  query,
-  where,
-  getDocs
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+<header class="bg-gradient-to-r from-[#0F1ACD] via-[#1E2BE0] to-[#3D4BFF]
+               px-5 pt-4 pb-4 text-white shadow-md">
 
-document.addEventListener("DOMContentLoaded", async () => {
+  <div class="flex items-center justify-between">
 
-  const userId =
-    localStorage.getItem("userId") ||
-    sessionStorage.getItem("userId");
+    <!-- LEFT -->
+    <div class="flex items-center gap-3">
 
-  if (!userId) {
-    window.location.href = "/trustlink_app/index.html";
-    return;
-  }
+      <img id="userAvatar"
+           class="w-10 h-10 rounded-full object-cover
+                  border border-white/40 shadow-sm"/>
 
-  try {
+      <div class="leading-tight">
+        <p class="text-xs opacity-80">
+          GM 👋
+        </p>
 
-    const userSnap =
-      await getDoc(doc(db, "users", userId));
+        <p id="firstNameText"
+           class="text-sm font-semibold tracking-tight">
+          User
+        </p>
 
-    if (!userSnap.exists()) {
-      window.location.href = "/trustlink_app/index.html";
-      return;
-    }
+        <p id="usernameText"
+           class="text-[10px] opacity-60">
+          @username
+        </p>
+      </div>
 
-    const user = userSnap.data();
+    </div>
 
-    /* ===============================
-       USER INFO
-    ================================= */
+    <!-- RIGHT -->
+    <div class="flex items-center gap-4">
 
-    document.getElementById("firstNameText")
-      .textContent = user.firstName;
+      <!-- Notification -->
+      <div class="relative cursor-pointer">
+        <i class="bi bi-bell text-lg"></i>
+        <span id="notificationBadge"
+              class="absolute -top-1 -right-2
+                     bg-red-500 text-white
+                     text-[9px] px-1 py-[1px]
+                     rounded-full font-semibold">
+          0
+        </span>
+      </div>
 
-    document.getElementById("usernameText")
-      .textContent = user.username;
+      <!-- Logout -->
+      <button id="logoutBtn"
+              class="bg-white/10 hover:bg-white/20
+                     p-2 rounded-lg transition">
+        <i class="bi bi-box-arrow-right text-base"></i>
+      </button>
 
-    /* ===============================
-       AVATAR BANQUE PRO
-    ================================= */
+    </div>
 
-    const avatar =
-      `https://api.dicebear.com/7.x/avataaars/png?seed=${user.username}`;
+  </div>
 
-    document.getElementById("userAvatar")
-      .src = avatar;
-
-    /* ===============================
-       NOTIFICATIONS COUNT
-    ================================= */
-
-    const q = query(
-      collection(db, "transactions"),
-      where("participants", "array-contains", userId)
-    );
-
-    const snapshot = await getDocs(q);
-
-    const badge =
-      document.getElementById("notificationBadge");
-
-    badge.textContent =
-      snapshot.empty ? 0 : snapshot.size;
-
-    if (snapshot.empty)
-      badge.classList.add("hidden");
-
-    /* ===============================
-       LOGOUT
-    ================================= */
-
-    document.getElementById("logoutBtn")
-      .addEventListener("click", () => {
-
-        localStorage.clear();
-        sessionStorage.clear();
-
-        window.location.href =
-          "/trustlink_app/index.html";
-      });
-
-  } catch (error) {
-    console.error("Header error:", error);
-    window.location.href = "/trustlink_app/index.html";
-  }
-
-});
+</header>
