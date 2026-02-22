@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Profil - TrustLink</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+
+</head>
+
+<body class="bg-[#EEF2FF] min-h-screen">
+
+  <!-- Header container -->
+  <div id="header-container"></div>
+
+  <main class="px-5 py-6">
+
+    <h1 class="text-lg font-semibold text-[#1E2BE0] mb-6">
+      Mon Profil
+    </h1>
+
+    <!-- CARD -->
+    <div class="bg-white rounded-2xl shadow-sm p-5 space-y-6">
+
+      <!-- Avatar Preview -->
+      <div class="flex flex-col items-center space-y-3">
+
+        <img id="profile-avatar"
+             class="w-24 h-24 rounded-full bg-gray-100 shadow-md"
+             src=""
+             alt="Avatar">
+
+        <p id="profile-name"
+           class="font-semibold text-sm"></p>
+
+        <p id="profile-username"
+           class="text-xs text-gray-500"></p>
+
+      </div>
+
+      <!-- Avatar Styles -->
+      <div>
+        <p class="text-sm font-medium mb-3">Choisir un style d’avatar</p>
+
+        <div id="avatar-options"
+             class="grid grid-cols-3 gap-4">
+        </div>
+      </div>
+
+      <!-- Save -->
+      <button id="save-avatar"
+              class="w-full py-2.5 rounded-xl
+                     bg-[#1E2BE0] text-white text-sm font-medium
+                     hover:bg-[#0F1ACD] transition">
+        Enregistrer
+      </button>
+
+    </div>
+
+  </main>
+
+  <script type="module">
+    async function loadHeader() {
+      const res = await fetch("/trustlink_app/partials/header.html");
+      const html = await res.text();
+      document.getElementById("header-container").innerHTML = html;
+      await import("/trustlink_app/main_js/header.js");
+    }
+    loadHeader();
+
+    import("/trustlink_app/main_js/profile.js");
+  </script>
+
+</body>
+</html>
