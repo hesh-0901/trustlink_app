@@ -5,66 +5,96 @@ import {
   collection,
   query,
   where,
-  getDocs
+  onSnapshot
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 document.addEventListener("DOMContentLoaded", async () => {
-
-  console.log("HEADER LOADED");
 
   const userId =
     localStorage.getItem("userId") ||
     sessionStorage.getItem("userId");
 
   if (!userId) {
-    console.log("No userId");
+    window.location.href = "/trustlink_app/index.html";
     return;
   }
 
   try {
 
+    /* ===============================
+       USER DATA
+    ================================= */
+
     const userRef = doc(db, "users", userId);
+
     const userSnap = await getDoc(userRef);
 
     if (!userSnap.exists()) {
-      console.log("User not found");
+      window.location.href = "/trustlink_app/index.html";
       return;
     }
 
     const user = userSnap.data();
 
-    document.getElementById("firstNameText").textContent =
-      user.firstName;
+    // Nom
+    document.getElementById("firstNameText")
+      .textContent = user.firstName;
 
-    document.getElementById("usernameText").textContent =
-      user.username;
+    document.getElementById("usernameText")
+      .textContent = user.username;
 
-    /* Crypto avatar */
-    document.getElementById("userAvatar").src =
-      `https://api.dicebear.com/7.x/avataaars/png?seed=${user.username}`;
+    /* ===============================
+       AVATAR BASED ON GENDER
+    ================================= */
 
-    /* Notifications count */
-    const q = query(
+    let avatarUrl;
+
+    if (user.gender === "Femme") {
+      avatarUrl =
+        `https://api.dicebear.com/7.x/avataaars/png?seed=${user.username}&gender=female`;
+    } else {
+      avatarUrl =
+        `https://api.dicebear.com/7.x/avataaars/png?seed=${user.username}&gender=male`;
+    }
+
+    document.getElementById("userAvatar").src = avatarUrl;
+
+    /* ===============================
+       REALTIME NOTIFICATIONS
+    ================================= */
+
+    const notifQuery = query(
       collection(db, "transactions"),
       where("participants", "array-contains", userId)
     );
 
-    const snapshot = await getDocs(q);
+    onSnapshot(notifQuery, (snapshot) => {
 
-    const badge =
-      document.getElementById("notificationBadge");
+      const badge =
+        document.getElementById("notificationBadge");
 
-    badge.textContent = snapshot.size;
+      const count = snapshot.size;
 
-    if (snapshot.size === 0)
-      badge.classList.add("hidden");
+      if (count > 0) {
+        badge.textContent = count;
+        badge.classList.remove("hidden");
+      } else {
+        badge.classList.add("hidden");
+      }
 
-    /* Logout */
+    });
+
+    /* ===============================
+       LOGOUT
+    ================================= */
+
     document.getElementById("logoutBtn")
       .addEventListener("click", () => {
 
-        localStorage.clear();
-        sessionStorage.clear();
+        localStorage.removeItem("userId");
+        localStorage.removeItem("role");
+        sessionStorage.removeItem("userId");
+        sessionStorage.removeItem("role");
 
         window.location.href =
           "/trustlink_app/index.html";
