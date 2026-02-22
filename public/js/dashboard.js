@@ -258,9 +258,7 @@ async function openModal(txId) {
 
   if (document.getElementById("txModal")) return;
 
-  const snap =
-    await getDoc(doc(db, "transactions", txId));
-
+  const snap = await getDoc(doc(db, "transactions", txId));
   if (!snap.exists()) return;
 
   const tx = snap.data();
@@ -282,10 +280,17 @@ async function openModal(txId) {
       ? `https://api.dicebear.com/7.x/avataaars/png?seed=${user.username}`
       : "";
 
+  const fullName =
+    user
+      ? `${user.firstName} ${user.lastName}`
+      : "Utilisateur";
+
   const modal = document.createElement("div");
 
+  modal.id = "txModal";
+
   modal.className =
-    "fixed inset-0 bg-black/50 backdrop-blur-sm flex items-end sm:items-center justify-center z-50";
+    "fixed inset-0 bg-black/50 backdrop-blur-sm flex items-end sm:items-center justify-center z-50 px-4";
 
   modal.onclick = (e) => {
     if (e.target.id === "txModal") closeModal();
@@ -293,40 +298,41 @@ async function openModal(txId) {
 
   modal.innerHTML = `
     <div id="modalContent"
-         class="bg-white rounded-t-3xl sm:rounded-3xl w-full sm:w-[92%] max-w-md p-6 shadow-2xl animate-slideUp">
+         class="bg-white rounded-3xl w-full max-w-md p-6 shadow-2xl">
 
-      <!-- Drag bar -->
-      <div class="flex justify-center mb-5">
-        <div class="w-12 h-1.5 bg-gray-300 rounded-full"></div>
+      <!-- HEADER -->
+      <div class="flex flex-col items-center text-center mb-6">
+
+        <img src="${avatar}"
+             class="w-20 h-20 rounded-full shadow-md mb-3"/>
+
+        <p class="text-base font-semibold text-gray-800">
+          ${fullName}
+        </p>
+
+        <p class="text-lg font-bold text-gray-900 mt-1">
+          ${getTitle(tx)}
+        </p>
+
+        <p class="text-xs text-gray-400 mt-1">
+          ${formatDate(tx.createdAt)}
+        </p>
+
       </div>
 
-      <!-- Avatar + Title -->
-      <div class="flex flex-col items-center mb-6">
-        <img src="${avatar}"
-             class="w-16 h-16 rounded-full mb-3"/>
-
-        <h3 class="text-lg font-semibold text-gray-800">
-          ${getTitle(tx)}
-        </h3>
-
-        <p class="text-sm text-gray-400">
-          ${formatDate(tx.createdAt)}
+      <!-- MONTANT PRINCIPAL -->
+      <div class="text-center mb-6">
+        <p class="text-3xl font-bold text-primaryStrong">
+          ${formatMoney(tx.amount, tx.currency)}
         </p>
       </div>
 
-      <!-- Details Card -->
+      <!-- DETAILS CARD -->
       <div class="bg-gray-50 rounded-2xl p-4 space-y-4 text-sm mb-6">
 
         <div class="flex justify-between">
-          <span class="text-gray-500">Montant</span>
-          <span class="font-semibold text-primaryStrong text-base">
-            ${formatMoney(tx.amount, tx.currency)}
-          </span>
-        </div>
-
-        <div class="flex justify-between">
           <span class="text-gray-500">Statut</span>
-          <span class="capitalize font-medium ${
+          <span class="font-medium ${
             tx.status === "completed"
               ? "text-green-600"
               : tx.status === "rejected"
@@ -340,18 +346,18 @@ async function openModal(txId) {
         <div class="flex justify-between">
           <span class="text-gray-500">Type</span>
           <span class="font-medium">
-            ${tx.type || tx.category}
+            ${formatNotificationType(tx)}
           </span>
         </div>
 
         ${
           tx.customMotif || tx.motif
             ? `
-            <div class="pt-4 border-t border-gray-200">
-              <span class="block text-gray-500 mb-2 text-xs uppercase tracking-wide">
+            <div class="pt-3 border-t border-gray-200">
+              <span class="block text-gray-400 text-xs uppercase mb-2">
                 Motif
               </span>
-              <p class="text-gray-700 text-sm leading-relaxed break-words whitespace-pre-wrap">
+              <p class="text-gray-700 break-words">
                 ${tx.customMotif || tx.motif}
               </p>
             </div>
@@ -361,42 +367,38 @@ async function openModal(txId) {
 
       </div>
 
-      <!-- Action Buttons -->
-      <div class="space-y-3">
+      <!-- ACTIONS -->
+      <div class="flex gap-3">
 
-        <!-- Download -->
+        <!-- DOWNLOAD -->
         <button
           onclick="downloadTransaction()"
-          class="w-full bg-primaryStrong hover:bg-primary text-white py-3 rounded-xl font-medium transition flex items-center justify-center gap-2">
-          <i class="bi bi-download"></i>
+          class="flex-1 bg-primaryStrong hover:bg-primary text-white py-3 rounded-2xl flex items-center justify-center transition">
+          <i class="bi bi-download text-lg"></i>
         </button>
 
         ${
           tx.status === "pending" &&
           tx.toUserId === userId
             ? `
-            <div class="flex gap-3">
-
               <button
                 onclick="executeAction('${txId}','approve')"
-                class="flex-1 bg-green-500 hover:bg-green-600 text-white py-3 rounded-xl transition flex items-center justify-center">
-                <i class="bi bi-check-lg"></i>
+                class="flex-1 bg-green-500 hover:bg-green-600 text-white py-3 rounded-2xl flex items-center justify-center transition">
+                <i class="bi bi-check-lg text-lg"></i>
               </button>
 
               <button
                 onclick="executeAction('${txId}','reject')"
-                class="flex-1 bg-red-500 hover:bg-red-600 text-white py-3 rounded-xl transition flex items-center justify-center">
-                <i class="bi bi-x-lg"></i>
+                class="flex-1 bg-red-500 hover:bg-red-600 text-white py-3 rounded-2xl flex items-center justify-center transition">
+                <i class="bi bi-x-lg text-lg"></i>
               </button>
-
-            </div>
             `
             : `
-            <button
-              onclick="closeModal()"
-              class="w-full bg-gray-200 hover:bg-gray-300 py-3 rounded-xl transition flex items-center justify-center">
-              <i class="bi bi-x-circle"></i>
-            </button>
+              <button
+                onclick="closeModal()"
+                class="flex-1 bg-gray-200 hover:bg-gray-300 py-3 rounded-2xl flex items-center justify-center transition">
+                <i class="bi bi-x-lg text-lg"></i>
+              </button>
             `
         }
 
@@ -405,7 +407,6 @@ async function openModal(txId) {
     </div>
   `;
 
-  modal.id = "txModal";
   document.body.appendChild(modal);
 }
 function closeModal() {
