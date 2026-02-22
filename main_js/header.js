@@ -27,7 +27,7 @@ function forceLogout() {
 }
 
 /* ==========================================
-   HASH GENERATOR (avatar stable)
+   HASH GENERATOR
 ========================================== */
 
 function generateHash(str) {
@@ -49,10 +49,6 @@ function updateHeaderUI(user) {
   const avatarImg = document.getElementById("headerAvatar");
   const roleBadge = document.getElementById("roleBadge");
 
-  // =====================
-  // NOM
-  // =====================
-
   if (fullNameEl) {
     fullNameEl.textContent =
       `${user.firstName ?? ""} ${user.lastName ?? ""}`.trim();
@@ -66,36 +62,44 @@ function updateHeaderUI(user) {
 
   if (!avatarImg) return;
 
-  // =====================
-  // AVATAR HUMANOÏDE AUTO
-  // =====================
-
   const seed = user.username || user.firstName || "user";
-  const gender = (user.gender || "").toLowerCase().trim();
   const role = (user.role || "").toLowerCase().trim();
 
   const hash = generateHash(seed);
 
-  // Palette différente selon genre
-  let backgroundColors = "c7d2fe,ddd6fe,e0e7ff"; // homme
-  if (gender === "femme") {
-    backgroundColors = "fecaca,fbcfe8,fde68a";
+  /* ==========================================
+     BACKGROUND CORPORATE SELON ROLE
+  ========================================== */
+
+  let background = "e2e8f0"; // neutral slate
+
+  if (role === "super_admin") {
+    background = "facc15"; // gold soft
+  } else if (role === "admin") {
+    background = "a78bfa"; // soft purple
+  } else if (role === "business") {
+    background = "60a5fa"; // soft blue
   }
+
+  /* ==========================================
+     AVATAR CORPORATE
+  ========================================== */
 
   const avatarUrl =
     `https://api.dicebear.com/7.x/personas/png` +
     `?seed=${hash}` +
     `&size=256` +
     `&radius=50` +
-    `&backgroundColor=${backgroundColors}` +
-    `&backgroundType=gradientLinear` +
-    `&scale=90`;
+    `&backgroundColor=${background}` +
+    `&backgroundType=solid` +
+    `&scale=85` +
+    `&flip=false`;
 
   avatarImg.src = avatarUrl;
 
-  // =====================
-  // RESET STYLE
-  // =====================
+  /* ==========================================
+     RESET STYLE
+  ========================================== */
 
   avatarImg.classList.remove(
     "border-yellow-500",
@@ -113,9 +117,9 @@ function updateHeaderUI(user) {
     );
   }
 
-  // =====================
-  // ROLE SYSTEM
-  // =====================
+  /* ==========================================
+     ROLE SYSTEM
+  ========================================== */
 
   if (role === "super_admin") {
 
@@ -148,8 +152,7 @@ function updateHeaderUI(user) {
     }
 
   } else {
-
-    avatarImg.classList.add("border-transparent");
+    avatarImg.classList.add("border-gray-200");
   }
 }
 
