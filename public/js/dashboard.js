@@ -408,6 +408,10 @@ async function openModal(txId) {
   modal.id = "txModal";
   document.body.appendChild(modal);
 }
+function closeModal() {
+  const modal = document.getElementById("txModal");
+  if (modal) modal.remove();
+}
 /* ===============================
    EXECUTE ACTION
 ================================ */
@@ -554,6 +558,7 @@ async function downloadTransaction() {
 
   // Remettre les styles
   element.classList.add("shadow-2xl");
+  element.classList.add("animate-slideUp");
 }
 
 window.downloadTransaction = downloadTransaction;
