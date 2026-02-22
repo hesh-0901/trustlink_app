@@ -35,10 +35,10 @@ function generateHash(str) {
 }
 
 /* ==========================================
-   AVATAR ENGINE USER PERSONNALISÉ
+   BUSINESS AVATAR ENGINE
 ========================================== */
 
-function generateUserAvatar(user) {
+function generateBusinessAvatar(user) {
 
   const seed =
     (user.username || "") +
@@ -50,47 +50,47 @@ function generateUserAvatar(user) {
   const gender = (user.gender || "").toLowerCase();
   const isFemale = gender.includes("femme");
 
-  /* 🎨 Couleurs modernes comme ton image */
+  const role = (user.role || "").toLowerCase();
+  const isAdmin = role.includes("admin");
+
+  /* 🎨 Couleurs strictes */
   const backgrounds = [
-    "#2563EB",
-    "#7C3AED",
-    "#F59E0B",
-    "#10B981",
-    "#EC4899",
-    "#0EA5E9",
-    "#F43F5E",
-    "#1E293B"
+    "#1E293B", // slate dark
+    "#0F172A", // navy
+    "#111827", // charcoal
+    "#1F2937", // gray dark
+    "#312E81"  // indigo deep
   ];
 
   const skins = [
-    "#F2D6CB",
-    "#EAC086",
-    "#C68642",
-    "#8D5524"
+    "#F1D0B5",
+    "#D8A47F",
+    "#B97A56",
+    "#8A5A44"
   ];
 
   const hairColors = [
-    "#111827",
-    "#3F3F46",
-    "#4B5563",
-    "#92400E"
-  ];
-
-  const clothesColors = [
-    "#1F2937",
-    "#334155",
-    "#6366F1",
     "#0F172A",
-    "#374151"
+    "#1F2937",
+    "#374151",
+    "#3F3F46"
   ];
 
   const bg = backgrounds[hash % backgrounds.length];
   const skin = skins[hash % skins.length];
   const hair = hairColors[hash % hairColors.length];
-  const clothes = clothesColors[hash % clothesColors.length];
 
-  const hasBeard = !isFemale && hash % 3 === 0;
-  const hasGlasses = hash % 4 === 0;
+  const hasBeard = !isFemale && hash % 2 === 0;
+  const hasGlasses = hash % 3 === 0;
+
+  /* 👔 Admin = costume */
+  const suitColor = "#111827";
+  const tieColors = ["#7C3AED", "#DC2626", "#2563EB", "#059669"];
+  const tie = tieColors[hash % tieColors.length];
+
+  /* 👕 User = t-shirt sobre */
+  const shirtColors = ["#334155", "#1F2937", "#374151"];
+  const shirt = shirtColors[hash % shirtColors.length];
 
   return `
   <svg viewBox="0 0 200 200" width="48" height="48">
@@ -99,36 +99,46 @@ function generateUserAvatar(user) {
     <circle cx="100" cy="100" r="100" fill="${bg}" />
 
     <!-- Neck -->
-    <rect x="85" y="120" width="30" height="30" fill="${skin}" />
+    <rect x="85" y="115" width="30" height="35" fill="${skin}" />
 
     <!-- Clothes -->
-    <path d="M40 200 Q100 140 160 200 Z" fill="${clothes}"/>
+    ${
+      isAdmin
+        ? `
+        <!-- Suit -->
+        <path d="M40 200 Q100 135 160 200 Z" fill="${suitColor}"/>
+        <!-- Shirt -->
+        <polygon points="85,140 100,160 115,140" fill="#ffffff"/>
+        <!-- Tie -->
+        <polygon points="95,140 105,140 102,175 98,175" fill="${tie}"/>
+        `
+        : `
+        <!-- T-shirt -->
+        <path d="M40 200 Q100 150 160 200 Z" fill="${shirt}"/>
+        `
+    }
 
     <!-- Face -->
-    <circle cx="100" cy="90" r="45" fill="${skin}" />
+    <circle cx="100" cy="85" r="45" fill="${skin}" />
 
     <!-- Hair -->
     ${
       isFemale
-        ? `<path d="M50 85 Q100 20 150 85 Q145 50 100 45 Q55 50 50 85 Z" fill="${hair}" />`
-        : `<path d="M55 70 Q100 30 145 70 Q140 50 100 45 Q60 50 55 70 Z" fill="${hair}" />`
+        ? `<path d="M50 80 Q100 25 150 80 Q140 45 100 40 Q60 45 50 80 Z" fill="${hair}" />`
+        : `<path d="M55 65 Q100 30 145 65 Q140 50 100 45 Q60 50 55 65 Z" fill="${hair}" />`
     }
 
     <!-- Eyes -->
-    <circle cx="85" cy="95" r="5" fill="#1F2937"/>
-    <circle cx="115" cy="95" r="5" fill="#1F2937"/>
+    <circle cx="85" cy="90" r="4" fill="#0F172A"/>
+    <circle cx="115" cy="90" r="4" fill="#0F172A"/>
 
-    <!-- Smile -->
-    <path d="M80 115 Q100 130 120 115" 
-          stroke="#1F2937" 
-          stroke-width="3" 
-          fill="none" 
-          stroke-linecap="round"/>
+    <!-- Mouth (neutral business) -->
+    <line x1="85" y1="115" x2="115" y2="115" stroke="#0F172A" stroke-width="3" stroke-linecap="round"/>
 
-    <!-- Beard (Homme seulement) -->
+    <!-- Beard -->
     ${
       hasBeard
-        ? `<path d="M75 105 Q100 150 125 105 Z" fill="${hair}" />`
+        ? `<path d="M75 105 Q100 145 125 105 Z" fill="${hair}" />`
         : ""
     }
 
@@ -136,9 +146,9 @@ function generateUserAvatar(user) {
     ${
       hasGlasses
         ? `
-        <circle cx="85" cy="95" r="10" stroke="#111827" stroke-width="3" fill="none"/>
-        <circle cx="115" cy="95" r="10" stroke="#111827" stroke-width="3" fill="none"/>
-        <line x1="95" y1="95" x2="105" y2="95" stroke="#111827" stroke-width="3"/>
+        <circle cx="85" cy="90" r="9" stroke="#000" stroke-width="2" fill="none"/>
+        <circle cx="115" cy="90" r="9" stroke="#000" stroke-width="2" fill="none"/>
+        <line x1="94" y1="90" x2="106" y2="90" stroke="#000" stroke-width="2"/>
         `
         : ""
     }
@@ -170,19 +180,19 @@ function updateHeaderUI(user) {
   }
 
   if (avatarWrapper) {
-    avatarWrapper.innerHTML = generateUserAvatar(user);
+    avatarWrapper.innerHTML = generateBusinessAvatar(user);
   }
 
-  /* Badge rôle */
   if (roleBadge && user.role) {
     roleBadge.classList.remove("hidden");
     roleBadge.textContent = user.role;
 
-    if (user.role === "super_admin") {
-      roleBadge.style.background = "#DC2626";
-    } else {
-      roleBadge.style.background = "#2563EB";
-    }
+    roleBadge.style.background =
+      user.role === "super_admin"
+        ? "#B91C1C"
+        : user.role === "admin"
+        ? "#1D4ED8"
+        : "#475569";
   }
 }
 
