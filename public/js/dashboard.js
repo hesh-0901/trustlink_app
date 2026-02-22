@@ -304,20 +304,20 @@ async function openModal(txId) {
           </span>
         </div>
 
-        ${
-          tx.customMotif || tx.motif
-            ? `
-            <div class="pt-3 border-t border-gray-200">
-              <span class="block text-gray-500 mb-1">
-                Motif
-              </span>
-              <span class="text-gray-700 text-sm">
-                ${tx.customMotif || tx.motif}
-              </span>
-            </div>
-            `
-            : ""
-        }
+            ${
+              tx.customMotif || tx.motif
+                ? `
+                <div class="pt-4 border-t border-gray-200">
+                  <span class="block text-gray-500 mb-2 text-xs uppercase tracking-wide">
+                    Motif
+                  </span>
+                  <p class="text-gray-700 text-sm leading-relaxed break-words whitespace-pre-wrap">
+                    ${tx.customMotif || tx.motif}
+                  </p>
+                </div>
+                `
+                : ""
+            }
 
       </div>
 
