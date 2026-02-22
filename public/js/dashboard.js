@@ -161,8 +161,6 @@ async function loadNotifications(next = false) {
 
     container.appendChild(div);
   });
-
-  createPaginationControls();
 }
 
 function createPagination() {
@@ -319,7 +317,6 @@ async function openModal(txId) {
 /* ===============================
    EXECUTE ACTION
 ================================ */
-
 async function executeAction(txId, action) {
 
   const txRef = doc(db, "transactions", txId);
@@ -335,11 +332,13 @@ async function executeAction(txId, action) {
     if (tx.status !== "pending")
       throw "Déjà traité";
 
+    if (tx.toUserId !== userId)
+      throw "Non autorisé";
+
     transaction.update(txRef, {
-      status:
-        action === "approve"
-          ? "completed"
-          : "rejected",
+      status: action === "approve"
+        ? "completed"
+        : "rejected",
       updatedAt: serverTimestamp()
     });
 
@@ -350,6 +349,7 @@ async function executeAction(txId, action) {
 }
 
 window.executeAction = executeAction;
+window.closeModal = closeModal;
 
 /* ===============================
    Helpers
