@@ -559,6 +559,20 @@ function formatNotificationType(tx) {
 
   return "Opération";
 }
+/* ===============================
+   TELECHARGEMENT
+================================ */
+function downloadAvatar(url) {
+
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = "avatar.png";
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
+window.downloadAvatar = downloadAvatar;
 
 /* ===============================
    INIT
