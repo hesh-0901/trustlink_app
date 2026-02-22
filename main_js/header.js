@@ -5,7 +5,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 /* ===============================
-   GET SESSION USER
+   SESSION
 ================================ */
 function getCurrentUserId() {
   return (
@@ -15,7 +15,7 @@ function getCurrentUserId() {
 }
 
 /* ===============================
-   LOAD USER DATA
+   LOAD USER
 ================================ */
 document.addEventListener("DOMContentLoaded", async () => {
 
@@ -36,9 +36,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       return;
     }
 
-    const data = userSnap.data();
+    const user = userSnap.data();
 
-    injectUserData(data);
+    injectUser(user);
 
   } catch (error) {
     console.error("Header error:", error);
@@ -48,32 +48,34 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 
 /* ===============================
-   INJECT USER DATA
+   INJECT DATA
 ================================ */
-function injectUserData(data) {
+function injectUser(user) {
 
-  document.getElementById("greetingDisplay").textContent =
-    `Bonjour ${data.firstName}`;
+  document.getElementById("firstNameDisplay").textContent =
+    user.firstName;
 
   document.getElementById("usernameDisplay").textContent =
-    data.username;
+    user.username;
 
-  generateAvatar(data.firstName, data.gender);
+  generateAvatar(user);
 
 }
 
 /* ===============================
-   AVATAR GENERATION
+   AVATAR DYNAMIQUE
 ================================ */
-function generateAvatar(name, gender) {
+function generateAvatar(user) {
+
+  const seed = user.firstName + user.username;
 
   const style =
-    gender === "Femme"
+    user.gender === "Femme"
       ? "personas"
       : "adventurer";
 
   const avatarUrl =
-    `https://api.dicebear.com/7.x/${style}/png?seed=${encodeURIComponent(name)}&size=128`;
+    `https://api.dicebear.com/7.x/${style}/png?seed=${encodeURIComponent(seed)}&size=128`;
 
   document.getElementById("userAvatar").src = avatarUrl;
 
