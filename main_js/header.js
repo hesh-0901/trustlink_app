@@ -1,4 +1,5 @@
 import { db } from "../js/firebase-init.js";
+
 import {
   doc,
   getDoc,
@@ -6,85 +7,121 @@ import {
   query,
   where,
   onSnapshot
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 (async function initHeader() {
+
   try {
-    const userId = localStorage.getItem("userId");
-    const role = localStorage.getItem("role");
+
+    /* ===============================
+       SESSION CHECK
+    ================================= */
+
+    const userId =
+      localStorage.getItem("userId") ||
+      sessionStorage.getItem("userId");
 
     if (!userId) {
       window.location.href = "/trustlink_app/index.html";
       return;
     }
 
-    // ---------------------------
-    // 1️⃣ Charger utilisateur
-    // ---------------------------
+    /* ===============================
+       FETCH USER
+    ================================= */
+
     const userRef = doc(db, "users", userId);
     const userSnap = await getDoc(userRef);
 
     if (!userSnap.exists()) {
-      localStorage.removeItem("userId");
-      localStorage.removeItem("role");
+      localStorage.clear();
+      sessionStorage.clear();
       window.location.href = "/trustlink_app/index.html";
       return;
     }
 
     const userData = userSnap.data();
 
-    // Injecter infos utilisateur
-    document.getElementById("user-firstname").textContent = userData.firstName;
-    document.getElementById("user-username").textContent = userData.username;
+    /* ===============================
+       INJECT USER DATA
+    ================================= */
 
-    // ---------------------------
-    // 2️⃣ Avatar dynamique Dicebear
-    // ---------------------------
+    const firstNameEl = document.getElementById("user-firstname");
+    const usernameEl = document.getElementById("user-username");
+    const avatarEl = document.getElementById("user-avatar");
+
+    if (firstNameEl) firstNameEl.textContent = userData.firstName;
+    if (usernameEl) usernameEl.textContent = userData.username;
+
+    /* ===============================
+       AVATAR
+    ================================= */
+
     const avatarStyle =
       userData.gender === "Femme"
         ? "adventurer-neutral"
         : "adventurer";
 
-    const avatarUrl = `https://api.dicebear.com/7.x/${avatarStyle}/png?seed=${encodeURIComponent(
-      userData.username
-    )}&backgroundColor=EEF2FF`;
+    const avatarUrl =
+      `https://api.dicebear.com/7.x/${avatarStyle}/png?` +
+      `seed=${encodeURIComponent(userData.username)}` +
+      `&backgroundColor=EEF2FF`;
 
-    document.getElementById("user-avatar").src = avatarUrl;
+    if (avatarEl) avatarEl.src = avatarUrl;
 
-    // ---------------------------
-    // 3️⃣ Notifications temps réel
-    // ---------------------------
+    /* ===============================
+       REAL-TIME NOTIFICATIONS
+    ================================= */
+
     const badge = document.getElementById("notification-badge");
 
-    const transactionsRef = collection(db, "transactions");
-    const q = query(
-      transactionsRef,
-      where("participants", "array-contains", userId)
-    );
+    if (badge) {
 
-    onSnapshot(q, (snapshot) => {
-      const count = snapshot.size;
+      const transactionsRef = collection(db, "transactions");
 
-      if (count > 0) {
-        badge.textContent = count > 9 ? "9+" : count;
-        badge.classList.remove("hidden");
-      } else {
-        badge.classList.add("hidden");
-      }
-    });
+      const q = query(
+        transactionsRef,
+        where("participants", "array-contains", userId)
+      );
 
-    // ---------------------------
-    // 4️⃣ Logout
-    // ---------------------------
+      onSnapshot(q, (snapshot) => {
+
+        const count = snapshot.size;
+
+        if (count > 0) {
+          badge.textContent = count > 9 ? "9+" : count;
+          badge.classList.remove("hidden");
+        } else {
+          badge.classList.add("hidden");
+        }
+
+      });
+    }
+
+    /* ===============================
+       LOGOUT
+    ================================= */
+
     const logoutBtn = document.getElementById("logout-btn");
 
-    logoutBtn.addEventListener("click", () => {
-      localStorage.removeItem("userId");
-      localStorage.removeItem("role");
-      window.location.href = "/trustlink_app/index.html";
-    });
+    if (logoutBtn) {
+      logoutBtn.addEventListener("click", () => {
+
+        localStorage.removeItem("userId");
+        localStorage.removeItem("role");
+
+        sessionStorage.removeItem("userId");
+        sessionStorage.removeItem("role");
+
+        window.location.href = "/trustlink_app/index.html";
+
+      });
+    }
 
   } catch (error) {
+
     console.error("Header error:", error);
+
   }
+
 })();
