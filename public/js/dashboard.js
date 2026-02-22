@@ -1,5 +1,4 @@
 /*public/js/dashboard.js*/
-/*public/js/dashboard.js*/
 import { db } from "../../js/firebase-init.js";
 
 import {
@@ -166,28 +165,47 @@ async function loadNotifications(next = false) {
   createPaginationControls();
 }
 
-function createPaginationControls() {
+function createPagination() {
 
   const container =
     document.getElementById("transactionsList");
 
-  const btn = document.createElement("button");
-  btn.className =
-    "w-full mt-3 text-sm text-primaryStrong font-medium";
-  btn.textContent = "Voir plus";
+  const pagination = document.createElement("div");
 
-  btn.onclick = () => {
-    currentPage++;
-    loadNotifications(true);
-  };
+  pagination.className =
+    "flex justify-center items-center gap-4 mt-6 text-sm";
 
-  container.appendChild(btn);
+  pagination.innerHTML = `
+    <button
+      ${currentPage === 1 ? "disabled" : ""}
+      onclick="changePage(${currentPage - 1})"
+      class="text-primaryStrong disabled:opacity-30">
+      ‹
+    </button>
+
+    <span class="font-medium">
+      ${currentPage} / ${totalPages}
+    </span>
+
+    <button
+      ${currentPage === totalPages ? "disabled" : ""}
+      onclick="changePage(${currentPage + 1})"
+      class="text-primaryStrong disabled:opacity-30">
+      ›
+    </button>
+  `;
+
+  container.appendChild(pagination);
 }
 
+function changePage(page) {
+  loadNotifications(page);
+}
+
+window.changePage = changePage;
 /* ===============================
    MODAL
 ================================ */
-
 async function openModal(txId) {
 
   const snap =
@@ -197,50 +215,99 @@ async function openModal(txId) {
 
   const tx = snap.data();
 
+  const counterpartyId =
+    tx.fromUserId === userId
+      ? tx.toUserId
+      : tx.fromUserId;
+
+  const userSnap =
+    await getDoc(doc(db, "users", counterpartyId));
+
+  const user = userSnap.exists()
+    ? userSnap.data()
+    : null;
+
+  const avatar =
+    user
+      ? `https://api.dicebear.com/7.x/avataaars/png?seed=${user.username}`
+      : "";
+
   const modal = document.createElement("div");
 
   modal.className =
-    "fixed inset-0 bg-black/40 flex items-center justify-center z-50";
+    "fixed inset-0 bg-black/40 flex items-end sm:items-center justify-center z-50";
 
   modal.innerHTML = `
-    <div class="bg-white rounded-2xl p-6 w-[90%] max-w-md">
+    <div class="bg-white rounded-t-3xl sm:rounded-2xl p-6 w-full sm:w-[90%] max-w-md animate-slideUp">
 
-      <h3 class="text-lg font-semibold mb-4">
-        Détails opération
-      </h3>
-
-      <div class="space-y-2 text-sm mb-6">
-        <div><strong>Montant :</strong> ${formatMoney(tx.amount, tx.currency)}</div>
-        <div><strong>Status :</strong> ${tx.status}</div>
-        <div><strong>Type :</strong> ${tx.type || tx.category}</div>
+      <div class="flex justify-center mb-4">
+        <div class="w-14 h-1 bg-gray-300 rounded-full"></div>
       </div>
 
-      <div class="flex gap-3">
-        ${
-          tx.status === "pending" &&
-          tx.toUserId === userId
-            ? `
+      <div class="flex flex-col items-center mb-6">
+
+        <img src="${avatar}"
+             class="w-16 h-16 rounded-full mb-3"/>
+
+        <h3 class="text-lg font-semibold">
+          ${getTitle(tx)}
+        </h3>
+
+        <p class="text-sm text-gray-400">
+          ${formatDate(tx.createdAt)}
+        </p>
+      </div>
+
+      <div class="space-y-3 text-sm mb-6">
+
+        <div class="flex justify-between">
+          <span>Montant</span>
+          <span class="font-semibold">
+            ${formatMoney(tx.amount, tx.currency)}
+          </span>
+        </div>
+
+        <div class="flex justify-between">
+          <span>Status</span>
+          <span class="capitalize">
+            ${tx.status}
+          </span>
+        </div>
+
+        <div class="flex justify-between">
+          <span>Type</span>
+          <span>
+            ${tx.type || tx.category}
+          </span>
+        </div>
+
+      </div>
+
+      ${
+        tx.status === "pending" &&
+        tx.toUserId === userId
+          ? `
+          <div class="flex gap-3">
             <button
               onclick="executeAction('${txId}','approve')"
-              class="flex-1 bg-green-500 text-white py-2 rounded-xl">
+              class="flex-1 bg-green-500 text-white py-3 rounded-xl">
               Approuver
             </button>
-
             <button
               onclick="executeAction('${txId}','reject')"
-              class="flex-1 bg-red-500 text-white py-2 rounded-xl">
+              class="flex-1 bg-red-500 text-white py-3 rounded-xl">
               Refuser
             </button>
-            `
-            : `
-            <button
-              onclick="closeModal()"
-              class="w-full bg-gray-200 py-2 rounded-xl">
-              Fermer
-            </button>
-            `
-        }
-      </div>
+          </div>
+          `
+          : `
+          <button
+            onclick="closeModal()"
+            class="w-full bg-gray-200 py-3 rounded-xl">
+            Fermer
+          </button>
+          `
+      }
 
     </div>
   `;
@@ -248,13 +315,6 @@ async function openModal(txId) {
   modal.id = "txModal";
   document.body.appendChild(modal);
 }
-
-function closeModal() {
-  const modal = document.getElementById("txModal");
-  if (modal) modal.remove();
-}
-
-window.closeModal = closeModal;
 
 /* ===============================
    EXECUTE ACTION
@@ -290,6 +350,59 @@ async function executeAction(txId, action) {
 }
 
 window.executeAction = executeAction;
+
+/* ===============================
+   Helpers
+================================ */
+function formatDate(timestamp) {
+
+  if (!timestamp) return "";
+
+  const date = new Date(timestamp.seconds * 1000);
+
+  return date.toLocaleDateString("fr-FR") +
+         " • " +
+         date.toLocaleTimeString("fr-FR", {
+           hour: "2-digit",
+           minute: "2-digit"
+         });
+}
+
+function getTitle(tx) {
+
+  if (tx.category === "request")
+    return "Nouvelle demande";
+
+  if (tx.type === "transfer")
+    return tx.fromUserId === userId
+      ? "Transfert envoyé"
+      : "Transfert reçu";
+
+  return "Opération";
+}
+
+function getIconConfig(tx) {
+
+  if (tx.category === "request")
+    return {
+      icon: "bi-question-circle",
+      bg: "bg-yellow-100",
+      color: "text-yellow-600"
+    };
+
+  if (tx.type === "transfer")
+    return {
+      icon: "bi-arrow-left-right",
+      bg: "bg-blue-100",
+      color: "text-blue-600"
+    };
+
+  return {
+    icon: "bi-bell",
+    bg: "bg-gray-100",
+    color: "text-gray-600"
+  };
+}
 
 /* ===============================
    INIT
