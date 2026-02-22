@@ -61,31 +61,29 @@ function updateHeaderUI(user) {
   const gender = (user.gender || "").toLowerCase().trim();
   const role = (user.role || "").toLowerCase().trim();
 
-  let style = "notionists";
+  let style = "avataaars";
 
   if (gender === "homme") {
-    style = "notionists";
+    style = "avataaars";
   } else if (gender === "femme") {
-    style = "notionists-neutral";
+    style = "micah";
   }
-// =====================
-// TEINT AFRIQUE
-// =====================
 
-const skinTones = "&skinColor=darkBrown,brown,tanned";
+  // =====================
+  // AVATAR STYLE (Cartoon moderne rond)
+  // =====================
 
-const avatarUrl =
-  "https://api.dicebear.com/7.x/" + style + "/png" +
-  "?seed=" + encodeURIComponent(seed) +
-  skinTones +
-  "&radius=50" +
-  "&size=256" +
-  "&backgroundType=gradientLinear" +
-  "&backgroundRotation=45" +
-  "&backgroundColor=1E2BE0,3D4BFF" +
-  "&t=" + Date.now(); // anti-cache
+  const avatarUrl =
+    "https://api.dicebear.com/7.x/" + style + "/png" +
+    "?seed=" + encodeURIComponent(seed) +
+    "&size=256" +
+    "&radius=50" +
+    "&backgroundColor=3D4BFF,E0E7FF,F3F4F6" +
+    "&backgroundType=gradientLinear" +
+    "&backgroundRotation=45" +
+    "&t=" + Date.now(); // anti-cache
 
-avatarImg.src = avatarUrl;
+  avatarImg.src = avatarUrl;
 
   // =====================
   // RESET STYLE
