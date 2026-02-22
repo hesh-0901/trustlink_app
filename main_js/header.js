@@ -61,7 +61,7 @@ function updateHeaderUI(user) {
   const gender = (user.gender || "").toLowerCase().trim();
   const role = (user.role || "").toLowerCase().trim();
 
-  let style = "notionists-neutral";
+  let style = "notionists";
 
   if (gender === "homme") {
     style = "notionists";
