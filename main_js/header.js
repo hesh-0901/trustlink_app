@@ -35,44 +35,62 @@ function generateHash(str) {
 }
 
 /* ==========================================
-   AVATAR ENGINE PREMIUM
+   PRO AVATAR ENGINE
 ========================================== */
 
-function generatePremiumAvatar(user) {
+function generateProAvatar(user) {
 
   const seed = user.username + user.walletBase + user.birthDate;
   const hash = generateHash(seed);
   const gender = (user.gender || "").toLowerCase();
 
-  // 🎨 Corporate backgrounds
+  const isFemale = gender === "femme";
+
+  // 🎨 Modern corporate backgrounds
   const backgrounds = [
-    "#E2E8F0", // slate
-    "#F1F5F9",
-    "#E0E7FF",
-    "#F8FAFC",
-    "#FEF3C7"
+    "#2563EB", // blue
+    "#7C3AED", // purple
+    "#0EA5E9", // sky
+    "#10B981", // emerald
+    "#F59E0B", // amber
+    "#EF4444", // red
+    "#1E293B", // dark slate
+    "#EC4899"  // pink
   ];
 
   const skins = [
-    "#F1C27D",
-    "#E0AC69",
+    "#F2D6CB",
+    "#EAC086",
     "#C68642",
     "#8D5524"
   ];
 
+  const hairColors = [
+    "#111827",
+    "#3F3F46",
+    "#4B5563",
+    "#92400E",
+    "#B45309"
+  ];
+
   const bg = backgrounds[hash % backgrounds.length];
   const skin = skins[hash % skins.length];
+  const hair = hairColors[hash % hairColors.length];
 
-  const hairColor = ["#111827", "#3F3F46", "#4B5563"][hash % 3];
-
-  const isFemale = gender === "femme";
+  const hasBeard = !isFemale && hash % 3 === 0;
+  const hasGlasses = hash % 4 === 0;
 
   return `
   <svg viewBox="0 0 200 200" width="48" height="48">
+    
+    <!-- Background -->
     <circle cx="100" cy="100" r="100" fill="${bg}" />
 
     <!-- Neck -->
     <rect x="85" y="120" width="30" height="30" fill="${skin}" />
+
+    <!-- Clothes -->
+    <path d="M40 200 Q100 140 160 200 Z" fill="${isFemale ? "#ffffff" : "#1f2937"}"/>
 
     <!-- Face -->
     <circle cx="100" cy="90" r="45" fill="${skin}" />
@@ -80,19 +98,35 @@ function generatePremiumAvatar(user) {
     <!-- Hair -->
     ${
       isFemale
-        ? `<path d="M55 90 Q100 30 145 90 V60 Q100 10 55 60 Z" fill="${hairColor}" />`
-        : `<path d="M60 70 Q100 30 140 70 V60 Q100 20 60 60 Z" fill="${hairColor}" />`
+        ? `<path d="M50 85 Q100 20 150 85 Q145 40 100 35 Q55 40 50 85 Z" fill="${hair}" />`
+        : `<path d="M55 70 Q100 25 145 70 Q140 45 100 40 Q60 45 55 70 Z" fill="${hair}" />`
     }
 
     <!-- Eyes -->
-    <circle cx="85" cy="90" r="4" fill="#1F2937"/>
-    <circle cx="115" cy="90" r="4" fill="#1F2937"/>
+    <circle cx="85" cy="95" r="5" fill="#1F2937"/>
+    <circle cx="115" cy="95" r="5" fill="#1F2937"/>
 
-    <!-- Nose -->
-    <rect x="98" y="95" width="4" height="10" rx="2" fill="#D4A373"/>
+    <!-- Smile -->
+    <path d="M80 115 Q100 130 120 115" stroke="#1F2937" stroke-width="3" fill="none" stroke-linecap="round"/>
 
-    <!-- Clothes -->
-    <path d="M50 200 Q100 150 150 200 Z" fill="${isFemale ? "#6366F1" : "#334155"}"/>
+    <!-- Beard -->
+    ${
+      hasBeard
+        ? `<path d="M75 105 Q100 150 125 105 Z" fill="${hair}" />`
+        : ""
+    }
+
+    <!-- Glasses -->
+    ${
+      hasGlasses
+        ? `
+        <circle cx="85" cy="95" r="10" stroke="#111827" stroke-width="3" fill="none"/>
+        <circle cx="115" cy="95" r="10" stroke="#111827" stroke-width="3" fill="none"/>
+        <line x1="95" y1="95" x2="105" y2="95" stroke="#111827" stroke-width="3"/>
+        `
+        : ""
+    }
+
   </svg>
   `;
 }
@@ -119,7 +153,7 @@ function updateHeaderUI(user) {
   }
 
   if (avatarWrapper) {
-    avatarWrapper.innerHTML = generatePremiumAvatar(user);
+    avatarWrapper.innerHTML = generateProAvatar(user);
   }
 }
 
