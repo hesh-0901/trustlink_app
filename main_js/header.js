@@ -40,29 +40,21 @@ function generatePremiumAvatar(user) {
   const isFemale = genderRaw.includes("femme");
   const isAdmin = roleRaw.includes("admin");
 
-  // 👔 Clothing selon rôle
+  // 👔 Vêtements selon rôle
   const clothing = isAdmin
     ? "blazerShirt"
     : "shirt";
 
-  // 🎨 Background corporate propre
-  const background = "f3f4f6";
-
-  // 👁 Style sérieux (pas cartoon)
-  const eyes = isFemale ? "variant05" : "variant12";
-
   return (
-    "https://api.dicebear.com/7.x/personas/png" +
+    "https://api.dicebear.com/7.x/personas/svg" +
     `?seed=${seed}` +
     `&size=256` +
     `&radius=50` +
-    `&backgroundColor=${background}` +
+    `&backgroundColor=f3f4f6` +
     `&gender=${isFemale ? "female" : "male"}` +
-    `&clothing=${clothing}` +
-    `&eyes=${eyes}`
+    `&clothing=${clothing}`
   );
 }
-
 /* ==========================================
    UPDATE HEADER UI
 ========================================== */
