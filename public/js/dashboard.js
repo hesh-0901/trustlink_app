@@ -372,31 +372,38 @@ async function openModal(txId) {
         tx.toUserId === userId
           ? `
           <div class="flex gap-3">
-            <button
-              onclick="executeAction('${txId}','approve')"
-              class="flex-1 bg-green-500 hover:bg-green-600 text-white py-3 rounded-xl font-medium transition">
-              Approuver
-            </button>
-            <button
-              onclick="executeAction('${txId}','reject')"
-              class="flex-1 bg-red-500 hover:bg-red-600 text-white py-3 rounded-xl font-medium transition">
-              Refuser
-            </button>
-          </div>
-          `
-          : `
-          <button
-            onclick="closeModal()"
-            class="w-full bg-gray-200 hover:bg-gray-300 py-3 rounded-xl font-medium transition">
-            Fermer
-          </button>
-          `
-        <button
+<!-- Bouton Télécharger -->
+<button
   onclick="downloadTransaction()"
   class="w-full bg-primaryStrong text-white py-3 rounded-xl font-medium mb-3">
   Télécharger la transaction
 </button>
-      }
+
+${
+  tx.status === "pending" &&
+  tx.toUserId === userId
+    ? `
+    <div class="flex gap-3">
+          <button
+            onclick="executeAction('${txId}','approve')"
+            class="flex-1 bg-green-500 hover:bg-green-600 text-white py-3 rounded-xl font-medium transition">
+            Approuver
+          </button>
+          <button
+            onclick="executeAction('${txId}','reject')"
+            class="flex-1 bg-red-500 hover:bg-red-600 text-white py-3 rounded-xl font-medium transition">
+            Refuser
+          </button>
+        </div>
+        `
+        : `
+        <button
+          onclick="closeModal()"
+          class="w-full bg-gray-200 hover:bg-gray-300 py-3 rounded-xl font-medium transition">
+          Fermer
+        </button>
+        `
+    }
 
     </div>
   `;
