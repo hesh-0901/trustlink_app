@@ -23,15 +23,16 @@ function forceLogout() {
 }
 
 /* ==========================================
-   MODERN AVATAR (DiceBear Personas)
+   MODERN BUSINESS AVATAR (DiceBear Personas)
 ========================================== */
 
 function generateModernAvatar(user) {
 
-  // Si plus tard tu ajoutes une vraie photo
+  // 🔹 Si l'utilisateur a uploadé une vraie photo
   if (user.avatarUrl) {
     return `
       <img src="${user.avatarUrl}"
+           alt="avatar"
            class="w-12 h-12 rounded-full object-cover shadow-md"/>
     `;
   }
@@ -44,23 +45,23 @@ function generateModernAvatar(user) {
   const role = (user.role || "").toLowerCase();
   const isAdmin = role.includes("admin");
 
-  // Couleurs vêtements selon rôle
-  const adminClothes = ["blazer", "shirt", "suit"];
-  const userClothes = ["shirt", "tshirt"];
+  // 🎯 Style vêtements selon rôle
+  const clothing = isAdmin
+    ? "blazer,shirt"
+    : "shirt";
 
-  const clothes = isAdmin
-    ? adminClothes.join(",")
-    : userClothes.join(",");
+  // 🔹 URL propre sans retour ligne
+  const avatarUrl =
+    `https://api.dicebear.com/7.x/personas/svg` +
+    `?seed=${seed}` +
+    `&gender=${isFemale ? "female" : "male"}` +
+    `&clothing=${clothing}` +
+    `&backgroundType=solid`;
 
   return `
-    <img 
-      src="https://api.dicebear.com/7.x/personas/svg
-      ?seed=${seed}
-      &gender=${isFemale ? "female" : "male"}
-      &clothing=${clothes}
-      &backgroundType=solid"
-      class="w-12 h-12 rounded-full shadow-md"
-    />
+    <img src="${avatarUrl}"
+         alt="avatar"
+         class="w-12 h-12 rounded-full shadow-md"/>
   `;
 }
 
@@ -75,21 +76,25 @@ function updateHeaderUI(user) {
   const avatarWrapper = document.getElementById("headerAvatarWrapper");
   const roleBadge = document.getElementById("roleBadge");
 
+  // Nom complet
   if (fullNameEl) {
     fullNameEl.textContent =
       `${user.firstName ?? ""} ${user.lastName ?? ""}`.trim();
   }
 
+  // Username
   if (usernameEl) {
     usernameEl.textContent = user.username ?? "";
     usernameEl.classList.remove("opacity-0");
     usernameEl.classList.add("opacity-100");
   }
 
+  // Avatar
   if (avatarWrapper) {
     avatarWrapper.innerHTML = generateModernAvatar(user);
   }
 
+  // Badge rôle
   if (roleBadge && user.role) {
     roleBadge.classList.remove("hidden");
     roleBadge.textContent = user.role;
@@ -132,11 +137,20 @@ function initRealtimeUser() {
   });
 }
 
+/* ==========================================
+   LOGOUT INIT
+========================================== */
+
 function initLogout() {
   const logoutBtn = document.getElementById("headerLogout");
   if (!logoutBtn) return;
+
   logoutBtn.addEventListener("click", forceLogout);
 }
+
+/* ==========================================
+   INIT
+========================================== */
 
 initRealtimeUser();
 initLogout();
