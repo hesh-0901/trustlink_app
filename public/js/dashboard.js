@@ -306,26 +306,30 @@ async function openModal(txId) {
       </div>
 
       <!-- Avatar + Nom -->
-      <div class="flex flex-col items-center mb-6">
-
-        <div class="relative">
-          <img src="${avatar}"
-               class="w-20 h-20 rounded-full shadow-md border-4 border-white"/>
-          <div class="absolute inset-0 rounded-full ring-2 ring-primary/20"></div>
-        </div>
-
-        <h3 class="text-lg font-semibold mt-4 text-gray-800">
-          ${fullName}
-        </h3>
-
-        <p class="text-sm text-gray-500">
-          ${getTitle(tx)}
-        </p>
-
-        <p class="text-xs text-gray-400 mt-1">
-          ${formatDate(tx.createdAt)}
-        </p>
-      </div>
+          <div class="flex flex-col items-center mb-6">
+          
+            <div class="relative">
+          
+              <img src="${avatar}"
+                   class="w-20 h-20 rounded-full mb-3 border border-gray-200 shadow-sm"/>
+          
+              <button
+                onclick="downloadAvatar('${avatar}')"
+                class="absolute -bottom-2 -right-2 bg-primaryStrong text-white rounded-full p-2 shadow-md active:scale-95 transition">
+                <i class="bi bi-download text-sm"></i>
+              </button>
+          
+            </div>
+          
+            <h3 class="text-lg font-semibold mt-4">
+              ${getTitle(tx)}
+            </h3>
+          
+            <p class="text-sm text-gray-400">
+              ${formatDate(tx.createdAt)}
+            </p>
+          
+          </div>
 
       <!-- Carte détails -->
       <div class="bg-gray-50 rounded-2xl p-4 space-y-4 text-sm mb-6">
