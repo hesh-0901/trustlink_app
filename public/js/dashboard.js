@@ -128,80 +128,84 @@ async function loadNotifications(page = 1) {
   const docs =
     snapshot.docs.slice(start, end);
 
-  for (const docSnap of docs) {
+ for (const docSnap of docs) {
 
-    const tx = docSnap.data();
-    const txId = docSnap.id;
+  const tx = docSnap.data();
+  const txId = docSnap.id;
 
-    const counterpartyId =
-      tx.fromUserId === userId
-        ? tx.toUserId
-        : tx.fromUserId;
+  const counterpartyId =
+    tx.fromUserId === userId
+      ? tx.toUserId
+      : tx.fromUserId;
 
-    const userSnap =
-      await getDoc(doc(db, "users", counterpartyId));
+  const userSnap =
+    await getDoc(doc(db, "users", counterpartyId));
 
-    const counterparty =
-      userSnap.exists()
-        ? userSnap.data()
-        : null;
+  const counterparty =
+    userSnap.exists()
+      ? userSnap.data()
+      : null;
 
-    const avatar =
-      counterparty
-        ? `https://api.dicebear.com/7.x/avataaars/png?seed=${counterparty.username}`
-        : "";
+  const avatar =
+    counterparty
+      ? `https://api.dicebear.com/7.x/avataaars/png?seed=${counterparty.username}`
+      : "";
 
-    const title = buildNotificationTitle(tx, counterparty);
+  const name =
+    counterparty
+      ? `${counterparty.firstName} ${counterparty.lastName}`
+      : "Utilisateur";
 
-    const div = document.createElement("div");
+  const div = document.createElement("div");
 
-    div.className =
-      "bg-white rounded-2xl p-4 shadow-sm hover:shadow-md transition cursor-pointer";
+  div.className =
+    "bg-white rounded-2xl p-4 shadow-sm hover:shadow-md transition cursor-pointer";
 
-    div.onclick = () => openModal(txId);
+  div.onclick = () => openModal(txId);
 
-    div.innerHTML = `
-      <div class="flex gap-3">
+  div.innerHTML = `
+    <div class="flex gap-3">
 
-        <img src="${avatar}"
-             class="w-12 h-12 rounded-full object-cover border border-gray-200"/>
+      <!-- Avatar -->
+      <img src="${avatar}"
+           class="w-12 h-12 rounded-full object-cover border border-gray-200"/>
 
-        <div class="flex-1 min-w-0">
+      <!-- Content -->
+      <div class="flex-1 min-w-0">
 
-          <div class="flex justify-between items-start">
+        <div class="flex justify-between items-start">
 
-            <p class="text-sm font-semibold text-gray-800 leading-tight">
-              ${title}
+          <div>
+            <p class="text-sm font-semibold text-gray-800">
+              ${name}
             </p>
 
-            <span class="text-xs text-gray-400 whitespace-nowrap ml-2">
-              ${formatDate(tx.createdAt)}
-            </span>
-
+            <p class="text-xs text-gray-500">
+              ${formatNotificationType(tx)}
+            </p>
           </div>
 
-          <div class="mt-1 flex justify-between items-center">
-
-            <span class="text-xs text-gray-500 capitalize">
-              ${getNotificationSubtitle(tx)}
-            </span>
-
-            <span class="text-sm font-semibold ${
-              tx.toUserId === userId
-                ? "text-green-600"
-                : "text-red-500"
-            }">
-              ${formatMoney(tx.amount, tx.currency)}
-            </span>
-
-          </div>
+          <span class="text-sm font-semibold ${
+            tx.toUserId === userId
+              ? "text-green-600"
+              : "text-red-500"
+          }">
+            ${formatMoney(tx.amount, tx.currency)}
+          </span>
 
         </div>
-      </div>
-    `;
 
-    container.appendChild(div);
-  }
+        <p class="text-xs text-gray-400 mt-2">
+          ${formatDate(tx.createdAt)}
+        </p>
+
+      </div>
+
+    </div>
+  `;
+
+  container.appendChild(div);
+}
 
   createPagination();
 }
@@ -532,6 +536,24 @@ function getNotificationSubtitle(tx) {
     return "Transfert";
 
   return tx.status;
+}
+/* ===============================
+   NOUVEAU 2
+================================ */
+function formatNotificationType(tx) {
+
+  if (tx.category === "request") {
+    if (tx.type === "fund_request")
+      return "Demande de fonds";
+    if (tx.type === "repayment_request")
+      return "Demande de remboursement";
+    return "Demande";
+  }
+
+  if (tx.type === "transfer")
+    return "Transfert";
+
+  return "Opération";
 }
 
 /* ===============================
