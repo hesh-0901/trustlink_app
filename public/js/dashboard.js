@@ -297,7 +297,8 @@ async function openModal(txId) {
   };
 
   modal.innerHTML = `
-    <div class="bg-white rounded-t-3xl sm:rounded-3xl w-full sm:w-[92%] max-w-md p-6 shadow-2xl animate-slideUp">
+    <div id="modalContent"
+     class="bg-white rounded-t-3xl sm:rounded-3xl w-full sm:w-[92%] max-w-md p-6 shadow-2xl animate-slideUp">
 
       <!-- Barre drag -->
       <div class="flex justify-center mb-5">
@@ -390,6 +391,11 @@ async function openModal(txId) {
             Fermer
           </button>
           `
+        <button
+  onclick="downloadTransaction()"
+  class="w-full bg-primaryStrong text-white py-3 rounded-xl font-medium mb-3">
+  Télécharger la transaction
+</button>
       }
 
     </div>
@@ -515,9 +521,43 @@ function formatNotificationType(tx) {
   return "Opération";
 }
 /* ===============================
-   TELECHARGEMENT
+   TELECHARGEMENT PNG
 ================================ */
 
+async function downloadTransaction() {
+
+  const element =
+    document.getElementById("modalContent");
+
+  if (!element) return;
+
+  // Désactiver l’ombre et animation pendant capture
+  element.classList.remove("shadow-2xl");
+  element.classList.remove("animate-slideUp");
+
+  const canvas =
+    await html2canvas(element, {
+      scale: 3,                 // qualité HD
+      useCORS: true,
+      backgroundColor: "#ffffff"
+    });
+
+  const link =
+    document.createElement("a");
+
+  link.download =
+    "TrustLink_Transaction.png";
+
+  link.href =
+    canvas.toDataURL("image/png");
+
+  link.click();
+
+  // Remettre les styles
+  element.classList.add("shadow-2xl");
+}
+
+window.downloadTransaction = downloadTransaction;
 
 /* ===============================
    INIT
