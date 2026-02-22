@@ -282,11 +282,6 @@ async function openModal(txId) {
       ? `https://api.dicebear.com/7.x/avataaars/png?seed=${user.username}`
       : "";
 
-  const fullName =
-    user
-      ? `${user.firstName} ${user.lastName}`
-      : "Utilisateur";
-
   const modal = document.createElement("div");
 
   modal.className =
@@ -298,29 +293,28 @@ async function openModal(txId) {
 
   modal.innerHTML = `
     <div id="modalContent"
-     class="bg-white rounded-t-3xl sm:rounded-3xl w-full sm:w-[92%] max-w-md p-6 shadow-2xl animate-slideUp">
+         class="bg-white rounded-t-3xl sm:rounded-3xl w-full sm:w-[92%] max-w-md p-6 shadow-2xl animate-slideUp">
 
-      <!-- Barre drag -->
+      <!-- Drag bar -->
       <div class="flex justify-center mb-5">
         <div class="w-12 h-1.5 bg-gray-300 rounded-full"></div>
       </div>
 
-      <!-- Avatar + Nom -->
-<div class="flex flex-col items-center mb-6">
+      <!-- Avatar + Title -->
+      <div class="flex flex-col items-center mb-6">
+        <img src="${avatar}"
+             class="w-16 h-16 rounded-full mb-3"/>
 
-  <img src="${avatar}"
-       class="w-16 h-16 rounded-full mb-3"/>
+        <h3 class="text-lg font-semibold text-gray-800">
+          ${getTitle(tx)}
+        </h3>
 
-  <h3 class="text-lg font-semibold">
-    ${getTitle(tx)}
-  </h3>
+        <p class="text-sm text-gray-400">
+          ${formatDate(tx.createdAt)}
+        </p>
+      </div>
 
-  <p class="text-sm text-gray-400">
-    ${formatDate(tx.createdAt)}
-  </p>
-</div>
-
-      <!-- Carte détails -->
+      <!-- Details Card -->
       <div class="bg-gray-50 rounded-2xl p-4 space-y-4 text-sm mb-6">
 
         <div class="flex justify-between">
@@ -350,71 +344,69 @@ async function openModal(txId) {
           </span>
         </div>
 
-            ${
-              tx.customMotif || tx.motif
-                ? `
-                <div class="pt-4 border-t border-gray-200">
-                  <span class="block text-gray-500 mb-2 text-xs uppercase tracking-wide">
-                    Motif
-                  </span>
-                  <p class="text-gray-700 text-sm leading-relaxed break-words whitespace-pre-wrap">
-                    ${tx.customMotif || tx.motif}
-                  </p>
-                </div>
-                `
-                : ""
-            }
+        ${
+          tx.customMotif || tx.motif
+            ? `
+            <div class="pt-4 border-t border-gray-200">
+              <span class="block text-gray-500 mb-2 text-xs uppercase tracking-wide">
+                Motif
+              </span>
+              <p class="text-gray-700 text-sm leading-relaxed break-words whitespace-pre-wrap">
+                ${tx.customMotif || tx.motif}
+              </p>
+            </div>
+            `
+            : ""
+        }
 
       </div>
 
-      ${
-        tx.status === "pending" &&
-        tx.toUserId === userId
-          ? `
-          <div class="flex gap-3">
-<!-- Bouton Télécharger -->
-<button
-  onclick="downloadTransaction()"
-  class="w-full bg-primaryStrong text-white py-3 rounded-xl font-medium mb-3">
-  Télécharger la transaction
-</button>
+      <!-- Action Buttons -->
+      <div class="space-y-3">
 
-${
-  tx.status === "pending" &&
-  tx.toUserId === userId
-    ? `
-    <div class="flex gap-3">
-          <button
-            onclick="executeAction('${txId}','approve')"
-            class="flex-1 bg-green-500 hover:bg-green-600 text-white py-3 rounded-xl font-medium transition">
-            Approuver
-          </button>
-          <button
-            onclick="executeAction('${txId}','reject')"
-            class="flex-1 bg-red-500 hover:bg-red-600 text-white py-3 rounded-xl font-medium transition">
-            Refuser
-          </button>
-        </div>
-        `
-        : `
+        <!-- Download -->
         <button
-          onclick="closeModal()"
-          class="w-full bg-gray-200 hover:bg-gray-300 py-3 rounded-xl font-medium transition">
-          Fermer
+          onclick="downloadTransaction()"
+          class="w-full bg-primaryStrong hover:bg-primary text-white py-3 rounded-xl font-medium transition flex items-center justify-center gap-2">
+          <i class="bi bi-download"></i>
         </button>
-        `
-    }
+
+        ${
+          tx.status === "pending" &&
+          tx.toUserId === userId
+            ? `
+            <div class="flex gap-3">
+
+              <button
+                onclick="executeAction('${txId}','approve')"
+                class="flex-1 bg-green-500 hover:bg-green-600 text-white py-3 rounded-xl transition flex items-center justify-center">
+                <i class="bi bi-check-lg"></i>
+              </button>
+
+              <button
+                onclick="executeAction('${txId}','reject')"
+                class="flex-1 bg-red-500 hover:bg-red-600 text-white py-3 rounded-xl transition flex items-center justify-center">
+                <i class="bi bi-x-lg"></i>
+              </button>
+
+            </div>
+            `
+            : `
+            <button
+              onclick="closeModal()"
+              class="w-full bg-gray-200 hover:bg-gray-300 py-3 rounded-xl transition flex items-center justify-center">
+              <i class="bi bi-x-circle"></i>
+            </button>
+            `
+        }
+
+      </div>
 
     </div>
   `;
 
   modal.id = "txModal";
   document.body.appendChild(modal);
-}
-
-function closeModal() {
-  const modal = document.getElementById("txModal");
-  if (modal) modal.remove();
 }
 /* ===============================
    EXECUTE ACTION
