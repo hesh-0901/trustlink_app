@@ -68,10 +68,6 @@ function updateHeaderUI(user) {
   } else if (gender === "femme") {
     style = "notionists-neutral";
   }
-
-  // =====================
-  // TEINT AFRIQUE
-  // =====================
 // =====================
 // TEINT AFRIQUE
 // =====================
