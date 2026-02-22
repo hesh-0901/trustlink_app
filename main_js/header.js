@@ -1,4 +1,4 @@
-import { db } from "/trustlink_app/js/firebase-init.js";
+import { db } from "../js/firebase-init.js";
 import {
   doc,
   onSnapshot
@@ -67,26 +67,29 @@ function updateHeaderUI(user) {
   if (!avatarImg) return;
 
   // =====================
-  // AVATAR 3D HUMANOÏDE
+  // AVATAR HUMANOÏDE AUTO
   // =====================
 
   const seed = user.username || user.firstName || "user";
   const gender = (user.gender || "").toLowerCase().trim();
   const role = (user.role || "").toLowerCase().trim();
 
-  let bodyType = "male";
-  if (gender === "femme") {
-    bodyType = "female";
-  }
-
   const hash = generateHash(seed);
 
-  // ReadyPlayerMe render endpoint (PNG 2D render of 3D avatar)
+  // Palette différente selon genre
+  let backgroundColors = "c7d2fe,ddd6fe,e0e7ff"; // homme
+  if (gender === "femme") {
+    backgroundColors = "fecaca,fbcfe8,fde68a";
+  }
+
   const avatarUrl =
-    `https://api.readyplayer.me/avatar?` +
-    `seed=${hash}&` +
-    `bodyType=${bodyType}&` +
-    `size=256`;
+    `https://api.dicebear.com/7.x/personas/png` +
+    `?seed=${hash}` +
+    `&size=256` +
+    `&radius=50` +
+    `&backgroundColor=${backgroundColors}` +
+    `&backgroundType=gradientLinear` +
+    `&scale=90`;
 
   avatarImg.src = avatarUrl;
 
