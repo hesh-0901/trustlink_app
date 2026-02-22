@@ -1,39 +1,59 @@
-<header class="bg-gradient-to-r from-[#0F1ACD] via-[#1E2BE0] to-[#3D4BFF] text-white px-4 py-3 shadow-md">
+<header class="bg-gradient-to-r from-[#0F1ACD] via-[#1E2BE0] to-[#3D4BFF] 
+               text-white px-4 py-3 shadow-sm">
+
   <div class="flex items-center justify-between">
 
-    <!-- Left: Avatar + User Info -->
+    <!-- LEFT SECTION -->
     <div class="flex items-center gap-3">
+
+      <!-- Avatar -->
       <div class="relative">
-        <img id="user-avatar"
-             class="w-11 h-11 rounded-full border-2 border-white shadow-md object-cover"
-             src=""
-             alt="Avatar">
+        <img
+          id="user-avatar"
+          src=""
+          alt="User Avatar"
+          class="w-11 h-11 rounded-full border border-white/40 
+                 shadow-md object-cover bg-white/20"
+        >
       </div>
 
+      <!-- User Info -->
       <div class="leading-tight">
-        <p class="text-xs opacity-80">Bonjour</p>
-        <p id="user-firstname" class="font-semibold text-sm"></p>
-        <p id="user-username" class="text-[11px] opacity-70"></p>
+        <p class="text-[11px] opacity-70">Bonjour</p>
+        <p id="user-firstname" class="text-sm font-semibold tracking-wide"></p>
+        <p id="user-username" class="text-[11px] opacity-60"></p>
       </div>
+
     </div>
 
-    <!-- Right: Notifications + Logout -->
+    <!-- RIGHT SECTION -->
     <div class="flex items-center gap-4">
 
-      <!-- Notification -->
+      <!-- Notifications -->
       <div class="relative cursor-pointer">
-        <i class="bi bi-bell text-lg"></i>
-        <span id="notification-badge"
-              class="hidden absolute -top-1 -right-2 bg-red-500 text-white text-[10px] px-1.5 py-[2px] rounded-full font-semibold">
+        <i class="bi bi-bell text-lg opacity-90"></i>
+
+        <span
+          id="notification-badge"
+          class="hidden absolute -top-1 -right-2 
+                 min-w-[18px] h-[18px] px-1 
+                 flex items-center justify-center
+                 bg-red-500 text-white text-[10px] 
+                 font-semibold rounded-full shadow-md">
         </span>
       </div>
 
       <!-- Logout -->
-      <button id="logout-btn"
-              class="bg-white/15 backdrop-blur-md px-3 py-1.5 rounded-full text-xs font-medium hover:bg-white/25 transition">
+      <button
+        id="logout-btn"
+        class="text-xs px-3 py-1.5 rounded-full 
+               bg-white/15 backdrop-blur-md 
+               border border-white/20
+               hover:bg-white/25 transition-all duration-200">
         Logout
       </button>
 
     </div>
+
   </div>
 </header>
