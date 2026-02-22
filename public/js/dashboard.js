@@ -128,7 +128,7 @@ async function loadNotifications(page = 1) {
   const docs =
     snapshot.docs.slice(start, end);
 
- for (const docSnap of docs) {
+for (const docSnap of docs) {
 
   const tx = docSnap.data();
   const txId = docSnap.id;
@@ -175,12 +175,12 @@ async function loadNotifications(page = 1) {
 
         <div class="flex justify-between items-start">
 
-          <div>
-            <p class="text-sm font-semibold text-gray-800">
+          <div class="min-w-0">
+            <p class="text-sm font-semibold text-gray-800 truncate">
               ${name}
             </p>
 
-            <p class="text-xs text-gray-500">
+            <p class="text-xs text-gray-500 truncate">
               ${formatNotificationType(tx)}
             </p>
           </div>
@@ -206,7 +206,6 @@ async function loadNotifications(page = 1) {
 
   container.appendChild(div);
 }
-
   createPagination();
 }
 
@@ -496,40 +495,7 @@ function getIconConfig(tx) {
 /* ===============================
    NOUVEAU
 ================================ */
-function buildNotificationTitle(tx, user) {
 
-  const name =
-    user
-      ? `${user.firstName} ${user.lastName}`
-      : "Utilisateur";
-
-  if (tx.category === "request")
-    return `${name} vous a envoyé une demande`;
-
-  if (tx.type === "transfer") {
-
-    if (tx.fromUserId === userId)
-      return `Vous avez envoyé un transfert à ${name}`;
-
-    return `${name} vous a envoyé un transfert`;
-  }
-
-  return "Nouvelle activité";
-}
-
-
-function getNotificationSubtitle(tx) {
-
-  if (tx.category === "request")
-    return tx.type === "fund_request"
-      ? "Demande de fonds"
-      : "Demande de remboursement";
-
-  if (tx.type === "transfer")
-    return "Transfert";
-
-  return tx.status;
-}
 /* ===============================
    NOUVEAU 2
 ================================ */
