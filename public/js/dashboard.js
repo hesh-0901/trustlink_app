@@ -88,45 +88,44 @@ async function loadWallets() {
 /* ===============================
    NOTIFICATIONS (4 PER PAGE)
 ================================ */
-
-let lastDoc = null;
 let currentPage = 1;
 const pageSize = 4;
+let totalPages = 1;
 
-async function loadNotifications(next = false) {
+async function loadNotifications(page = 1) {
 
   const container =
     document.getElementById("transactionsList");
 
-  if (!next) {
-    container.innerHTML = "";
-    lastDoc = null;
-    currentPage = 1;
-  }
+  container.innerHTML = "";
+  currentPage = page;
 
-  let q = query(
+  const baseQuery = query(
     collection(db, "transactions"),
     where("participants", "array-contains", userId),
-    orderBy("createdAt", "desc"),
-    limit(pageSize)
+    orderBy("createdAt", "desc")
   );
 
-  if (lastDoc)
-    q = query(
-      collection(db, "transactions"),
-      where("participants", "array-contains", userId),
-      orderBy("createdAt", "desc"),
-      startAfter(lastDoc),
-      limit(pageSize)
-    );
+  const snapshot = await getDocs(baseQuery);
 
-  const snapshot = await getDocs(q);
+  if (snapshot.empty) {
+    container.innerHTML =
+      `<div class="text-center text-gray-400 text-sm py-6">
+        Aucune notification
+      </div>`;
+    return;
+  }
 
-  if (snapshot.empty) return;
+  totalPages =
+    Math.ceil(snapshot.docs.length / pageSize);
 
-  lastDoc = snapshot.docs[snapshot.docs.length - 1];
+  const start = (page - 1) * pageSize;
+  const end = start + pageSize;
 
-  snapshot.forEach(docSnap => {
+  const docs =
+    snapshot.docs.slice(start, end);
+
+  docs.forEach(docSnap => {
 
     const tx = docSnap.data();
     const txId = docSnap.id;
@@ -140,11 +139,9 @@ async function loadNotifications(next = false) {
 
     div.innerHTML = `
       <div class="flex items-center gap-3">
-
         <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
           <i class="bi bi-bell text-primaryStrong"></i>
         </div>
-
         <div>
           <p class="text-sm font-medium">
             ${tx.category === "request"
@@ -155,12 +152,13 @@ async function loadNotifications(next = false) {
             ${formatMoney(tx.amount, tx.currency)}
           </p>
         </div>
-
       </div>
     `;
 
     container.appendChild(div);
   });
+
+  createPagination();
 }
 
 function createPagination() {
@@ -312,6 +310,11 @@ async function openModal(txId) {
 
   modal.id = "txModal";
   document.body.appendChild(modal);
+}
+    function closeModal() {
+  const modal =
+    document.getElementById("txModal");
+  if (modal) modal.remove();
 }
 
 /* ===============================
