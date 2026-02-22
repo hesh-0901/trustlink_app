@@ -16,10 +16,6 @@ if (!userId) {
   window.location.href = "../index.html";
 }
 
-/* ==========================================
-   FORCE LOGOUT
-========================================== */
-
 function forceLogout() {
   localStorage.clear();
   sessionStorage.clear();
@@ -39,6 +35,69 @@ function generateHash(str) {
 }
 
 /* ==========================================
+   AVATAR ENGINE PREMIUM
+========================================== */
+
+function generatePremiumAvatar(user) {
+
+  const seed = user.username + user.walletBase + user.birthDate;
+  const hash = generateHash(seed);
+  const gender = (user.gender || "").toLowerCase();
+
+  // 🎨 Corporate backgrounds
+  const backgrounds = [
+    "#E2E8F0", // slate
+    "#F1F5F9",
+    "#E0E7FF",
+    "#F8FAFC",
+    "#FEF3C7"
+  ];
+
+  const skins = [
+    "#F1C27D",
+    "#E0AC69",
+    "#C68642",
+    "#8D5524"
+  ];
+
+  const bg = backgrounds[hash % backgrounds.length];
+  const skin = skins[hash % skins.length];
+
+  const hairColor = ["#111827", "#3F3F46", "#4B5563"][hash % 3];
+
+  const isFemale = gender === "femme";
+
+  return `
+  <svg viewBox="0 0 200 200" width="48" height="48">
+    <circle cx="100" cy="100" r="100" fill="${bg}" />
+
+    <!-- Neck -->
+    <rect x="85" y="120" width="30" height="30" fill="${skin}" />
+
+    <!-- Face -->
+    <circle cx="100" cy="90" r="45" fill="${skin}" />
+
+    <!-- Hair -->
+    ${
+      isFemale
+        ? `<path d="M55 90 Q100 30 145 90 V60 Q100 10 55 60 Z" fill="${hairColor}" />`
+        : `<path d="M60 70 Q100 30 140 70 V60 Q100 20 60 60 Z" fill="${hairColor}" />`
+    }
+
+    <!-- Eyes -->
+    <circle cx="85" cy="90" r="4" fill="#1F2937"/>
+    <circle cx="115" cy="90" r="4" fill="#1F2937"/>
+
+    <!-- Nose -->
+    <rect x="98" y="95" width="4" height="10" rx="2" fill="#D4A373"/>
+
+    <!-- Clothes -->
+    <path d="M50 200 Q100 150 150 200 Z" fill="${isFemale ? "#6366F1" : "#334155"}"/>
+  </svg>
+  `;
+}
+
+/* ==========================================
    UPDATE HEADER UI
 ========================================== */
 
@@ -46,8 +105,7 @@ function updateHeaderUI(user) {
 
   const fullNameEl = document.getElementById("headerFullName");
   const usernameEl = document.getElementById("headerUsername");
-  const avatarImg = document.getElementById("headerAvatar");
-  const roleBadge = document.getElementById("roleBadge");
+  const avatarWrapper = document.getElementById("headerAvatarWrapper");
 
   if (fullNameEl) {
     fullNameEl.textContent =
@@ -60,99 +118,8 @@ function updateHeaderUI(user) {
     usernameEl.classList.add("opacity-100");
   }
 
-  if (!avatarImg) return;
-
-  const seed = user.username || user.firstName || "user";
-  const role = (user.role || "").toLowerCase().trim();
-
-  const hash = generateHash(seed);
-
-  /* ==========================================
-     BACKGROUND CORPORATE SELON ROLE
-  ========================================== */
-
-  let background = "e2e8f0"; // neutral slate
-
-  if (role === "super_admin") {
-    background = "facc15"; // gold soft
-  } else if (role === "admin") {
-    background = "a78bfa"; // soft purple
-  } else if (role === "business") {
-    background = "60a5fa"; // soft blue
-  }
-
-  /* ==========================================
-     AVATAR CORPORATE
-  ========================================== */
-
-  const avatarUrl =
-    `https://api.dicebear.com/7.x/personas/png` +
-    `?seed=${hash}` +
-    `&size=256` +
-    `&radius=50` +
-    `&backgroundColor=${background}` +
-    `&backgroundType=solid` +
-    `&scale=85` +
-    `&flip=false`;
-
-  avatarImg.src = avatarUrl;
-
-  /* ==========================================
-     RESET STYLE
-  ========================================== */
-
-  avatarImg.classList.remove(
-    "border-yellow-500",
-    "border-blue-600",
-    "border-purple-600",
-    "shadow-yellow-400"
-  );
-
-  if (roleBadge) {
-    roleBadge.classList.add("hidden");
-    roleBadge.classList.remove(
-      "bg-yellow-500",
-      "bg-blue-600",
-      "bg-purple-600"
-    );
-  }
-
-  /* ==========================================
-     ROLE SYSTEM
-  ========================================== */
-
-  if (role === "super_admin") {
-
-    avatarImg.classList.add("border-yellow-500", "shadow-yellow-400");
-
-    if (roleBadge) {
-      roleBadge.textContent = "SUPER";
-      roleBadge.classList.remove("hidden");
-      roleBadge.classList.add("bg-yellow-500");
-    }
-
-  } else if (role === "admin") {
-
-    avatarImg.classList.add("border-purple-600");
-
-    if (roleBadge) {
-      roleBadge.textContent = "ADMIN";
-      roleBadge.classList.remove("hidden");
-      roleBadge.classList.add("bg-purple-600");
-    }
-
-  } else if (role === "business") {
-
-    avatarImg.classList.add("border-blue-600");
-
-    if (roleBadge) {
-      roleBadge.textContent = "PRO";
-      roleBadge.classList.remove("hidden");
-      roleBadge.classList.add("bg-blue-600");
-    }
-
-  } else {
-    avatarImg.classList.add("border-gray-200");
+  if (avatarWrapper) {
+    avatarWrapper.innerHTML = generatePremiumAvatar(user);
   }
 }
 
@@ -185,21 +152,11 @@ function initRealtimeUser() {
   });
 }
 
-/* ==========================================
-   LOGOUT BUTTON
-========================================== */
-
 function initLogout() {
-
   const logoutBtn = document.getElementById("headerLogout");
   if (!logoutBtn) return;
-
   logoutBtn.addEventListener("click", forceLogout);
 }
-
-/* ==========================================
-   INIT
-========================================== */
 
 initRealtimeUser();
 initLogout();
