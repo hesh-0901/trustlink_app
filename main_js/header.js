@@ -27,30 +27,39 @@ function forceLogout() {
 }
 
 /* ==========================================
-   GENERATE MODERN AVATAR (DiceBear)
+   PREMIUM BUSINESS AVATAR ENGINE
 ========================================== */
 
-function generateAvatarUrl(user) {
+function generatePremiumAvatar(user) {
 
   const seed = encodeURIComponent(user.username || "user");
-  const role = (user.role || "").toLowerCase();
-  const gender = (user.gender || "").toLowerCase();
 
-  const isAdmin = role.includes("admin");
-  const isFemale = gender.includes("femme");
+  const genderRaw = (user.gender || "").toLowerCase();
+  const roleRaw = (user.role || "").toLowerCase();
 
+  const isFemale = genderRaw.includes("femme");
+  const isAdmin = roleRaw.includes("admin");
+
+  // 👔 Clothing selon rôle
   const clothing = isAdmin
     ? "blazerShirt"
     : "shirt";
 
+  // 🎨 Background corporate propre
+  const background = "f3f4f6";
+
+  // 👁 Style sérieux (pas cartoon)
+  const eyes = isFemale ? "variant05" : "variant12";
+
   return (
     "https://api.dicebear.com/7.x/personas/png" +
     `?seed=${seed}` +
-    `&backgroundColor=f3f4f6` +
-    `&radius=50` +
     `&size=256` +
+    `&radius=50` +
+    `&backgroundColor=${background}` +
     `&gender=${isFemale ? "female" : "male"}` +
-    `&clothing=${clothing}`
+    `&clothing=${clothing}` +
+    `&eyes=${eyes}`
   );
 }
 
@@ -63,6 +72,7 @@ function updateHeaderUI(user) {
   const fullNameEl = document.getElementById("headerFullName");
   const usernameEl = document.getElementById("headerUsername");
   const avatarImg = document.getElementById("headerAvatar");
+  const roleBadge = document.getElementById("roleBadge");
 
   if (fullNameEl) {
     fullNameEl.textContent =
@@ -76,7 +86,19 @@ function updateHeaderUI(user) {
   }
 
   if (avatarImg) {
-    avatarImg.src = generateAvatarUrl(user);
+    avatarImg.src = generatePremiumAvatar(user);
+  }
+
+  if (roleBadge && user.role) {
+    roleBadge.classList.remove("hidden");
+    roleBadge.textContent = user.role;
+
+    roleBadge.style.background =
+      user.role === "super_admin"
+        ? "#DC2626"
+        : user.role === "admin"
+        ? "#2563EB"
+        : "#475569";
   }
 }
 
