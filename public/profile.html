@@ -12,120 +12,110 @@
 
 <body class="bg-[#EEF2FF] min-h-screen">
 
-  <div id="header-container"></div>
-
-  <main class="max-w-md mx-auto px-4 py-6 space-y-6">
+  <main class="max-w-md mx-auto py-8 px-5 space-y-6">
 
     <!-- ===============================
-         USER CARD
+         PROFILE HEADER CARD
     ================================= -->
 
-    <div class="bg-white rounded-2xl shadow-sm p-5 space-y-4">
+    <div class="bg-white rounded-3xl shadow-sm overflow-hidden">
 
-      <div class="flex items-center gap-4">
-
-        <img id="profile-avatar"
-             class="w-20 h-20 rounded-full bg-gray-100 shadow-md"
-             src="">
-
-        <div>
-          <p id="profile-name"
-             class="font-semibold text-sm"></p>
-          <p id="profile-username"
-             class="text-xs text-gray-500"></p>
-        </div>
-
+      <!-- Top Banner -->
+      <div class="h-32 bg-gradient-to-r 
+                  from-[#0F1ACD] via-[#1E2BE0] to-[#3D4BFF]">
       </div>
 
-      <div class="grid grid-cols-2 gap-3 text-xs text-gray-600">
+      <!-- Avatar Section -->
+      <div class="relative flex flex-col items-center pb-6 -mt-14">
 
-        <div>
-          <p class="opacity-60">Téléphone</p>
-          <p id="profile-phone" class="font-medium"></p>
+        <div class="relative">
+          <img id="profile-avatar"
+               class="w-24 h-24 rounded-full border-4 border-white shadow-md bg-gray-100"
+               src="">
+
+          <!-- Edit Button -->
+          <button id="edit-avatar-btn"
+                  class="absolute bottom-0 right-0 
+                         bg-[#1E2BE0] text-white 
+                         w-8 h-8 rounded-full 
+                         flex items-center justify-center 
+                         shadow-md active:scale-95 transition">
+            <i class="bi bi-pencil text-xs"></i>
+          </button>
         </div>
 
-        <div>
-          <p class="opacity-60">Genre</p>
-          <p id="profile-gender" class="font-medium"></p>
-        </div>
+        <h2 id="profile-name"
+            class="mt-3 font-semibold text-sm">
+        </h2>
 
-        <div>
-          <p class="opacity-60">Date de naissance</p>
-          <p id="profile-birth" class="font-medium"></p>
-        </div>
-
-        <div>
-          <p class="opacity-60">Wallet Base</p>
-          <p id="profile-wallet" class="font-medium"></p>
-        </div>
+        <p id="profile-username"
+           class="text-xs text-gray-500">
+        </p>
 
       </div>
 
     </div>
 
     <!-- ===============================
-         AVATAR SECTION
+         PERSONAL INFO
     ================================= -->
 
-    <div class="bg-white rounded-2xl shadow-sm p-5 space-y-4">
+    <div class="bg-white rounded-3xl shadow-sm p-5 space-y-4 text-sm">
 
-      <h2 class="text-sm font-semibold text-[#1E2BE0]">
-        Changer d’avatar
-      </h2>
-
-      <div id="avatar-options"
-           class="grid grid-cols-3 gap-4 max-h-72 overflow-y-auto">
+      <div class="flex justify-between">
+        <span class="text-gray-500">Téléphone</span>
+        <span id="profile-phone"></span>
       </div>
 
-      <button id="save-avatar"
-              class="w-full py-2.5 rounded-xl
-                     bg-[#1E2BE0] text-white text-sm font-medium
-                     hover:bg-[#0F1ACD] transition">
-        Enregistrer avatar
-      </button>
+      <div class="flex justify-between">
+        <span class="text-gray-500">Genre</span>
+        <span id="profile-gender"></span>
+      </div>
+
+      <div class="flex justify-between">
+        <span class="text-gray-500">Naissance</span>
+        <span id="profile-birth"></span>
+      </div>
+
+      <div class="flex justify-between">
+        <span class="text-gray-500">Wallet Base</span>
+        <span id="profile-wallet"></span>
+      </div>
 
     </div>
 
     <!-- ===============================
-         FRIENDS SECTION
+         AVATAR MODAL (HIDDEN)
     ================================= -->
 
-    <div class="bg-white rounded-2xl shadow-sm p-5 space-y-4">
+    <div id="avatar-modal"
+         class="fixed inset-0 bg-black/40 hidden 
+                flex items-end justify-center">
 
-      <h2 class="text-sm font-semibold text-[#1E2BE0]">
-        Amis
-      </h2>
+      <div class="bg-white w-full max-w-md 
+                  rounded-t-3xl p-5 space-y-4 
+                  max-h-[70vh] overflow-y-auto">
 
-      <input id="usernameInput"
-             placeholder="Ajouter via @username"
-             class="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#1E2BE0]">
-
-      <div id="previewBox"
-           class="hidden bg-gray-50 p-3 rounded-xl flex items-center justify-between">
-
-        <div class="flex items-center gap-3">
-          <img id="previewAvatar"
-               class="w-10 h-10 rounded-full bg-gray-100">
-          <div>
-            <p id="previewName"
-               class="text-sm font-medium"></p>
-            <p id="previewUsername"
-               class="text-xs text-gray-500"></p>
-          </div>
+        <div class="flex justify-between items-center">
+          <h3 class="font-semibold text-sm">
+            Choisir un avatar
+          </h3>
+          <button id="close-avatar-modal"
+                  class="text-gray-500">
+            <i class="bi bi-x-lg"></i>
+          </button>
         </div>
 
-        <button id="addBtn"
-                class="hidden text-[#1E2BE0] text-sm font-medium">
-          Ajouter
+        <div id="avatar-options"
+             class="grid grid-cols-3 gap-4">
+        </div>
+
+        <button id="save-avatar"
+                class="w-full py-3 rounded-xl
+                       bg-[#1E2BE0] text-white text-sm font-medium">
+          Enregistrer
         </button>
 
-      </div>
-
-      <p id="errorMsg"
-         class="hidden text-red-500 text-xs"></p>
-
-      <div id="friendsList"
-           class="space-y-3">
       </div>
 
     </div>
@@ -133,14 +123,6 @@
   </main>
 
   <script type="module">
-    async function loadHeader() {
-      const res = await fetch("/trustlink_app/partials/header.html");
-      const html = await res.text();
-      document.getElementById("header-container").innerHTML = html;
-      await import("/trustlink_app/main_js/header.js");
-    }
-    loadHeader();
-
     import("/trustlink_app/main_js/profile.js");
   </script>
 
