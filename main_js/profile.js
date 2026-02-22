@@ -7,7 +7,6 @@ import {
   query,
   where,
   getDocs,
-  addDoc,
   deleteDoc,
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
@@ -41,26 +40,20 @@ if (!userId) {
      USER INFO
   ================================= */
 
-  document.getElementById("profile-name").textContent =
-    `${user.firstName} ${user.lastName}`;
+  const setText = (id, value) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = value;
+  };
 
-  document.getElementById("profile-username").textContent =
-    `@${user.username}`;
-
-  document.getElementById("profile-phone").textContent =
-    user.phoneNumber;
-
-  document.getElementById("profile-gender").textContent =
-    user.gender;
-
-  document.getElementById("profile-birth").textContent =
-    user.birthDate;
-
-  document.getElementById("profile-wallet").textContent =
-    user.walletBase;
+  setText("profile-name", `${user.firstName} ${user.lastName}`);
+  setText("profile-username", `@${user.username}`);
+  setText("profile-phone", user.phoneNumber);
+  setText("profile-gender", user.gender);
+  setText("profile-birth", user.birthDate);
+  setText("profile-wallet", user.walletBase);
 
   /* ===============================
-     AVATAR SECTION (MODAL)
+     AVATAR SECTION
   ================================= */
 
   const avatarStyles = [
@@ -68,107 +61,88 @@ if (!userId) {
     "personas",
     "avataaars-neutral",
     "initials",
-    "identicon",
-    "multiavatar"
+    "identicon"
   ];
 
   let selectedStyle = user.avatarStyle || "micah";
 
-  const profileAvatar =
-    document.getElementById("profile-avatar");
+  function generateAvatar(style, username) {
+    return `https://api.dicebear.com/7.x/${style}/svg?seed=${username}&radius=50`;
+  }
 
-  const modal =
-    document.getElementById("avatar-modal");
+  const profileAvatar = document.getElementById("profile-avatar");
+
+  if (profileAvatar) {
+    profileAvatar.src =
+      generateAvatar(selectedStyle, user.username);
+  }
 
   const container =
     document.getElementById("avatar-options");
 
-  const editBtn =
-    document.getElementById("edit-avatar-btn");
+  if (container) {
 
-  const closeBtn =
-    document.getElementById("close-avatar-modal");
+    container.innerHTML = "";
+
+    avatarStyles.forEach(style => {
+
+      const img = document.createElement("img");
+
+      img.src =
+        generateAvatar(style, user.username);
+
+      img.className =
+        "w-16 h-16 rounded-full cursor-pointer border-2 transition";
+
+      if (style === selectedStyle)
+        img.classList.add("border-[#1E2BE0]");
+      else
+        img.classList.add("border-transparent");
+
+      img.addEventListener("click", () => {
+
+        selectedStyle = style;
+
+        if (profileAvatar)
+          profileAvatar.src =
+            generateAvatar(style, user.username);
+
+        document
+          .querySelectorAll("#avatar-options img")
+          .forEach(i =>
+            i.classList.remove("border-[#1E2BE0]")
+          );
+
+        img.classList.add("border-[#1E2BE0]");
+      });
+
+      container.appendChild(img);
+    });
+  }
 
   const saveBtn =
     document.getElementById("save-avatar");
 
-  function generateAvatar(style, username) {
-    if (style === "multiavatar") {
-      return `https://api.multiavatar.com/${username}.svg`;
-    }
+  if (saveBtn) {
+    saveBtn.addEventListener("click", async () => {
 
-    return `https://api.dicebear.com/7.x/${style}/svg?seed=${username}&radius=50`;
+      await updateDoc(userRef, {
+        avatarStyle: selectedStyle,
+        updatedAt: serverTimestamp()
+      });
+
+      alert("Avatar mis à jour ✔️");
+    });
   }
 
-  /* Avatar initial */
-  profileAvatar.src =
-    generateAvatar(selectedStyle, user.username);
-
-  /* Open modal */
-  editBtn?.addEventListener("click", () => {
-    modal.classList.remove("hidden");
-  });
-
-  /* Close modal */
-  closeBtn?.addEventListener("click", () => {
-    modal.classList.add("hidden");
-  });
-
-  /* Render avatar options */
-  container.innerHTML = "";
-
-  avatarStyles.forEach(style => {
-
-    const img = document.createElement("img");
-
-    img.src =
-      generateAvatar(style, user.username);
-
-    img.className =
-      "w-16 h-16 rounded-full cursor-pointer border-2 transition";
-
-    if (style === selectedStyle) {
-      img.classList.add("border-[#1E2BE0]");
-    } else {
-      img.classList.add("border-transparent");
-    }
-
-    img.addEventListener("click", () => {
-
-      selectedStyle = style;
-
-      profileAvatar.src =
-        generateAvatar(style, user.username);
-
-      document
-        .querySelectorAll("#avatar-options img")
-        .forEach(i =>
-          i.classList.remove("border-[#1E2BE0]")
-        );
-
-      img.classList.add("border-[#1E2BE0]");
-    });
-
-    container.appendChild(img);
-  });
-
-  /* Save avatar */
-  saveBtn?.addEventListener("click", async () => {
-
-    await updateDoc(userRef, {
-      avatarStyle: selectedStyle,
-      updatedAt: serverTimestamp()
-    });
-
-    modal.classList.add("hidden");
-  });
-
   /* ===============================
-     FRIENDS (BENEFICIARIES)
+     FRIENDS SECTION (SAFE)
   ================================= */
 
   const friendsList =
     document.getElementById("friendsList");
+
+  if (!friendsList) return; // si la section n'existe pas, on stop
 
   async function loadFriends() {
 
@@ -194,7 +168,7 @@ if (!userId) {
 
       const friend = friendSnap.data();
 
-      const friendAvatarStyle =
+      const friendStyle =
         friend.avatarStyle || "micah";
 
       const friendDiv =
@@ -206,7 +180,7 @@ if (!userId) {
       friendDiv.innerHTML = `
         <div class="flex items-center gap-3">
           <img 
-            src="${generateAvatar(friendAvatarStyle, friend.username)}"
+            src="${generateAvatar(friendStyle, friend.username)}"
             class="w-10 h-10 rounded-full bg-white"
           />
           <div>
