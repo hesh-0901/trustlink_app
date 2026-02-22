@@ -1,143 +1,48 @@
-import { db } from "../js/firebase-init.js";
-import {
-  doc,
-  onSnapshot
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-/* ==========================================
-   SESSION CHECK
-========================================== */
+const auth = getAuth();
+const db = getFirestore();
 
-const userId =
-  localStorage.getItem("userId") ||
-  sessionStorage.getItem("userId");
+document.addEventListener("DOMContentLoaded", async () => {
+  const user = auth.currentUser;
 
-if (!userId) {
-  window.location.href = "../index.html";
-}
+  if (!user) return;
 
-/* ==========================================
-   FORCE LOGOUT
-========================================== */
+  const docRef = doc(db, "users", user.uid);
+  const docSnap = await getDoc(docRef);
 
-function forceLogout() {
-  localStorage.clear();
-  sessionStorage.clear();
-  window.location.href = "../index.html";
-}
+  if (docSnap.exists()) {
+    const data = docSnap.data();
 
-/* ==========================================
-   PREMIUM BUSINESS AVATAR ENGINE
-========================================== */
+    const firstName = data.firstName;
+    const username = data.username;
+    const gender = data.gender;
 
-function generatePremiumAvatar(user) {
+    // Injection texte
+    document.getElementById("greetingDisplay").textContent = `Bonjour ${firstName}`;
+    document.getElementById("usernameDisplay").textContent = username;
 
-  const seed = encodeURIComponent(user.username || "user");
-
-  const genderRaw = (user.gender || "").toLowerCase();
-  const roleRaw = (user.role || "").toLowerCase();
-
-  const isFemale = genderRaw.includes("femme");
-  const isAdmin = roleRaw.includes("admin");
-
-  // 👔 Vêtements selon rôle
-  const clothing = isAdmin
-    ? "blazerShirt"
-    : "shirt";
-
-  return (
-    "https://api.dicebear.com/7.x/personas/svg" +
-    `?seed=${seed}` +
-    `&size=256` +
-    `&radius=50` +
-    `&backgroundColor=f3f4f6` +
-    `&gender=${isFemale ? "female" : "male"}` +
-    `&clothing=${clothing}`
-  );
-}
-/* ==========================================
-   UPDATE HEADER UI
-========================================== */
-
-function updateHeaderUI(user) {
-
-  const fullNameEl = document.getElementById("headerFullName");
-  const usernameEl = document.getElementById("headerUsername");
-  const avatarImg = document.getElementById("headerAvatar");
-  const roleBadge = document.getElementById("roleBadge");
-
-  if (fullNameEl) {
-    fullNameEl.textContent =
-      `${user.firstName ?? ""} ${user.lastName ?? ""}`.trim();
+    // Avatar génération dynamique
+    generateAvatar(firstName, gender);
   }
+});
 
-  if (usernameEl) {
-    usernameEl.textContent = user.username ?? "";
-    usernameEl.classList.remove("opacity-0");
-    usernameEl.classList.add("opacity-100");
-  }
+// Avatar generator
+function generateAvatar(name, gender) {
+  const baseUrl = "https://api.dicebear.com/7.x/";
 
-  if (avatarImg) {
-    avatarImg.src = generatePremiumAvatar(user);
-  }
+  let style = gender === "Femme"
+    ? "adventurer-neutral"
+    : "adventurer";
 
-  if (roleBadge && user.role) {
-    roleBadge.classList.remove("hidden");
-    roleBadge.textContent = user.role;
+  const avatarUrl = `${baseUrl}${style}/svg?seed=${name}&backgroundColor=0f172a`;
 
-    roleBadge.style.background =
-      user.role === "super_admin"
-        ? "#DC2626"
-        : user.role === "admin"
-        ? "#2563EB"
-        : "#475569";
-  }
+  document.getElementById("userAvatar").src = avatarUrl;
 }
 
-/* ==========================================
-   REALTIME USER LISTENER
-========================================== */
-
-function initRealtimeUser() {
-
-  const userRef = doc(db, "users", userId);
-
-  onSnapshot(userRef, (snap) => {
-
-    if (!snap.exists()) {
-      forceLogout();
-      return;
-    }
-
-    const user = snap.data();
-
-    if (!user.isActive) {
-      forceLogout();
-      return;
-    }
-
-    updateHeaderUI(user);
-
-  }, (error) => {
-    console.error("Realtime user error:", error);
-  });
-}
-
-/* ==========================================
-   LOGOUT BUTTON
-========================================== */
-
-function initLogout() {
-
-  const logoutBtn = document.getElementById("headerLogout");
-  if (!logoutBtn) return;
-
-  logoutBtn.addEventListener("click", forceLogout);
-}
-
-/* ==========================================
-   INIT
-========================================== */
-
-initRealtimeUser();
-initLogout();
+// Logout
+document.getElementById("logoutBtn").addEventListener("click", async () => {
+  await signOut(auth);
+  window.location.href = "/index.html";
+});
