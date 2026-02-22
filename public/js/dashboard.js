@@ -204,7 +204,6 @@ window.changePage = changePage;
 ================================ */
 async function openModal(txId) {
 
-  // Empêche double ouverture
   if (document.getElementById("txModal")) return;
 
   const snap =
@@ -305,9 +304,23 @@ async function openModal(txId) {
           </span>
         </div>
 
+        ${
+          tx.customMotif || tx.motif
+            ? `
+            <div class="pt-3 border-t border-gray-200">
+              <span class="block text-gray-500 mb-1">
+                Motif
+              </span>
+              <span class="text-gray-700 text-sm">
+                ${tx.customMotif || tx.motif}
+              </span>
+            </div>
+            `
+            : ""
+        }
+
       </div>
 
-      <!-- Boutons -->
       ${
         tx.status === "pending" &&
         tx.toUserId === userId
@@ -345,7 +358,6 @@ function closeModal() {
   const modal = document.getElementById("txModal");
   if (modal) modal.remove();
 }
-
 /* ===============================
    EXECUTE ACTION
 ================================ */
