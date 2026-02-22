@@ -1,4 +1,3 @@
-
 import { db } from "../js/firebase-init.js";
 import {
   doc,
@@ -28,65 +27,31 @@ function forceLogout() {
 }
 
 /* ==========================================
-   PREMIUM AVATAR GENERATOR
+   GENERATE MODERN AVATAR (DiceBear)
 ========================================== */
 
-function generatePremiumAvatar(user) {
+function generateAvatarUrl(user) {
 
-  const size = 256;
-  const canvas = document.createElement("canvas");
-  canvas.width = size;
-  canvas.height = size;
+  const seed = encodeURIComponent(user.username || "user");
+  const role = (user.role || "").toLowerCase();
+  const gender = (user.gender || "").toLowerCase();
 
-  const ctx = canvas.getContext("2d");
+  const isAdmin = role.includes("admin");
+  const isFemale = gender.includes("femme");
 
-  const first = user.firstName?.[0] || "";
-  const last = user.lastName?.[0] || "";
-  const initials = (first + last).toUpperCase() || "U";
+  const clothing = isAdmin
+    ? "blazerShirt"
+    : "shirt";
 
-  const seed = user.username || "user";
-
-  // Cache performance
-  const cacheKey = "avatar_" + seed;
-  const cached = localStorage.getItem(cacheKey);
-  if (cached) return cached;
-
-  // Hash → Hue
-  function stringToHue(str) {
-    let hash = 0;
-    for (let i = 0; i < str.length; i++) {
-      hash = str.charCodeAt(i) + ((hash << 5) - hash);
-    }
-    return Math.abs(hash % 360);
-  }
-
-  const hue = stringToHue(seed);
-  const color1 = `hsl(${hue}, 70%, 45%)`;
-  const color2 = `hsl(${(hue + 40) % 360}, 70%, 35%)`;
-
-  // Gradient
-  const gradient = ctx.createLinearGradient(0, 0, size, size);
-  gradient.addColorStop(0, color1);
-  gradient.addColorStop(1, color2);
-
-  ctx.fillStyle = gradient;
-  ctx.fillRect(0, 0, size, size);
-
-  // Glass overlay
-  ctx.fillStyle = "rgba(255,255,255,0.05)";
-  ctx.fillRect(0, 0, size, size);
-
-  // Initiales
-  ctx.fillStyle = "#ffffff";
-  ctx.font = "600 96px Inter, sans-serif";
-  ctx.textAlign = "center";
-  ctx.textBaseline = "middle";
-  ctx.fillText(initials, size / 2, size / 2);
-
-  const image = canvas.toDataURL("image/png");
-  localStorage.setItem(cacheKey, image);
-
-  return image;
+  return (
+    "https://api.dicebear.com/7.x/personas/png" +
+    `?seed=${seed}` +
+    `&backgroundColor=f3f4f6` +
+    `&radius=50` +
+    `&size=256` +
+    `&gender=${isFemale ? "female" : "male"}` +
+    `&clothing=${clothing}`
+  );
 }
 
 /* ==========================================
@@ -111,34 +76,9 @@ function updateHeaderUI(user) {
   }
 
   if (avatarImg) {
-
-    const seed = user.username || user.firstName || "user";
-
-    avatarImg.src =
-      `https://api.dicebear.com/7.x/personas/png?seed=${seed}
-      &backgroundColor=f3f4f6
-      &radius=50
-      &size=256`;
-
+    avatarImg.src = generateAvatarUrl(user);
   }
 }
-if (avatarImg) {
-
-  const seed = user.username || "user";
-
-  avatarImg.src =
-    `https://api.dicebear.com/7.x/personas/png
-    ?seed=${seed}
-    &backgroundColor=f3f4f6
-    &radius=50
-    &size=256
-    &face=smile
-    &mouth=smile
-    &eyes=variant12
-    &clothes=blazerShirt
-    `;
-}
-
 
 /* ==========================================
    REALTIME USER LISTENER
