@@ -72,8 +72,9 @@ function updateHeaderUI(user) {
   // =====================
   // TEINT AFRIQUE
   // =====================
-
-  const skinTones = "&skinColor=darkBrown,brown,tanned";
+// =====================
+// TEINT AFRIQUE
+// =====================
 
 const skinTones = "&skinColor=darkBrown,brown,tanned";
 
