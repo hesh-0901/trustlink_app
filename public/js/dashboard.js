@@ -119,47 +119,96 @@ async function loadNotifications(page = 1) {
   totalPages =
     Math.ceil(snapshot.docs.length / pageSize);
 
-  const start = (page - 1) * pageSize;
+  if (currentPage > totalPages)
+    currentPage = totalPages;
+
+  const start = (currentPage - 1) * pageSize;
   const end = start + pageSize;
 
   const docs =
     snapshot.docs.slice(start, end);
 
-  docs.forEach(docSnap => {
+  for (const docSnap of docs) {
 
     const tx = docSnap.data();
     const txId = docSnap.id;
 
+    const counterpartyId =
+      tx.fromUserId === userId
+        ? tx.toUserId
+        : tx.fromUserId;
+
+    const userSnap =
+      await getDoc(doc(db, "users", counterpartyId));
+
+    const counterparty =
+      userSnap.exists()
+        ? userSnap.data()
+        : null;
+
+    const avatar =
+      counterparty
+        ? `https://api.dicebear.com/7.x/avataaars/png?seed=${counterparty.username}`
+        : "";
+
+    const title = buildNotificationTitle(tx, counterparty);
+
     const div = document.createElement("div");
 
     div.className =
-      "bg-white rounded-2xl p-4 shadow flex items-center justify-between cursor-pointer";
+      "bg-white rounded-2xl p-4 shadow-sm hover:shadow-md transition cursor-pointer";
 
     div.onclick = () => openModal(txId);
 
     div.innerHTML = `
-      <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
-          <i class="bi bi-bell text-primaryStrong"></i>
-        </div>
-        <div>
-          <p class="text-sm font-medium">
-            ${tx.category === "request"
-              ? "Nouvelle demande"
-              : "Transaction"}
-          </p>
-          <p class="text-xs text-gray-400">
-            ${formatMoney(tx.amount, tx.currency)}
-          </p>
+      <div class="flex gap-3">
+
+        <img src="${avatar}"
+             class="w-12 h-12 rounded-full object-cover border border-gray-200"/>
+
+        <div class="flex-1 min-w-0">
+
+          <div class="flex justify-between items-start">
+
+            <p class="text-sm font-semibold text-gray-800 leading-tight">
+              ${title}
+            </p>
+
+            <span class="text-xs text-gray-400 whitespace-nowrap ml-2">
+              ${formatDate(tx.createdAt)}
+            </span>
+
+          </div>
+
+          <div class="mt-1 flex justify-between items-center">
+
+            <span class="text-xs text-gray-500 capitalize">
+              ${getNotificationSubtitle(tx)}
+            </span>
+
+            <span class="text-sm font-semibold ${
+              tx.toUserId === userId
+                ? "text-green-600"
+                : "text-red-500"
+            }">
+              ${formatMoney(tx.amount, tx.currency)}
+            </span>
+
+          </div>
+
         </div>
       </div>
     `;
 
     container.appendChild(div);
-  });
+  }
 
   createPagination();
 }
+
+/* ===============================
+   PAGINATION
+================================ */
 
 function createPagination() {
 
@@ -446,6 +495,43 @@ function getIconConfig(tx) {
     bg: "bg-gray-100",
     color: "text-gray-600"
   };
+}
+/* ===============================
+   NOUVEAU
+================================ */
+function buildNotificationTitle(tx, user) {
+
+  const name =
+    user
+      ? `${user.firstName} ${user.lastName}`
+      : "Utilisateur";
+
+  if (tx.category === "request")
+    return `${name} vous a envoyé une demande`;
+
+  if (tx.type === "transfer") {
+
+    if (tx.fromUserId === userId)
+      return `Vous avez envoyé un transfert à ${name}`;
+
+    return `${name} vous a envoyé un transfert`;
+  }
+
+  return "Nouvelle activité";
+}
+
+
+function getNotificationSubtitle(tx) {
+
+  if (tx.category === "request")
+    return tx.type === "fund_request"
+      ? "Demande de fonds"
+      : "Demande de remboursement";
+
+  if (tx.type === "transfer")
+    return "Transfert";
+
+  return tx.status;
 }
 
 /* ===============================
