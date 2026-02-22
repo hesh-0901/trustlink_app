@@ -1,3 +1,4 @@
+
 import { db } from "../js/firebase-init.js";
 import {
   doc,
@@ -13,56 +14,79 @@ const userId =
   sessionStorage.getItem("userId");
 
 if (!userId) {
-  window.location.href = "index.html";
+  window.location.href = "../index.html";
 }
+
+/* ==========================================
+   FORCE LOGOUT
+========================================== */
 
 function forceLogout() {
   localStorage.clear();
   sessionStorage.clear();
-  window.location.href = "index.html";
+  window.location.href = "../index.html";
 }
 
 /* ==========================================
-   MODERN BUSINESS AVATAR (DiceBear Personas)
+   PREMIUM AVATAR GENERATOR
 ========================================== */
 
-function generateModernAvatar(user) {
+function generatePremiumAvatar(user) {
 
-  // 🔹 Si l'utilisateur a uploadé une vraie photo
-  if (user.avatarUrl) {
-    return `
-      <img src="${user.avatarUrl}"
-           alt="avatar"
-           class="w-12 h-12 rounded-full object-cover shadow-md"/>
-    `;
+  const size = 256;
+  const canvas = document.createElement("canvas");
+  canvas.width = size;
+  canvas.height = size;
+
+  const ctx = canvas.getContext("2d");
+
+  const first = user.firstName?.[0] || "";
+  const last = user.lastName?.[0] || "";
+  const initials = (first + last).toUpperCase() || "U";
+
+  const seed = user.username || "user";
+
+  // Cache performance
+  const cacheKey = "avatar_" + seed;
+  const cached = localStorage.getItem(cacheKey);
+  if (cached) return cached;
+
+  // Hash → Hue
+  function stringToHue(str) {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+      hash = str.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    return Math.abs(hash % 360);
   }
 
-  const seed = encodeURIComponent(user.username || "user");
+  const hue = stringToHue(seed);
+  const color1 = `hsl(${hue}, 70%, 45%)`;
+  const color2 = `hsl(${(hue + 40) % 360}, 70%, 35%)`;
 
-  const gender = (user.gender || "").toLowerCase();
-  const isFemale = gender.includes("femme");
+  // Gradient
+  const gradient = ctx.createLinearGradient(0, 0, size, size);
+  gradient.addColorStop(0, color1);
+  gradient.addColorStop(1, color2);
 
-  const role = (user.role || "").toLowerCase();
-  const isAdmin = role.includes("admin");
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, size, size);
 
-  // 🎯 Style vêtements selon rôle
-  const clothing = isAdmin
-    ? "blazer,shirt"
-    : "shirt";
+  // Glass overlay
+  ctx.fillStyle = "rgba(255,255,255,0.05)";
+  ctx.fillRect(0, 0, size, size);
 
-  // 🔹 URL propre sans retour ligne
-  const avatarUrl =
-    `https://api.dicebear.com/7.x/personas/svg` +
-    `?seed=${seed}` +
-    `&gender=${isFemale ? "female" : "male"}` +
-    `&clothing=${clothing}` +
-    `&backgroundType=solid`;
+  // Initiales
+  ctx.fillStyle = "#ffffff";
+  ctx.font = "600 96px Inter, sans-serif";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText(initials, size / 2, size / 2);
 
-  return `
-    <img src="${avatarUrl}"
-         alt="avatar"
-         class="w-12 h-12 rounded-full shadow-md"/>
-  `;
+  const image = canvas.toDataURL("image/png");
+  localStorage.setItem(cacheKey, image);
+
+  return image;
 }
 
 /* ==========================================
@@ -73,40 +97,48 @@ function updateHeaderUI(user) {
 
   const fullNameEl = document.getElementById("headerFullName");
   const usernameEl = document.getElementById("headerUsername");
-  const avatarWrapper = document.getElementById("headerAvatarWrapper");
-  const roleBadge = document.getElementById("roleBadge");
+  const avatarImg = document.getElementById("headerAvatar");
 
-  // Nom complet
   if (fullNameEl) {
     fullNameEl.textContent =
       `${user.firstName ?? ""} ${user.lastName ?? ""}`.trim();
   }
 
-  // Username
   if (usernameEl) {
     usernameEl.textContent = user.username ?? "";
     usernameEl.classList.remove("opacity-0");
     usernameEl.classList.add("opacity-100");
   }
 
-  // Avatar
-  if (avatarWrapper) {
-    avatarWrapper.innerHTML = generateModernAvatar(user);
-  }
+  if (avatarImg) {
 
-  // Badge rôle
-  if (roleBadge && user.role) {
-    roleBadge.classList.remove("hidden");
-    roleBadge.textContent = user.role;
+    const seed = user.username || user.firstName || "user";
 
-    roleBadge.style.background =
-      user.role === "super_admin"
-        ? "#DC2626"
-        : user.role === "admin"
-        ? "#2563EB"
-        : "#475569";
+    avatarImg.src =
+      `https://api.dicebear.com/7.x/personas/png?seed=${seed}
+      &backgroundColor=f3f4f6
+      &radius=50
+      &size=256`;
+
   }
 }
+if (avatarImg) {
+
+  const seed = user.username || "user";
+
+  avatarImg.src =
+    `https://api.dicebear.com/7.x/personas/png
+    ?seed=${seed}
+    &backgroundColor=f3f4f6
+    &radius=50
+    &size=256
+    &face=smile
+    &mouth=smile
+    &eyes=variant12
+    &clothes=blazerShirt
+    `;
+}
+
 
 /* ==========================================
    REALTIME USER LISTENER
@@ -138,10 +170,11 @@ function initRealtimeUser() {
 }
 
 /* ==========================================
-   LOGOUT INIT
+   LOGOUT BUTTON
 ========================================== */
 
 function initLogout() {
+
   const logoutBtn = document.getElementById("headerLogout");
   if (!logoutBtn) return;
 
