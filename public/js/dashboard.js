@@ -306,30 +306,19 @@ async function openModal(txId) {
       </div>
 
       <!-- Avatar + Nom -->
-          <div class="flex flex-col items-center mb-6">
-          
-            <div class="relative">
-          
-              <img src="${avatar}"
-                   class="w-20 h-20 rounded-full mb-3 border border-gray-200 shadow-sm"/>
-          
-              <button
-                onclick="downloadAvatar('${avatar}')"
-                class="absolute -bottom-2 -right-2 bg-primaryStrong text-white rounded-full p-2 shadow-md active:scale-95 transition">
-                <i class="bi bi-download text-sm"></i>
-              </button>
-          
-            </div>
-          
-            <h3 class="text-lg font-semibold mt-4">
-              ${getTitle(tx)}
-            </h3>
-          
-            <p class="text-sm text-gray-400">
-              ${formatDate(tx.createdAt)}
-            </p>
-          
-          </div>
+<div class="flex flex-col items-center mb-6">
+
+  <img src="${avatar}"
+       class="w-16 h-16 rounded-full mb-3"/>
+
+  <h3 class="text-lg font-semibold">
+    ${getTitle(tx)}
+  </h3>
+
+  <p class="text-sm text-gray-400">
+    ${formatDate(tx.createdAt)}
+  </p>
+</div>
 
       <!-- Carte détails -->
       <div class="bg-gray-50 rounded-2xl p-4 space-y-4 text-sm mb-6">
@@ -562,17 +551,7 @@ function formatNotificationType(tx) {
 /* ===============================
    TELECHARGEMENT
 ================================ */
-function downloadAvatar(url) {
 
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = "avatar.png";
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-}
-
-window.downloadAvatar = downloadAvatar;
 
 /* ===============================
    INIT
