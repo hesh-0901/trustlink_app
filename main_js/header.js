@@ -8,7 +8,7 @@ import {
   onSnapshot
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-document.addEventListener("DOMContentLoaded", async () => {
+async function initHeader() {
 
   const userId =
     localStorage.getItem("userId") ||
@@ -21,13 +21,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   try {
 
-    /* ===============================
-       USER DATA
-    ================================= */
+    /* ================= USER ================= */
 
-    const userRef = doc(db, "users", userId);
-
-    const userSnap = await getDoc(userRef);
+    const userSnap = await getDoc(doc(db, "users", userId));
 
     if (!userSnap.exists()) {
       window.location.href = "/trustlink_app/index.html";
@@ -36,32 +32,20 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const user = userSnap.data();
 
-    // Nom
-    document.getElementById("firstNameText")
-      .textContent = user.firstName;
+    document.getElementById("firstNameText").textContent =
+      user.firstName;
 
-    document.getElementById("usernameText")
-      .textContent = user.username;
+    document.getElementById("usernameText").textContent =
+      user.username;
 
-    /* ===============================
-       AVATAR BASED ON GENDER
-    ================================= */
+    /* ================= AVATAR ================= */
 
-    let avatarUrl;
-
-    if (user.gender === "Femme") {
-      avatarUrl =
-        `https://api.dicebear.com/7.x/avataaars/png?seed=${user.username}&gender=female`;
-    } else {
-      avatarUrl =
-        `https://api.dicebear.com/7.x/avataaars/png?seed=${user.username}&gender=male`;
-    }
+    const avatarUrl =
+      `https://api.dicebear.com/7.x/avataaars/png?seed=${user.username}`;
 
     document.getElementById("userAvatar").src = avatarUrl;
 
-    /* ===============================
-       REALTIME NOTIFICATIONS
-    ================================= */
+    /* ================= NOTIFICATIONS REALTIME ================= */
 
     const notifQuery = query(
       collection(db, "transactions"),
@@ -73,10 +57,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       const badge =
         document.getElementById("notificationBadge");
 
-      const count = snapshot.size;
-
-      if (count > 0) {
-        badge.textContent = count;
+      if (snapshot.size > 0) {
+        badge.textContent = snapshot.size;
         badge.classList.remove("hidden");
       } else {
         badge.classList.add("hidden");
@@ -84,24 +66,23 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     });
 
-    /* ===============================
-       LOGOUT
-    ================================= */
+    /* ================= LOGOUT ================= */
 
     document.getElementById("logoutBtn")
       .addEventListener("click", () => {
 
-        localStorage.removeItem("userId");
-        localStorage.removeItem("role");
-        sessionStorage.removeItem("userId");
-        sessionStorage.removeItem("role");
+        localStorage.clear();
+        sessionStorage.clear();
 
         window.location.href =
           "/trustlink_app/index.html";
       });
 
-  } catch (err) {
-    console.error("HEADER ERROR:", err);
+  } catch (error) {
+    console.error("HEADER ERROR:", error);
   }
 
-});
+}
+
+/* 🔥 IMPORTANT */
+initHeader();
