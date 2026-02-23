@@ -68,29 +68,34 @@ body {
   overflow: hidden;
   color: white;
   box-shadow:
-    0 20px 45px rgba(0,0,0,0.25),
-    0 8px 20px rgba(0,0,0,0.12);
+    0 25px 55px rgba(0,0,0,0.35),
+    0 10px 25px rgba(0,0,0,0.15);
 }
 
-/* Texture fond */
+/* Texture premium croisée */
 .wallet-card::before {
   content: "";
   position: absolute;
   inset: 0;
-  background-image:
-    radial-gradient(rgba(255,255,255,0.05) 1px, transparent 1px);
-  background-size: 7px 7px;
+  background:
+    repeating-linear-gradient(
+      45deg,
+      rgba(255,255,255,0.05) 0px,
+      rgba(255,255,255,0.05) 2px,
+      transparent 2px,
+      transparent 8px
+    );
   opacity: 0.25;
 }
 
-/* Reflet premium */
+/* Halo lumineux subtil */
 .wallet-card::after {
   content: "";
   position: absolute;
-  top: -50%;
+  top: -60%;
   left: -30%;
-  width: 150%;
-  height: 150%;
+  width: 160%;
+  height: 160%;
   background: radial-gradient(
     circle at top left,
     rgba(255,255,255,0.25),
@@ -100,28 +105,28 @@ body {
 }
 
 /* ===============================
-   USD (plus clair)
+   USD — BLEU NUIT PROFOND
 ================================= */
 
 .gradient-usd {
   background: linear-gradient(
     135deg,
-    #1E2BE0 0%,
-    #3F4FFF 50%,
-    #6C7CFF 100%
+    #050B2E 0%,
+    #0A144F 40%,
+    #0F1ACD 100%
   );
 }
 
 /* ===============================
-   CDF (plus foncé que USD)
+   CDF — PLUS FONCÉ QUE USD
 ================================= */
 
 .gradient-cdf {
   background: linear-gradient(
     135deg,
-    #0C1585 0%,
-    #1522B8 50%,
-    #2534D6 100%
+    #020824 0%,
+    #081047 50%,
+    #101B80 100%
   );
 }
 
@@ -140,77 +145,6 @@ body {
   letter-spacing: 1px;
 }
 </style>
-
-</head>
-
-<body class="min-h-screen">
-
-<div id="header-container"
-     class="fixed top-0 left-0 w-full z-50 bg-transparent"></div>
-
-<main class="max-w-md mx-auto px-6 pt-28 pb-36">
-
-<section class="swipe-container mb-10">
-
-  <!-- USD CARD -->
-  <div class="swipe-item">
-    <div class="wallet-card gradient-usd">
-
-      <div class="flex justify-between items-center mb-4 relative z-10">
-        <img src="/trustlink_app/assets/white.logo.png"
-             class="h-7">
-        <span class="text-sm opacity-90 font-semibold tracking-wide">
-          USD
-        </span>
-      </div>
-
-      <p class="text-sm opacity-80 relative z-10">
-        Solde disponible
-      </p>
-
-      <div id="balanceUSD"
-           class="balance-amount relative z-10">
-        $0
-      </div>
-
-      <div id="walletBaseUSD"
-           class="wallet-base relative z-10">
-        TL-RXQV-B5KV
-      </div>
-
-    </div>
-  </div>
-
-  <!-- CDF CARD -->
-  <div class="swipe-item">
-    <div class="wallet-card gradient-cdf">
-
-      <div class="flex justify-between items-center mb-4 relative z-10">
-        <img src="/trustlink_app/assets/white.logo.png"
-             class="h-7">
-        <span class="text-sm opacity-90 font-semibold tracking-wide">
-          CDF
-        </span>
-      </div>
-
-      <p class="text-sm opacity-80 relative z-10">
-        Solde disponible
-      </p>
-
-      <div id="balanceCDF"
-           class="balance-amount relative z-10">
-        0 CDF
-      </div>
-
-      <div id="walletBaseCDF"
-           class="wallet-base relative z-10">
-        TL-RXQV-B5KV
-      </div>
-
-    </div>
-  </div>
-
-</section>
   <!-- ACTIONS RAPIDES -->
   <section class="mb-10">
 
