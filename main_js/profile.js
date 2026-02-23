@@ -150,8 +150,7 @@ if ("requestIdleCallback" in window) {
   /* ===============================
      FRIENDS
   ================================= */
-
-  const friendsList =
+    const friendsList =
     document.getElementById("friendsList");
 
   const friendsCount =
@@ -169,8 +168,23 @@ if ("requestIdleCallback" in window) {
   const friendUsername =
     document.getElementById("friend-username");
 
-  const friendPhone =
-    document.getElementById("friend-phone");
+  const friendAvatar =
+    document.getElementById("friend-avatar");
+
+  const friendWallet =
+    document.getElementById("friend-wallet");
+
+  const friendCdf =
+    document.getElementById("friend-cdf");
+
+  const friendUsd =
+    document.getElementById("friend-usd");
+
+  const deleteFriendBtn =
+    document.getElementById("delete-friend");
+
+  const writeFriendBtn =
+    document.getElementById("write-friend");
 
   closeFriendModal?.addEventListener("click", () =>
     friendModal.classList.add("hidden")
@@ -186,6 +200,7 @@ if ("requestIdleCallback" in window) {
     const snapshot = await getDocs(q);
 
     friendsList.innerHTML = "";
+
     friendsCount.textContent =
       `${snapshot.size} ami${snapshot.size > 1 ? "s" : ""}`;
 
@@ -193,16 +208,17 @@ if ("requestIdleCallback" in window) {
 
       const data = docSnap.data();
 
+      const friendRef =
+        doc(db, "users", data.beneficiaryId);
+
       const friendSnap =
-        await getDoc(
-          doc(db, "users", data.beneficiaryId)
-        );
+        await getDoc(friendRef);
 
       if (!friendSnap.exists()) continue;
 
       const friend = friendSnap.data();
 
-      const friendAvatar =
+      const avatarFile =
         friend.avatarImage || "avatar1.PNG";
 
       const div = document.createElement("div");
@@ -212,7 +228,7 @@ if ("requestIdleCallback" in window) {
 
       div.innerHTML = `
         <img 
-          src="${getAvatar(friendAvatar)}"
+          src="${getAvatar(avatarFile)}"
           class="w-12 h-12 rounded-full object-cover"
         />
         <div>
@@ -233,8 +249,37 @@ if ("requestIdleCallback" in window) {
         friendUsername.textContent =
           `@${friend.username}`;
 
-        friendPhone.textContent =
-          friend.phoneNumber;
+        friendAvatar.src =
+          getAvatar(avatarFile);
+
+        friendWallet.textContent =
+          friend.walletBase || "-";
+
+        friendCdf.textContent =
+          friend.balanceCDF
+            ? `${friend.balanceCDF} CDF`
+            : "0 CDF";
+
+        friendUsd.textContent =
+          friend.balanceUSD
+            ? `${friend.balanceUSD} USD`
+            : "0 USD";
+
+        deleteFriendBtn.onclick = async () => {
+
+          await deleteDoc(
+            doc(db, "beneficiaries", docSnap.id)
+          );
+
+          friendModal.classList.add("hidden");
+          loadFriends();
+        };
+
+        writeFriendBtn.onclick = () => {
+
+          window.location.href =
+            `/trustlink_app/chat.html?user=${data.beneficiaryId}`;
+        };
 
         friendModal.classList.remove("hidden");
       });
@@ -243,22 +288,30 @@ if ("requestIdleCallback" in window) {
     }
   }
 
-  document.querySelectorAll(".copy-btn")
-    .forEach(btn => {
+  document.addEventListener("click", (e) => {
 
-      btn.addEventListener("click", () => {
+    const btn = e.target.closest(".copy-btn");
+    if (!btn) return;
 
-        const target =
-          document.getElementById(
-            btn.dataset.copy
-          );
+    const target =
+      document.getElementById(
+        btn.dataset.copy
+      );
 
-        navigator.clipboard.writeText(
-          target.textContent
-        );
-      });
+    if (!target) return;
 
-    });
+    navigator.clipboard.writeText(
+      target.textContent.trim()
+    );
+
+    btn.innerHTML =
+      '<i class="bi bi-check text-xs text-green-500"></i>';
+
+    setTimeout(() => {
+      btn.innerHTML =
+        '<i class="bi bi-copy text-xs"></i>';
+    }, 1200);
+  });
 
   loadFriends();
 
