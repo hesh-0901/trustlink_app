@@ -16,8 +16,8 @@
 
 <body class="bg-gray-50 min-h-screen flex flex-col">
 
-<!-- HEADER -->
-<div id="header-container" class="fixed top-0 left-0 w-full z-50 bg-white shadow-sm"></div>
+<div id="header-container"
+     class="fixed top-0 left-0 w-full z-50 bg-white shadow-sm"></div>
 
 <main class="flex-1 pt-20 pb-28 px-4 max-w-md mx-auto w-full space-y-6">
 
@@ -25,23 +25,26 @@
 Nouveau virement
 </h1>
 
-<!-- CARTE WALLET -->
+<!-- WALLET CARD -->
 <div id="walletCard"
-class="bg-gradient-to-br from-blue-600 to-indigo-700 text-white p-5 rounded-2xl shadow-lg space-y-2">
+class="bg-gradient-to-br from-indigo-900 via-blue-800 to-blue-600
+text-white p-6 rounded-2xl shadow-xl relative overflow-hidden">
 
 <div class="flex justify-between items-center">
 <span id="walletCurrency" class="text-sm opacity-90"></span>
 <i class="bi bi-credit-card-2-front text-lg"></i>
 </div>
 
-<div class="text-2xl font-bold" id="walletBalance">0</div>
+<div id="walletBalance"
+class="text-3xl font-bold mt-2">0</div>
 
-<div class="text-xs opacity-80">
-Réservé: <span id="walletReserved">0</span>
-</div>
-
-<div class="text-xs opacity-80">
-Disponible: <span id="walletAvailable">0</span>
+<div class="text-xs text-white/60 mt-3 space-y-1">
+<div>Réservé:
+<span id="walletReserved"
+class="font-medium text-white/70">0</span></div>
+<div>Disponible:
+<span id="walletAvailable"
+class="font-medium text-white">0</span></div>
 </div>
 
 </div>
@@ -52,19 +55,49 @@ class="w-full border rounded-xl px-4 py-3 bg-white shadow-sm">
 <option value="">Choisir un compte</option>
 </select>
 
-<!-- BENEFICIARY SELECT -->
+<!-- MODE -->
+<div class="flex gap-3">
+<button id="modeFriend"
+class="flex-1 bg-blue-600 text-white py-2 rounded-xl text-sm">
+Envoyer à un ami
+</button>
+
+<button id="modeManual"
+class="flex-1 bg-gray-200 text-gray-600 py-2 rounded-xl text-sm">
+Adresse wallet
+</button>
+</div>
+
+<!-- FRIEND SELECT -->
+<div id="friendSection">
 <select id="beneficiarySelect"
 class="w-full border rounded-xl px-4 py-3 bg-white shadow-sm">
 <option value="">Choisir un bénéficiaire</option>
 </select>
 
-<div class="text-center text-xs text-gray-400">ou</div>
+<div id="friendPreview"
+class="hidden bg-white rounded-2xl p-4 shadow-sm flex items-center gap-4 mt-3">
 
-<!-- MANUAL ADDRESS -->
+<img id="friendAvatar"
+class="w-14 h-14 rounded-full object-cover">
+
+<div>
+<div id="friendName"
+class="font-semibold text-gray-800"></div>
+<div id="friendUsername"
+class="text-xs text-gray-500"></div>
+</div>
+
+</div>
+</div>
+
+<!-- MANUAL -->
+<div id="manualSection" class="hidden">
 <input type="text"
 id="manualWallet"
 placeholder="Adresse wallet"
 class="w-full border rounded-xl px-4 py-3 bg-white shadow-sm">
+</div>
 
 <!-- AMOUNT -->
 <div class="relative">
@@ -74,26 +107,6 @@ placeholder="Montant"
 class="w-full border rounded-xl px-4 py-3 bg-white shadow-sm">
 <span id="currencyTag"
 class="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-gray-500"></span>
-</div>
-
-<!-- TYPE -->
-<select id="motifType"
-class="w-full border rounded-xl px-4 py-3 bg-white shadow-sm">
-<option value="">Type de transfert</option>
-<option value="standard">Standard</option>
-<option value="loan">Prêt</option>
-<option value="repayment">Remboursement</option>
-<option value="engagement">Engagement</option>
-</select>
-
-<input type="text"
-id="customMotif"
-placeholder="Motif"
-class="w-full border rounded-xl px-4 py-3 bg-white shadow-sm">
-
-<!-- SUMMARY -->
-<div id="summaryBox"
-class="hidden bg-white p-4 rounded-xl shadow-sm text-sm space-y-1">
 </div>
 
 <p id="errorMsg"
@@ -106,7 +119,15 @@ Confirmer le virement
 
 </main>
 
-<!-- NAVBAR -->
+<!-- LOADING -->
+<div id="loadingOverlay"
+class="fixed inset-0 bg-black/40 hidden flex items-center justify-center z-50">
+<div class="bg-white p-6 rounded-2xl shadow-lg text-center space-y-3">
+<div class="animate-spin w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full mx-auto"></div>
+<p class="text-sm text-gray-600">Transaction en cours...</p>
+</div>
+</div>
+
 <div id="navbar-container"
 class="fixed bottom-0 left-0 w-full z-50 bg-white shadow-inner"></div>
 
