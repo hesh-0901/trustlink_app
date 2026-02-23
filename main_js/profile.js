@@ -174,11 +174,8 @@ if ("requestIdleCallback" in window) {
   const friendWallet =
     document.getElementById("friend-wallet");
 
-  const friendCdf =
-    document.getElementById("friend-cdf");
-
-  const friendUsd =
-    document.getElementById("friend-usd");
+  const friendPhone =
+    document.getElementById("friend-phone");
 
   const deleteFriendBtn =
     document.getElementById("delete-friend");
@@ -255,15 +252,8 @@ if ("requestIdleCallback" in window) {
         friendWallet.textContent =
           friend.walletBase || "-";
 
-        friendCdf.textContent =
-          friend.balanceCDF
-            ? `${friend.balanceCDF} CDF`
-            : "0 CDF";
-
-        friendUsd.textContent =
-          friend.balanceUSD
-            ? `${friend.balanceUSD} USD`
-            : "0 USD";
+        friendPhone.textContent =
+          friend.phoneNumber || "-";
 
         deleteFriendBtn.onclick = async () => {
 
