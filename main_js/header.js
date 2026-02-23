@@ -41,6 +41,25 @@ import {
     }
 
     const userData = userSnap.data();
+    onSnapshot(userRef, (snap) => {
+
+  if (!snap.exists()) return;
+
+  const updatedUser = snap.data();
+
+  if (avatarEl && updatedUser.avatarImage) {
+
+    avatarEl.src =
+      "/trustlink_app/assets/avatars/" +
+      updatedUser.avatarImage;
+
+    localStorage.setItem(
+      "userAvatar",
+      updatedUser.avatarImage
+    );
+  }
+
+});
 
     /* ===============================
        INJECT USER DATA
