@@ -26,6 +26,9 @@ const userId =
 if (!userId)
   window.location.href = "/trustlink_app/index.html";
 
+const AVATAR_PATH =
+  "/trustlink_app/assets/avatars/";
+
 /* ===============================
    FORMAT
 ================================ */
@@ -146,10 +149,19 @@ for (const docSnap of docs) {
       ? userSnap.data()
       : null;
 
-  const avatar =
-    counterparty
-      ? `https://api.dicebear.com/7.x/avataaars/png?seed=${counterparty.username}`
-      : "";
+let avatar = "";
+
+if (counterparty?.avatarImage) {
+
+  avatar =
+    AVATAR_PATH + counterparty.avatarImage;
+
+} else if (counterparty) {
+
+  avatar =
+    `https://api.dicebear.com/7.x/avataaars/png?seed=${counterparty.username}`;
+
+}
 
   const name =
     counterparty
@@ -275,10 +287,19 @@ async function openModal(txId) {
     ? userSnap.data()
     : null;
 
-  const avatar =
-    user
-      ? `https://api.dicebear.com/7.x/avataaars/png?seed=${user.username}`
-      : "";
+let avatar = "";
+
+if (user?.avatarImage) {
+
+  avatar =
+    AVATAR_PATH + user.avatarImage;
+
+} else if (user) {
+
+  avatar =
+    `https://api.dicebear.com/7.x/avataaars/png?seed=${user.username}`;
+
+}
 
   const fullName =
     user
