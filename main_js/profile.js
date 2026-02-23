@@ -154,6 +154,28 @@ if ("requestIdleCallback" in window) {
   const friendsList =
     document.getElementById("friendsList");
 
+  const friendsCount =
+    document.getElementById("friends-count");
+
+  const friendModal =
+    document.getElementById("friend-modal");
+
+  const closeFriendModal =
+    document.getElementById("close-friend-modal");
+
+  const friendName =
+    document.getElementById("friend-name");
+
+  const friendUsername =
+    document.getElementById("friend-username");
+
+  const friendPhone =
+    document.getElementById("friend-phone");
+
+  closeFriendModal?.addEventListener("click", () =>
+    friendModal.classList.add("hidden")
+  );
+
   async function loadFriends() {
 
     const q = query(
@@ -162,7 +184,10 @@ if ("requestIdleCallback" in window) {
     );
 
     const snapshot = await getDocs(q);
+
     friendsList.innerHTML = "";
+    friendsCount.textContent =
+      `${snapshot.size} ami${snapshot.size > 1 ? "s" : ""}`;
 
     for (const docSnap of snapshot.docs) {
 
@@ -183,41 +208,57 @@ if ("requestIdleCallback" in window) {
       const div = document.createElement("div");
 
       div.className =
-        "flex items-center justify-between bg-gray-50 p-3 rounded-xl";
+        "flex items-center gap-3 bg-gray-50 hover:bg-gray-100 p-3 rounded-2xl cursor-pointer transition";
 
       div.innerHTML = `
-        <div class="flex items-center gap-3">
-          <img 
-            src="${getAvatar(friendAvatar)}"
-            class="w-10 h-10 rounded-full object-cover"
-          />
-          <div>
-            <p class="text-sm font-medium">
-              ${friend.firstName} ${friend.lastName}
-            </p>
-            <p class="text-xs text-gray-500">
-              @${friend.username}
-            </p>
-          </div>
+        <img 
+          src="${getAvatar(friendAvatar)}"
+          class="w-12 h-12 rounded-full object-cover"
+        />
+        <div>
+          <p class="text-sm font-medium">
+            ${friend.firstName} ${friend.lastName}
+          </p>
+          <p class="text-xs text-gray-500">
+            @${friend.username}
+          </p>
         </div>
-        <button class="text-red-500 text-xs font-medium">
-          Supprimer
-        </button>
       `;
 
-      div.querySelector("button")
-        .addEventListener("click", async () => {
+      div.addEventListener("click", () => {
 
-          await deleteDoc(
-            doc(db, "beneficiaries", docSnap.id)
-          );
+        friendName.textContent =
+          `${friend.firstName} ${friend.lastName}`;
 
-          loadFriends();
-        });
+        friendUsername.textContent =
+          `@${friend.username}`;
+
+        friendPhone.textContent =
+          friend.phoneNumber;
+
+        friendModal.classList.remove("hidden");
+      });
 
       friendsList.appendChild(div);
     }
   }
+
+  document.querySelectorAll(".copy-btn")
+    .forEach(btn => {
+
+      btn.addEventListener("click", () => {
+
+        const target =
+          document.getElementById(
+            btn.dataset.copy
+          );
+
+        navigator.clipboard.writeText(
+          target.textContent
+        );
+      });
+
+    });
 
   loadFriends();
 
