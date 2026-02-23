@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -77,29 +78,15 @@ body {
   content: "";
   position: absolute;
   inset: 0;
-
-  background-image:
-    url("data:image/svg+xml;utf8,
-    <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 500'>
-      <path fill='white' fill-opacity='0.06'
-        d='M150 250
-           C200 200, 300 200, 350 250
-           C400 300, 500 300, 550 250
-           C600 200, 700 200, 750 250
-           C800 300, 850 280, 900 250
-           L900 350
-           C850 380, 750 380, 700 350
-           C650 320, 550 320, 500 350
-           C450 380, 350 380, 300 350
-           C250 320, 150 320, 100 350
-           Z'/>
-    </svg>");
-
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: 140%;
-  opacity: 0.35;
-  pointer-events: none;
+  background:
+    repeating-linear-gradient(
+      45deg,
+      rgba(255,255,255,0.05) 0px,
+      rgba(255,255,255,0.05) 2px,
+      transparent 2px,
+      transparent 8px
+    );
+  opacity: 0.25;
 }
 
 /* Halo lumineux subtil */
