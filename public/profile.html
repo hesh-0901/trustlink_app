@@ -17,9 +17,11 @@
     <!-- PROFILE CARD -->
     <div class="bg-white rounded-3xl shadow-sm overflow-hidden">
 
-      <div class="h-32 bg-gradient-to-r 
-                  from-[#0F1ACD] via-[#1E2BE0] to-[#3D4BFF]">
-      </div>
+        <div class="h-36 relative">
+          <img src="/trustlink_app/assets/trl.jpg"
+               class="w-full h-full object-cover">
+          <div class="absolute inset-0 bg-black/30"></div>
+        </div>
 
       <div class="relative flex flex-col items-center pb-6 -mt-14">
 
@@ -72,19 +74,82 @@
     </div>
 
     <!-- FRIENDS -->
-    <div class="bg-white rounded-3xl shadow-sm p-5 space-y-4">
+<div class="bg-white rounded-3xl shadow-sm p-5 space-y-4">
 
-      <div class="flex justify-between items-center">
-        <h2 class="text-sm font-semibold text-[#1E2BE0]">
-          Amis
-        </h2>
-        <span class="text-xs text-gray-400">
-          Bénéficiaires
-        </span>
+  <div class="flex justify-between items-center">
+    <div>
+      <h2 class="text-sm font-semibold text-[#1E2BE0]">
+        Amis
+      </h2>
+      <p id="friends-count"
+         class="text-xs text-gray-400 mt-1">
+        0 amis
+      </p>
+    </div>
+    <span class="text-xs text-gray-400">
+      Bénéficiaires
+    </span>
+  </div>
+
+  <div id="friendsList" class="space-y-3"></div>
+</div>
+
+<!-- FRIEND MODAL -->
+<div id="friend-modal"
+     class="fixed inset-0 bg-black/40 hidden 
+            flex items-center justify-center z-50">
+
+  <div class="bg-white w-[90%] max-w-sm 
+              rounded-3xl p-6 space-y-4">
+
+    <div class="flex justify-between items-center">
+      <h3 class="font-semibold text-sm">
+        Informations
+      </h3>
+      <button id="close-friend-modal"
+              class="text-gray-500">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+
+    <div class="space-y-2 text-sm">
+
+      <div>
+        <p class="text-gray-400 text-xs">Nom</p>
+        <div class="flex justify-between items-center">
+          <span id="friend-name"></span>
+          <button data-copy="friend-name"
+                  class="copy-btn text-[#1E2BE0] text-xs">
+            Copier
+          </button>
+        </div>
       </div>
 
-      <div id="friendsList" class="space-y-3"></div>
+      <div>
+        <p class="text-gray-400 text-xs">Username</p>
+        <div class="flex justify-between items-center">
+          <span id="friend-username"></span>
+          <button data-copy="friend-username"
+                  class="copy-btn text-[#1E2BE0] text-xs">
+            Copier
+          </button>
+        </div>
+      </div>
+
+      <div>
+        <p class="text-gray-400 text-xs">Téléphone</p>
+        <div class="flex justify-between items-center">
+          <span id="friend-phone"></span>
+          <button data-copy="friend-phone"
+                  class="copy-btn text-[#1E2BE0] text-xs">
+            Copier
+          </button>
+        </div>
+      </div>
+
     </div>
+  </div>
+</div>
 
     <!-- AVATAR MODAL -->
     <div id="avatar-modal"
