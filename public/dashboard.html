@@ -145,6 +145,76 @@ body {
   letter-spacing: 1px;
 }
 </style>
+  </head>
+
+<body class="min-h-screen">
+
+<div id="header-container"
+     class="fixed top-0 left-0 w-full z-50 bg-transparent"></div>
+
+<main class="max-w-md mx-auto px-6 pt-28 pb-36">
+
+<section class="swipe-container mb-10">
+
+  <!-- USD CARD -->
+  <div class="swipe-item">
+    <div class="wallet-card gradient-usd">
+
+      <div class="flex justify-between items-center mb-4 relative z-10">
+        <img src="/trustlink_app/assets/white.logo.png"
+             class="h-7">
+        <span class="text-sm opacity-90 font-semibold tracking-wide">
+          USD
+        </span>
+      </div>
+
+      <p class="text-sm opacity-80 relative z-10">
+        Solde disponible
+      </p>
+
+      <div id="balanceUSD"
+           class="balance-amount relative z-10">
+        $0
+      </div>
+
+      <div id="walletBaseUSD"
+           class="wallet-base relative z-10">
+        TL-RXQV-B5KV
+      </div>
+
+    </div>
+  </div>
+
+  <!-- CDF CARD -->
+  <div class="swipe-item">
+    <div class="wallet-card gradient-cdf">
+
+      <div class="flex justify-between items-center mb-4 relative z-10">
+        <img src="/trustlink_app/assets/white.logo.png"
+             class="h-7">
+        <span class="text-sm opacity-90 font-semibold tracking-wide">
+          CDF
+        </span>
+      </div>
+
+      <p class="text-sm opacity-80 relative z-10">
+        Solde disponible
+      </p>
+
+      <div id="balanceCDF"
+           class="balance-amount relative z-10">
+        0 CDF
+      </div>
+
+      <div id="walletBaseCDF"
+           class="wallet-base relative z-10">
+        TL-RXQV-B5KV
+      </div>
+
+    </div>
+  </div>
+
+</section>
   <!-- ACTIONS RAPIDES -->
   <section class="mb-10">
 
@@ -306,35 +376,6 @@ async function loadHeader() {
   await import("../main_js/header.js");
 }
 loadHeader();
-</script>
-
-  <script>
-/* ===============================
-   SWIPE 3D EFFECT
-================================= */
-
-const container =
-  document.getElementById("walletSwipe");
-
-const items =
-  container.querySelectorAll(".swipe-item");
-
-container.addEventListener("scroll", () => {
-
-  const scrollLeft =
-    container.scrollLeft;
-
-  const width =
-    container.offsetWidth;
-
-  const index =
-    Math.round(scrollLeft / width);
-
-  items.forEach((item, i) => {
-    item.classList.toggle("active", i === index);
-  });
-
-});
 </script>
 
 </body>
