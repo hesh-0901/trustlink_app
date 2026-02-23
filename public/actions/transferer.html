@@ -25,30 +25,6 @@
 Nouveau virement
 </h1>
 
-<!-- WALLET CARD -->
-<div id="walletCard"
-class="bg-gradient-to-br from-indigo-900 via-blue-800 to-blue-600
-text-white p-6 rounded-2xl shadow-xl relative overflow-hidden">
-
-<div class="flex justify-between items-center">
-<span id="walletCurrency" class="text-sm opacity-90"></span>
-<i class="bi bi-credit-card-2-front text-lg"></i>
-</div>
-
-<div id="walletBalance"
-class="text-3xl font-bold mt-2">0</div>
-
-<div class="text-xs text-white/60 mt-3 space-y-1">
-<div>Réservé:
-<span id="walletReserved"
-class="font-medium text-white/70">0</span></div>
-<div>Disponible:
-<span id="walletAvailable"
-class="font-medium text-white">0</span></div>
-</div>
-
-</div>
-
 <!-- SELECT WALLET -->
 <select id="walletSelect"
 class="w-full border rounded-xl px-4 py-3 bg-white shadow-sm">
@@ -74,21 +50,6 @@ Adresse wallet
 class="w-full border rounded-xl px-4 py-3 bg-white shadow-sm">
 <option value="">Choisir un bénéficiaire</option>
 </select>
-
-<div id="friendPreview"
-class="hidden bg-white rounded-2xl p-4 shadow-sm flex items-center gap-4 mt-3">
-
-<img id="friendAvatar"
-class="w-14 h-14 rounded-full object-cover">
-
-<div>
-<div id="friendName"
-class="font-semibold text-gray-800"></div>
-<div id="friendUsername"
-class="text-xs text-gray-500"></div>
-</div>
-
-</div>
 </div>
 
 <!-- MANUAL -->
@@ -100,13 +61,27 @@ class="w-full border rounded-xl px-4 py-3 bg-white shadow-sm">
 </div>
 
 <!-- AMOUNT -->
+<div class="space-y-2">
+
 <div class="relative">
 <input type="number"
 id="amount"
 placeholder="Montant"
-class="w-full border rounded-xl px-4 py-3 bg-white shadow-sm">
+class="w-full border rounded-xl px-4 py-3 bg-white shadow-sm text-lg font-semibold">
 <span id="currencyTag"
 class="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-gray-500"></span>
+</div>
+
+<!-- RESERVED / AVAILABLE -->
+<div class="text-xs text-gray-500 space-y-1 hidden" id="balanceInfo">
+<div>Réservé :
+<span id="walletReserved" class="font-medium text-gray-600">0</span>
+</div>
+<div>Disponible :
+<span id="walletAvailable" class="font-semibold text-gray-800">0</span>
+</div>
+</div>
+
 </div>
 
 <p id="errorMsg"
@@ -114,10 +89,37 @@ class="text-red-500 text-sm hidden"></p>
 
 <button id="confirmBtn"
 class="w-full bg-blue-600 text-white py-3 rounded-xl font-semibold active:scale-95 transition">
-Confirmer le virement
+Continuer
 </button>
 
 </main>
+
+<!-- CONFIRMATION MODAL -->
+<div id="confirmModal"
+class="fixed inset-0 bg-black/40 hidden flex items-center justify-center z-50 px-4">
+
+<div class="bg-white w-full max-w-md rounded-2xl p-6 space-y-4 shadow-xl">
+
+<h2 class="text-lg font-semibold text-gray-800">
+Confirmer la transaction
+</h2>
+
+<div id="confirmDetails"
+class="text-sm text-gray-600 space-y-2"></div>
+
+<div class="flex gap-3 pt-4">
+<button id="cancelConfirm"
+class="flex-1 bg-gray-200 py-3 rounded-xl">
+Annuler
+</button>
+<button id="validateConfirm"
+class="flex-1 bg-blue-600 text-white py-3 rounded-xl">
+Valider
+</button>
+</div>
+
+</div>
+</div>
 
 <!-- LOADING -->
 <div id="loadingOverlay"
