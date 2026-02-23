@@ -24,30 +24,20 @@ const amountInput = document.getElementById("amount");
 const currencyTag = document.getElementById("currencyTag");
 const confirmBtn = document.getElementById("confirmBtn");
 const errorMsg = document.getElementById("errorMsg");
-const loadingOverlay = document.getElementById("loadingOverlay");
-
-const walletBalance = document.getElementById("walletBalance");
+const balanceInfo = document.getElementById("balanceInfo");
 const walletReserved = document.getElementById("walletReserved");
 const walletAvailable = document.getElementById("walletAvailable");
-const walletCurrency = document.getElementById("walletCurrency");
 
-const friendSection = document.getElementById("friendSection");
-const manualSection = document.getElementById("manualSection");
-const modeFriend = document.getElementById("modeFriend");
-const modeManual = document.getElementById("modeManual");
-
-const friendPreview = document.getElementById("friendPreview");
-const friendAvatar = document.getElementById("friendAvatar");
-const friendName = document.getElementById("friendName");
-const friendUsername = document.getElementById("friendUsername");
+const confirmModal = document.getElementById("confirmModal");
+const confirmDetails = document.getElementById("confirmDetails");
+const cancelConfirm = document.getElementById("cancelConfirm");
+const validateConfirm = document.getElementById("validateConfirm");
+const loadingOverlay = document.getElementById("loadingOverlay");
 
 let selectedWallet = null;
 
-/* ===============================
-   LOAD WALLETS
-================================ */
+/* LOAD WALLETS */
 async function loadWallets() {
-
   const q = query(
     collection(db, "wallets"),
     where("userId", "==", userId),
@@ -58,21 +48,16 @@ async function loadWallets() {
 
   snapshot.forEach(docSnap => {
     const wallet = docSnap.data();
-
     const option = document.createElement("option");
     option.value = docSnap.id;
     option.textContent =
       `${wallet.currency} - ${wallet.walletAddress}`;
-
     walletSelect.appendChild(option);
   });
 }
-
 loadWallets();
 
-/* ===============================
-   WALLET CHANGE
-================================ */
+/* WALLET CHANGE */
 walletSelect.addEventListener("change", async () => {
 
   const walletDoc =
@@ -85,44 +70,48 @@ walletSelect.addEventListener("change", async () => {
   const reserved = selectedWallet.reservedBalance || 0;
   const available = selectedWallet.balance - reserved;
 
-  walletCurrency.textContent = selectedWallet.currency;
-  walletBalance.textContent = selectedWallet.balance;
   walletReserved.textContent = reserved;
   walletAvailable.textContent = available;
   currencyTag.textContent = selectedWallet.currency;
+
+  balanceInfo.classList.remove("hidden");
 });
 
-/* ===============================
-   MODE SWITCH
-================================ */
-modeFriend.addEventListener("click", () => {
-  friendSection.classList.remove("hidden");
-  manualSection.classList.add("hidden");
-  modeFriend.classList.replace("bg-gray-200", "bg-blue-600");
-  modeFriend.classList.replace("text-gray-600", "text-white");
+/* CONTINUER */
+confirmBtn.addEventListener("click", () => {
+
+  const amount = parseFloat(amountInput.value);
+  const toWalletId = manualWallet.value.trim();
+
+  if (!selectedWallet || !amount || !toWalletId)
+    return showError("Champs requis");
+
+  confirmDetails.innerHTML = `
+    <div><strong>De :</strong> ${selectedWallet.walletAddress}</div>
+    <div><strong>Vers :</strong> ${toWalletId}</div>
+    <div><strong>Montant :</strong> ${amount} ${selectedWallet.currency}</div>
+    <div><strong>Type :</strong> Transfert standard</div>
+  `;
+
+  confirmModal.classList.remove("hidden");
 });
 
-modeManual.addEventListener("click", () => {
-  friendSection.classList.add("hidden");
-  manualSection.classList.remove("hidden");
+/* CANCEL */
+cancelConfirm.addEventListener("click", () => {
+  confirmModal.classList.add("hidden");
 });
 
-/* ===============================
-   CONFIRM
-================================ */
-confirmBtn.addEventListener("click", async () => {
+/* VALIDATE */
+validateConfirm.addEventListener("click", async () => {
 
   const amount = parseFloat(amountInput.value);
   const walletId = walletSelect.value;
   const toWalletId = manualWallet.value.trim();
 
-  if (!walletId || !toWalletId || !amount)
-    return showError("Champs requis");
-
   try {
 
+    confirmModal.classList.add("hidden");
     loadingOverlay.classList.remove("hidden");
-    confirmBtn.disabled = true;
 
     await runTransaction(db, async (transaction) => {
 
@@ -170,13 +159,11 @@ confirmBtn.addEventListener("click", async () => {
 
     });
 
-    loadingOverlay.classList.add("hidden");
-    showSuccess();
+    location.reload();
 
   } catch (error) {
 
     loadingOverlay.classList.add("hidden");
-    confirmBtn.disabled = false;
     showError(error);
 
   }
@@ -186,31 +173,4 @@ confirmBtn.addEventListener("click", async () => {
 function showError(msg) {
   errorMsg.textContent = msg;
   errorMsg.classList.remove("hidden");
-}
-
-function showSuccess() {
-
-  const modal = document.createElement("div");
-
-  modal.className =
-    "fixed inset-0 bg-black/40 flex items-center justify-center z-50";
-
-  modal.innerHTML = `
-    <div class="bg-white p-6 rounded-2xl shadow-xl text-center space-y-4">
-      <i class="bi bi-check-circle text-green-500 text-4xl"></i>
-      <div class="font-semibold text-gray-800">
-        Transaction effectuée
-      </div>
-      <div class="text-sm text-gray-500">
-        Votre virement est en attente de validation.
-      </div>
-    </div>
-  `;
-
-  document.body.appendChild(modal);
-
-  setTimeout(() => {
-    modal.remove();
-    location.reload();
-  }, 2000);
 }
