@@ -56,20 +56,45 @@ import {
 /* ===============================
     AVATAR (NOUVEAU - STYLE CORPORATE)
 ================================= */
-const avatarStyle = "avataaars-neutral";
+/* ===============================
+   AVATAR (SYSTÈME INTERNE PRIORITAIRE)
+================================= */
 
-const avatarUrl =
-  `https://api.dicebear.com/7.x/${avatarStyle}/svg?` +
-  `seed=${encodeURIComponent(userData.username)}` +
-  `&radius=50`;
+const AVATAR_PATH =
+  "/trustlink_app/assets/avatars/";
 
 if (avatarEl) {
-  avatarEl.src = avatarUrl;
-  avatarEl.onerror = () => {
+
+  if (userData.avatarImage) {
+
+    // Avatar interne enregistré en Firestore
     avatarEl.src =
-      "https://api.dicebear.com/7.x/initials/svg?seed=" +
-      encodeURIComponent(userData.firstName);
-  };
+      AVATAR_PATH + userData.avatarImage;
+
+    // On met aussi en cache local
+    localStorage.setItem(
+      "userAvatar",
+      userData.avatarImage
+    );
+
+  } else {
+
+    // Fallback Dicebear
+    const avatarStyle = "avataaars-neutral";
+
+    const avatarUrl =
+      `https://api.dicebear.com/7.x/${avatarStyle}/svg?` +
+      `seed=${encodeURIComponent(userData.username)}` +
+      `&radius=50`;
+
+    avatarEl.src = avatarUrl;
+
+    avatarEl.onerror = () => {
+      avatarEl.src =
+        "https://api.dicebear.com/7.x/initials/svg?seed=" +
+        encodeURIComponent(userData.firstName);
+    };
+  }
 }
 
     /* ===============================
