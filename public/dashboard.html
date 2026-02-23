@@ -67,85 +67,77 @@ body {
   position: relative;
   overflow: hidden;
   color: white;
-
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-
-  border: 1px solid rgba(255,255,255,0.15);
-
   box-shadow:
-    0 15px 35px rgba(15, 26, 205, 0.25),
-    0 5px 15px rgba(0,0,0,0.08);
-
-  transition:
-    transform 0.25s ease,
-    box-shadow 0.25s ease;
+    0 20px 45px rgba(0,0,0,0.25),
+    0 8px 20px rgba(0,0,0,0.12);
 }
 
-/* Glow léger */
-.wallet-card:hover {
-  transform: translateY(-4px);
-  box-shadow:
-    0 20px 45px rgba(61, 75, 255, 0.35),
-    0 10px 25px rgba(0,0,0,0.12);
-}
-
-/* Animation mobile tap */
-.wallet-card:active {
-  transform: scale(0.98);
-}
-
-/* Motif signature TrustLink */
+/* Texture fond */
 .wallet-card::before {
-  content: "TL";
-  position: absolute;
-  right: 18px;
-  bottom: 12px;
-  font-size: 90px;
-  font-weight: 700;
-  opacity: 0.05;
-  letter-spacing: -8px;
-}
-
-/* Texture très subtile */
-.wallet-card::after {
   content: "";
   position: absolute;
   inset: 0;
   background-image:
-    radial-gradient(rgba(255,255,255,0.04) 1px, transparent 1px);
-  background-size: 8px 8px;
-  pointer-events: none;
+    radial-gradient(rgba(255,255,255,0.05) 1px, transparent 1px);
+  background-size: 7px 7px;
+  opacity: 0.25;
+}
+
+/* Reflet premium */
+.wallet-card::after {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -30%;
+  width: 150%;
+  height: 150%;
+  background: radial-gradient(
+    circle at top left,
+    rgba(255,255,255,0.25),
+    transparent 60%
+  );
+  transform: rotate(25deg);
 }
 
 /* ===============================
-   USD STYLE (plus profond & premium)
+   USD (plus clair)
 ================================= */
 
 .gradient-usd {
   background: linear-gradient(
     135deg,
-    #0E1AB8 0%,
-    #1E2BE0 45%,
-    #2F3FFF 100%
+    #1E2BE0 0%,
+    #3F4FFF 50%,
+    #6C7CFF 100%
   );
 }
 
 /* ===============================
-   CDF STYLE (plus doux & moderne)
+   CDF (plus foncé que USD)
 ================================= */
 
 .gradient-cdf {
   background: linear-gradient(
     135deg,
-    #4A5BFF 0%,
-    #6C7DFF 50%,
-    #9CA8FF 100%
+    #0C1585 0%,
+    #1522B8 50%,
+    #2534D6 100%
   );
 }
 
-body.modal-open {
-  overflow: hidden;
+/* Montant mis en avant */
+.balance-amount {
+  font-size: 34px;
+  font-weight: 800;
+  letter-spacing: -1px;
+  margin-top: 6px;
+}
+
+.wallet-base {
+  font-size: 13px;
+  opacity: 0.85;
+  margin-top: 14px;
+  letter-spacing: 1px;
 }
 </style>
 
@@ -160,11 +152,11 @@ body.modal-open {
 
 <section class="swipe-container mb-10">
 
-  <!-- USD -->
+  <!-- USD CARD -->
   <div class="swipe-item">
     <div class="wallet-card gradient-usd">
 
-      <div class="flex justify-between items-center mb-6 relative z-10">
+      <div class="flex justify-between items-center mb-4 relative z-10">
         <img src="/trustlink_app/assets/white.logo.png"
              class="h-7">
         <span class="text-sm opacity-90 font-semibold tracking-wide">
@@ -172,23 +164,28 @@ body.modal-open {
         </span>
       </div>
 
-      <p class="text-sm opacity-80 mb-2 relative z-10">
+      <p class="text-sm opacity-80 relative z-10">
         Solde disponible
       </p>
 
-      <h2 id="balanceUSD"
-          class="text-3xl font-bold tracking-tight relative z-10">
+      <div id="balanceUSD"
+           class="balance-amount relative z-10">
         $0
-      </h2>
+      </div>
+
+      <div id="walletBaseUSD"
+           class="wallet-base relative z-10">
+        TL-RXQV-B5KV
+      </div>
 
     </div>
   </div>
 
-  <!-- CDF -->
+  <!-- CDF CARD -->
   <div class="swipe-item">
     <div class="wallet-card gradient-cdf">
 
-      <div class="flex justify-between items-center mb-6 relative z-10">
+      <div class="flex justify-between items-center mb-4 relative z-10">
         <img src="/trustlink_app/assets/white.logo.png"
              class="h-7">
         <span class="text-sm opacity-90 font-semibold tracking-wide">
@@ -196,20 +193,24 @@ body.modal-open {
         </span>
       </div>
 
-      <p class="text-sm opacity-80 mb-2 relative z-10">
+      <p class="text-sm opacity-80 relative z-10">
         Solde disponible
       </p>
 
-      <h2 id="balanceCDF"
-          class="text-3xl font-bold tracking-tight relative z-10">
+      <div id="balanceCDF"
+           class="balance-amount relative z-10">
         0 CDF
-      </h2>
+      </div>
+
+      <div id="walletBaseCDF"
+           class="wallet-base relative z-10">
+        TL-RXQV-B5KV
+      </div>
 
     </div>
   </div>
 
 </section>
-  
   <!-- ACTIONS RAPIDES -->
   <section class="mb-10">
 
