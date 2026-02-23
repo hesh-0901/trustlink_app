@@ -445,7 +445,7 @@ async function executeAction(txId, action) {
 
     const txDoc = await transaction.get(txRef);
     if (!txDoc.exists())
-      throw "Introuvable";
+      throw "Transaction introuvable";
 
     const tx = txDoc.data();
 
@@ -455,12 +455,65 @@ async function executeAction(txId, action) {
     if (tx.toUserId !== userId)
       throw "Non autorisé";
 
-    transaction.update(txRef, {
-      status: action === "approve"
-        ? "completed"
-        : "rejected",
-      updatedAt: serverTimestamp()
-    });
+    const fromWalletRef =
+      doc(db, "wallets", tx.fromWalletId);
+
+    const toWalletRef =
+      doc(db, "wallets", tx.toWalletId);
+
+    const fromWalletDoc =
+      await transaction.get(fromWalletRef);
+
+    const toWalletDoc =
+      await transaction.get(toWalletRef);
+
+    if (!fromWalletDoc.exists() || !toWalletDoc.exists())
+      throw "Wallet introuvable";
+
+    const fromWallet = fromWalletDoc.data();
+    const toWallet = toWalletDoc.data();
+
+    const reserved =
+      fromWallet.reservedBalance || 0;
+
+    if (action === "approve") {
+
+      if (reserved < tx.amount)
+        throw "Réserve insuffisante";
+
+      // 🔥 Déduire solde réel + enlever réserve
+      transaction.update(fromWalletRef, {
+        balance: fromWallet.balance - tx.amount,
+        reservedBalance: reserved - tx.amount,
+        updatedAt: serverTimestamp()
+      });
+
+      // 🔥 Ajouter au receveur
+      transaction.update(toWalletRef, {
+        balance: toWallet.balance + tx.amount,
+        updatedAt: serverTimestamp()
+      });
+
+      // 🔥 Marquer completed
+      transaction.update(txRef, {
+        status: "completed",
+        updatedAt: serverTimestamp()
+      });
+
+    } else {
+
+      // 🔥 Rejet → libérer réserve
+      transaction.update(fromWalletRef, {
+        reservedBalance: reserved - tx.amount,
+        updatedAt: serverTimestamp()
+      });
+
+      transaction.update(txRef, {
+        status: "rejected",
+        updatedAt: serverTimestamp()
+      });
+
+    }
 
   });
 
