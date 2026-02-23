@@ -17,23 +17,31 @@ const userId =
 if (!userId)
   window.location.href = "/trustlink_app/index.html";
 
-/* ELEMENTS */
 const walletSelect = document.getElementById("walletSelect");
 const beneficiarySelect = document.getElementById("beneficiarySelect");
 const manualWallet = document.getElementById("manualWallet");
 const amountInput = document.getElementById("amount");
 const currencyTag = document.getElementById("currencyTag");
-const summaryBox = document.getElementById("summaryBox");
 const confirmBtn = document.getElementById("confirmBtn");
 const errorMsg = document.getElementById("errorMsg");
+const loadingOverlay = document.getElementById("loadingOverlay");
 
 const walletBalance = document.getElementById("walletBalance");
 const walletReserved = document.getElementById("walletReserved");
 const walletAvailable = document.getElementById("walletAvailable");
 const walletCurrency = document.getElementById("walletCurrency");
 
+const friendSection = document.getElementById("friendSection");
+const manualSection = document.getElementById("manualSection");
+const modeFriend = document.getElementById("modeFriend");
+const modeManual = document.getElementById("modeManual");
+
+const friendPreview = document.getElementById("friendPreview");
+const friendAvatar = document.getElementById("friendAvatar");
+const friendName = document.getElementById("friendName");
+const friendUsername = document.getElementById("friendUsername");
+
 let selectedWallet = null;
-let selectedRecipient = null;
 
 /* ===============================
    LOAD WALLETS
@@ -63,38 +71,6 @@ async function loadWallets() {
 loadWallets();
 
 /* ===============================
-   LOAD BENEFICIARIES
-================================ */
-async function loadBeneficiaries() {
-
-  const q = query(
-    collection(db, "beneficiaries"),
-    where("userId", "==", userId)
-  );
-
-  const snapshot = await getDocs(q);
-
-  for (const docSnap of snapshot.docs) {
-
-    const beneficiaryId = docSnap.data().beneficiaryId;
-    const userSnap = await getDoc(doc(db, "users", beneficiaryId));
-
-    if (!userSnap.exists()) continue;
-
-    const user = userSnap.data();
-
-    const option = document.createElement("option");
-    option.value = beneficiaryId;
-    option.textContent =
-      `${user.firstName} ${user.lastName}`;
-
-    beneficiarySelect.appendChild(option);
-  }
-}
-
-loadBeneficiaries();
-
-/* ===============================
    WALLET CHANGE
 ================================ */
 walletSelect.addEventListener("change", async () => {
@@ -117,49 +93,19 @@ walletSelect.addEventListener("change", async () => {
 });
 
 /* ===============================
-   BENEFICIARY SELECT
+   MODE SWITCH
 ================================ */
-beneficiarySelect.addEventListener("change", async () => {
-
-  const beneficiaryId = beneficiarySelect.value;
-  if (!beneficiaryId) return;
-
-  const q = query(
-    collection(db, "wallets"),
-    where("userId", "==", beneficiaryId),
-    where("currency", "==", selectedWallet.currency)
-  );
-
-  const snapshot = await getDocs(q);
-
-  if (snapshot.empty)
-    return showError("Pas de wallet compatible");
-
-  selectedRecipient = snapshot.docs[0].data();
-  manualWallet.value = selectedRecipient.walletAddress;
+modeFriend.addEventListener("click", () => {
+  friendSection.classList.remove("hidden");
+  manualSection.classList.add("hidden");
+  modeFriend.classList.replace("bg-gray-200", "bg-blue-600");
+  modeFriend.classList.replace("text-gray-600", "text-white");
 });
 
-/* ===============================
-   SUMMARY UPDATE
-================================ */
-amountInput.addEventListener("input", updateSummary);
-
-function updateSummary() {
-
-  if (!selectedWallet || !amountInput.value) {
-    summaryBox.classList.add("hidden");
-    return;
-  }
-
-  summaryBox.innerHTML = `
-    <div><strong>Montant:</strong> ${amountInput.value} ${selectedWallet.currency}</div>
-    <div><strong>Disponible après:</strong>
-      ${(selectedWallet.balance - (selectedWallet.reservedBalance || 0) - amountInput.value)}
-    </div>
-  `;
-
-  summaryBox.classList.remove("hidden");
-}
+modeManual.addEventListener("click", () => {
+  friendSection.classList.add("hidden");
+  manualSection.classList.remove("hidden");
+});
 
 /* ===============================
    CONFIRM
@@ -167,84 +113,72 @@ function updateSummary() {
 confirmBtn.addEventListener("click", async () => {
 
   const amount = parseFloat(amountInput.value);
-  const recipientAddress = manualWallet.value.trim();
+  const walletId = walletSelect.value;
+  const toWalletId = manualWallet.value.trim();
 
-  if (!selectedWallet || !recipientAddress || !amount)
+  if (!walletId || !toWalletId || !amount)
     return showError("Champs requis");
 
   try {
 
-    const fromRef = doc(db, "wallets", walletSelect.value);
-    const txRef = doc(collection(db, "transactions"));
+    loadingOverlay.classList.remove("hidden");
+    confirmBtn.disabled = true;
 
     await runTransaction(db, async (transaction) => {
 
-  const fromRef = doc(db, "wallets", walletSelect.value);
-  const toRef = doc(db, "wallets", recipientAddress);
-  const txRef = doc(collection(db, "transactions"));
+      const fromRef = doc(db, "wallets", walletId);
+      const toRef = doc(db, "wallets", toWalletId);
+      const txRef = doc(collection(db, "transactions"));
 
-  /* =========================
-     🔹 TOUS LES READS D'ABORD
-  ========================= */
+      const fromDoc = await transaction.get(fromRef);
+      const toDoc = await transaction.get(toRef);
 
-  const fromDoc = await transaction.get(fromRef);
-  const toDoc = await transaction.get(toRef);
+      if (!fromDoc.exists())
+        throw "Wallet source introuvable";
 
-  if (!fromDoc.exists())
-    throw "Wallet source introuvable";
+      if (!toDoc.exists())
+        throw "Destinataire introuvable";
 
-  if (!toDoc.exists())
-    throw "Destinataire introuvable";
+      const fromWallet = fromDoc.data();
+      const toWallet = toDoc.data();
 
-  const fromWallet = fromDoc.data();
-  const toWallet = toDoc.data();
+      const reserved = fromWallet.reservedBalance || 0;
+      const available = fromWallet.balance - reserved;
 
-  const reserved = fromWallet.reservedBalance || 0;
-  const available = fromWallet.balance - reserved;
+      if (amount > available)
+        throw "Solde insuffisant";
 
-  if (amount > available)
-    throw "Solde insuffisant";
-
-  /* =========================
-     🔹 ENSUITE LES WRITES
-  ========================= */
-
-  transaction.update(fromRef, {
-    reservedBalance: reserved + amount,
-    updatedAt: serverTimestamp()
-  });
+      transaction.update(fromRef, {
+        reservedBalance: reserved + amount,
+        updatedAt: serverTimestamp()
+      });
 
       transaction.set(txRef, {
-        category: "transfer", // 🔥 OBLIGATOIRE pour les rules
+        category: "transfer",
         type: "transfer",
-      
         status: "pending",
-      
         fromUserId: userId,
         toUserId: toWallet.userId,
-      
-        fromWalletId: walletSelect.value,
-        toWalletId: recipientAddress,
-      
+        fromWalletId: walletId,
+        toWalletId: toWalletId,
         currency: fromWallet.currency,
         amount: amount,
-      
-        motifType: document.getElementById("motifType").value,
-        customMotif: document.getElementById("customMotif").value || "Transfert",
-      
         participants: [userId, toWallet.userId],
-      
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp()
       });
 
-});
+    });
 
-    alert("Virement en attente ✔️");
-    location.reload();
+    loadingOverlay.classList.add("hidden");
+    showSuccess();
 
   } catch (error) {
+
+    loadingOverlay.classList.add("hidden");
+    confirmBtn.disabled = false;
     showError(error);
+
   }
 
 });
@@ -252,4 +186,31 @@ confirmBtn.addEventListener("click", async () => {
 function showError(msg) {
   errorMsg.textContent = msg;
   errorMsg.classList.remove("hidden");
+}
+
+function showSuccess() {
+
+  const modal = document.createElement("div");
+
+  modal.className =
+    "fixed inset-0 bg-black/40 flex items-center justify-center z-50";
+
+  modal.innerHTML = `
+    <div class="bg-white p-6 rounded-2xl shadow-xl text-center space-y-4">
+      <i class="bi bi-check-circle text-green-500 text-4xl"></i>
+      <div class="font-semibold text-gray-800">
+        Transaction effectuée
+      </div>
+      <div class="text-sm text-gray-500">
+        Votre virement est en attente de validation.
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(modal);
+
+  setTimeout(() => {
+    modal.remove();
+    location.reload();
+  }, 2000);
 }
