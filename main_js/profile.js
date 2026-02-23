@@ -24,6 +24,30 @@ if (!userId) {
 }
 
 /* ===============================
+   AVATAR CONFIG
+================================ */
+
+const TOTAL_AVATARS = 30;
+const AVATAR_PATH = "/trustlink_app/assets/avatars/";
+
+/* ===============================
+   PRELOAD AVATARS (CACHE)
+================================ */
+
+function preloadAvatars() {
+  for (let i = 1; i <= TOTAL_AVATARS; i++) {
+    const img = new Image();
+    img.src = `${AVATAR_PATH}avatar${i}.PNG`;
+  }
+}
+
+if ("requestIdleCallback" in window) {
+  requestIdleCallback(preloadAvatars);
+} else {
+  setTimeout(preloadAvatars, 1500);
+}
+
+/* ===============================
    INIT
 ================================ */
 
@@ -31,14 +55,9 @@ if (!userId) {
 
   const userRef = doc(db, "users", userId);
   const userSnap = await getDoc(userRef);
-
   if (!userSnap.exists()) return;
 
   const user = userSnap.data();
-
-  /* ===============================
-     USER INFO
-  ================================= */
 
   const setText = (id, value) => {
     const el = document.getElementById(id);
@@ -53,96 +72,87 @@ if (!userId) {
   setText("profile-wallet", user.walletBase);
 
   /* ===============================
-     AVATAR SECTION
+     AVATAR LOCAL SYSTEM
   ================================= */
 
-  const avatarStyles = [
-    "micah",
-    "personas",
-    "avataaars-neutral",
-    "initials",
-    "identicon"
-  ];
+  let selectedAvatar =
+    user.avatarImage || "avatar1.PNG";
 
-  let selectedStyle = user.avatarStyle || "micah";
+  const profileAvatar =
+    document.getElementById("profile-avatar");
 
-  function generateAvatar(style, username) {
-    return `https://api.dicebear.com/7.x/${style}/svg?seed=${username}&radius=50`;
+  function getAvatar(file) {
+    return `${AVATAR_PATH}${file}`;
   }
 
-  const profileAvatar = document.getElementById("profile-avatar");
-
-  if (profileAvatar) {
-    profileAvatar.src =
-      generateAvatar(selectedStyle, user.username);
-  }
+  profileAvatar.src = getAvatar(selectedAvatar);
 
   const container =
     document.getElementById("avatar-options");
 
-  if (container) {
+  const modal =
+    document.getElementById("avatar-modal");
 
-    container.innerHTML = "";
+  document.getElementById("edit-avatar-btn")
+    ?.addEventListener("click", () =>
+      modal.classList.remove("hidden")
+    );
 
-    avatarStyles.forEach(style => {
+  document.getElementById("close-avatar-modal")
+    ?.addEventListener("click", () =>
+      modal.classList.add("hidden")
+    );
 
-      const img = document.createElement("img");
+  container.innerHTML = "";
 
-      img.src =
-        generateAvatar(style, user.username);
+  for (let i = 1; i <= TOTAL_AVATARS; i++) {
 
-      img.className =
-        "w-16 h-16 rounded-full cursor-pointer border-2 transition";
+    const file = `avatar${i}.PNG`;
 
-      if (style === selectedStyle)
-        img.classList.add("border-[#1E2BE0]");
-      else
-        img.classList.add("border-transparent");
+    const img = document.createElement("img");
+    img.src = getAvatar(file);
+    img.className =
+      "w-16 h-16 rounded-full cursor-pointer border-2 transition object-cover";
 
-      img.addEventListener("click", () => {
+    if (file === selectedAvatar)
+      img.classList.add("border-[#1E2BE0]");
+    else
+      img.classList.add("border-transparent");
 
-        selectedStyle = style;
+    img.addEventListener("click", () => {
 
-        if (profileAvatar)
-          profileAvatar.src =
-            generateAvatar(style, user.username);
+      selectedAvatar = file;
+      profileAvatar.src = getAvatar(file);
 
-        document
-          .querySelectorAll("#avatar-options img")
-          .forEach(i =>
-            i.classList.remove("border-[#1E2BE0]")
-          );
+      document
+        .querySelectorAll("#avatar-options img")
+        .forEach(i =>
+          i.classList.remove("border-[#1E2BE0]")
+        );
 
-        img.classList.add("border-[#1E2BE0]");
-      });
-
-      container.appendChild(img);
+      img.classList.add("border-[#1E2BE0]");
     });
+
+    container.appendChild(img);
   }
 
-  const saveBtn =
-    document.getElementById("save-avatar");
-
-  if (saveBtn) {
-    saveBtn.addEventListener("click", async () => {
+  document.getElementById("save-avatar")
+    ?.addEventListener("click", async () => {
 
       await updateDoc(userRef, {
-        avatarStyle: selectedStyle,
+        avatarImage: selectedAvatar,
         updatedAt: serverTimestamp()
       });
 
-      alert("Avatar mis à jour ✔️");
+      modal.classList.add("hidden");
     });
-  }
 
   /* ===============================
-     FRIENDS SECTION (SAFE)
+     FRIENDS
   ================================= */
 
   const friendsList =
     document.getElementById("friendsList");
-
-  if (!friendsList) return; // si la section n'existe pas, on stop
 
   async function loadFriends() {
 
@@ -152,7 +162,6 @@ if (!userId) {
     );
 
     const snapshot = await getDocs(q);
-
     friendsList.innerHTML = "";
 
     for (const docSnap of snapshot.docs) {
@@ -168,20 +177,19 @@ if (!userId) {
 
       const friend = friendSnap.data();
 
-      const friendStyle =
-        friend.avatarStyle || "micah";
+      const friendAvatar =
+        friend.avatarImage || "avatar1.PNG";
 
-      const friendDiv =
-        document.createElement("div");
+      const div = document.createElement("div");
 
-      friendDiv.className =
+      div.className =
         "flex items-center justify-between bg-gray-50 p-3 rounded-xl";
 
-      friendDiv.innerHTML = `
+      div.innerHTML = `
         <div class="flex items-center gap-3">
           <img 
-            src="${generateAvatar(friendStyle, friend.username)}"
-            class="w-10 h-10 rounded-full bg-white"
+            src="${getAvatar(friendAvatar)}"
+            class="w-10 h-10 rounded-full object-cover"
           />
           <div>
             <p class="text-sm font-medium">
@@ -197,8 +205,7 @@ if (!userId) {
         </button>
       `;
 
-      friendDiv
-        .querySelector("button")
+      div.querySelector("button")
         .addEventListener("click", async () => {
 
           await deleteDoc(
@@ -208,7 +215,7 @@ if (!userId) {
           loadFriends();
         });
 
-      friendsList.appendChild(friendDiv);
+      friendsList.appendChild(div);
     }
   }
 
