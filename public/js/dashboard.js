@@ -131,56 +131,61 @@ async function loadNotifications(page = 1) {
   const docs =
     snapshot.docs.slice(start, end);
 
-    let counterparty = null;
-let avatar = "";
-let name = "Système";
+for (const docSnap of docs) {
 
-/* =========================
-   TRANSFER
-========================= */
-if (tx.category === "transfer") {
+  const tx = docSnap.data();
+  const txId = docSnap.id;
 
-  const counterpartyId =
-    tx.fromUserId === userId
-      ? tx.toUserId
-      : tx.fromUserId;
+  let counterparty = null;
+  let avatar = "";
+  let name = "Système";
 
-  if (counterpartyId) {
+  /* =========================
+     TRANSFER
+  ========================= */
+  if (tx.category === "transfer") {
 
-    const userSnap =
-      await getDoc(doc(db, "users", counterpartyId));
+    const counterpartyId =
+      tx.fromUserId === userId
+        ? tx.toUserId
+        : tx.fromUserId;
 
-    if (userSnap.exists()) {
+    if (counterpartyId) {
 
-      counterparty = userSnap.data();
+      const userSnap =
+        await getDoc(doc(db, "users", counterpartyId));
 
-      name =
-        `${counterparty.firstName} ${counterparty.lastName}`;
+      if (userSnap.exists()) {
 
-      if (counterparty.avatarImage) {
+        counterparty = userSnap.data();
 
-        avatar =
-          AVATAR_PATH + counterparty.avatarImage;
+        name =
+          `${counterparty.firstName} ${counterparty.lastName}`;
 
-      } else {
+        if (counterparty.avatarImage) {
 
-        avatar =
-          `https://api.dicebear.com/7.x/avataaars/png?seed=${counterparty.username}`;
+          avatar =
+            AVATAR_PATH + counterparty.avatarImage;
+
+        } else {
+
+          avatar =
+            `https://api.dicebear.com/7.x/avataaars/png?seed=${counterparty.username}`;
+        }
       }
     }
   }
-}
 
-/* =========================
-   DEPOSIT
-========================= */
-else if (tx.category === "deposit") {
+  /* =========================
+     DEPOSIT
+  ========================= */
+  else if (tx.category === "deposit") {
 
-  name = "Dépôt";
+    name = "Dépôt";
 
-  avatar =
-    "https://api.dicebear.com/7.x/avataaars/png?seed=deposit";
-}
+    avatar =
+      "https://api.dicebear.com/7.x/avataaars/png?seed=deposit";
+  }
 
   const div = document.createElement("div");
 
@@ -191,14 +196,10 @@ else if (tx.category === "deposit") {
 
   div.innerHTML = `
     <div class="flex gap-3">
-
-      <!-- Avatar -->
       <img src="${avatar}"
            class="w-12 h-12 rounded-full object-cover border border-gray-200"/>
 
-      <!-- Content -->
       <div class="flex-1 min-w-0">
-
         <div class="flex justify-between items-start">
 
           <div class="min-w-0">
@@ -224,16 +225,14 @@ else if (tx.category === "deposit") {
         <p class="text-xs text-gray-400 mt-2">
           ${formatDate(tx.createdAt)}
         </p>
-
       </div>
-
     </div>
   `;
 
   container.appendChild(div);
 }
-  createPagination();
-}
+
+createPagination();
 
 /* ===============================
    PAGINATION
