@@ -33,6 +33,8 @@ const errorMsg = document.getElementById("errorMsg");
 const balanceInfo = document.getElementById("balanceInfo");
 const walletReserved = document.getElementById("walletReserved");
 const walletAvailable = document.getElementById("walletAvailable");
+const transactionType = document.getElementById("transactionType");
+const transactionMotif = document.getElementById("transactionMotif");
 
 const confirmModal = document.getElementById("confirmModal");
 const confirmDetails = document.getElementById("confirmDetails");
@@ -206,7 +208,8 @@ confirmBtn.addEventListener("click", () => {
     <div><strong>De :</strong> ${selectedWallet.walletAddress}</div>
     <div><strong>Vers :</strong> ${toWalletId}</div>
     <div><strong>Montant :</strong> ${amount} ${selectedWallet.currency}</div>
-    <div><strong>Type :</strong> Transfert standard</div>
+    <div><strong>Type :</strong> ${transactionType.value}</div>
+<div><strong>Motif :</strong> ${transactionMotif.value || "Non spécifié"}</div>
   `;
 
   confirmModal.classList.remove("hidden");
@@ -261,21 +264,28 @@ validateConfirm.addEventListener("click", async () => {
         reservedBalance: reserved + amount,
         updatedAt: serverTimestamp()
       });
-
       transaction.set(txRef, {
-        category: "transfer",
-        type: "transfer",
-        status: "pending",
-        fromUserId: userId,
-        toUserId: toWallet.userId,
-        fromWalletId: walletId,
-        toWalletId: toWalletId,
-        currency: fromWallet.currency,
-        amount: amount,
-        participants: [userId, toWallet.userId],
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp()
-      });
+  category: "transfer",
+  type: transactionType.value,
+  status: "pending",
+
+  fromUserId: userId,
+  toUserId: toWallet.userId,
+
+  fromWalletId: walletId,
+  toWalletId: toWalletId,
+
+  currency: fromWallet.currency,
+  amount: amount,
+
+  motifType: transactionType.value,
+  customMotif: transactionMotif.value || "Transfert",
+
+  participants: [userId, toWallet.userId],
+
+  createdAt: serverTimestamp(),
+  updatedAt: serverTimestamp()
+});
 
     });
 
