@@ -131,42 +131,56 @@ async function loadNotifications(page = 1) {
   const docs =
     snapshot.docs.slice(start, end);
 
-for (const docSnap of docs) {
+    let counterparty = null;
+let avatar = "";
+let name = "Système";
 
-  const tx = docSnap.data();
-  const txId = docSnap.id;
+/* =========================
+   TRANSFER
+========================= */
+if (tx.category === "transfer") {
 
   const counterpartyId =
     tx.fromUserId === userId
       ? tx.toUserId
       : tx.fromUserId;
 
-  const userSnap =
-    await getDoc(doc(db, "users", counterpartyId));
+  if (counterpartyId) {
 
-  const counterparty =
-    userSnap.exists()
-      ? userSnap.data()
-      : null;
+    const userSnap =
+      await getDoc(doc(db, "users", counterpartyId));
 
-let avatar = "";
+    if (userSnap.exists()) {
 
-if (counterparty?.avatarImage) {
+      counterparty = userSnap.data();
 
-  avatar =
-    AVATAR_PATH + counterparty.avatarImage;
+      name =
+        `${counterparty.firstName} ${counterparty.lastName}`;
 
-} else if (counterparty) {
+      if (counterparty.avatarImage) {
 
-  avatar =
-    `https://api.dicebear.com/7.x/avataaars/png?seed=${counterparty.username}`;
+        avatar =
+          AVATAR_PATH + counterparty.avatarImage;
 
+      } else {
+
+        avatar =
+          `https://api.dicebear.com/7.x/avataaars/png?seed=${counterparty.username}`;
+      }
+    }
+  }
 }
 
-  const name =
-    counterparty
-      ? `${counterparty.firstName} ${counterparty.lastName}`
-      : "Utilisateur";
+/* =========================
+   DEPOSIT
+========================= */
+else if (tx.category === "deposit") {
+
+  name = "Dépôt";
+
+  avatar =
+    "https://api.dicebear.com/7.x/avataaars/png?seed=deposit";
+}
 
   const div = document.createElement("div");
 
@@ -275,36 +289,56 @@ async function openModal(txId) {
 
   const tx = snap.data();
 
+    let user = null;
+let avatar = "";
+let fullName = "Système";
+
+/* =========================
+   TRANSFER
+========================= */
+if (tx.category === "transfer") {
+
   const counterpartyId =
     tx.fromUserId === userId
       ? tx.toUserId
       : tx.fromUserId;
 
-  const userSnap =
-    await getDoc(doc(db, "users", counterpartyId));
+  if (counterpartyId) {
 
-  const user = userSnap.exists()
-    ? userSnap.data()
-    : null;
+    const userSnap =
+      await getDoc(doc(db, "users", counterpartyId));
 
-let avatar = "";
+    if (userSnap.exists()) {
 
-if (user?.avatarImage) {
+      user = userSnap.data();
 
-  avatar =
-    AVATAR_PATH + user.avatarImage;
+      fullName =
+        `${user.firstName} ${user.lastName}`;
 
-} else if (user) {
+      if (user.avatarImage) {
 
-  avatar =
-    `https://api.dicebear.com/7.x/avataaars/png?seed=${user.username}`;
+        avatar =
+          AVATAR_PATH + user.avatarImage;
 
+      } else {
+
+        avatar =
+          `https://api.dicebear.com/7.x/avataaars/png?seed=${user.username}`;
+      }
+    }
+  }
 }
 
-  const fullName =
-    user
-      ? `${user.firstName} ${user.lastName}`
-      : "Utilisateur";
+/* =========================
+   DEPOSIT
+========================= */
+else if (tx.category === "deposit") {
+
+  fullName = "Dépôt";
+
+  avatar =
+    "https://api.dicebear.com/7.x/avataaars/png?seed=deposit";
+}
 
   const modal = document.createElement("div");
 
