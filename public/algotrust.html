@@ -3,18 +3,17 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>AlgoTrust - TrustLink</title>
+<title>AlgoTrust - Neural Core</title>
 
 <script src="https://cdn.tailwindcss.com"></script>
 <script type="module" src="/trustlink_app/js/firebase-init.js"></script>
 
 <style>
-
 body{
   margin:0;
-  background: radial-gradient(circle at center, #0b1220 0%, #05070f 70%);
+  background: radial-gradient(circle at center, #0a0f1c 0%, #05070f 80%);
   color:white;
-  font-family: system-ui, -apple-system;
+  font-family: system-ui,-apple-system;
   overflow:hidden;
 }
 
@@ -22,51 +21,63 @@ body{
 
 .core-wrapper{
   position:relative;
-  width:260px;
-  height:260px;
+  width:280px;
+  height:280px;
 }
 
 .core{
   width:100%;
   height:100%;
   border-radius:50%;
-  background: radial-gradient(circle at 30% 30%, #1e3a8a, #0f172a 70%);
+  background: radial-gradient(circle at 40% 40%, #1e40af, #0f172a 70%);
   box-shadow:
-    0 0 60px rgba(37,99,235,0.4),
-    inset 0 0 40px rgba(59,130,246,0.3);
+    0 0 80px rgba(37,99,235,0.4),
+    inset 0 0 50px rgba(59,130,246,0.3);
   position:relative;
+  overflow:hidden;
 }
 
-/* Energy pulse */
-@keyframes pulse {
-  0%{ transform:scale(1); }
-  50%{ transform:scale(1.05); }
-  100%{ transform:scale(1); }
+/* Scanner radar */
+@keyframes radarSweep{
+  from{ transform:rotate(0deg); }
+  to{ transform:rotate(360deg); }
 }
 
-.core::after{
-  content:"";
+.radar{
   position:absolute;
-  inset:25%;
+  inset:0;
   border-radius:50%;
-  background: radial-gradient(circle, #3b82f6, transparent 70%);
-  animation:pulse 4s ease-in-out infinite;
+  background: conic-gradient(
+    rgba(59,130,246,0.4),
+    transparent 20%
+  );
+  animation: radarSweep 6s linear infinite;
+  mix-blend-mode: screen;
+}
+
+/* Ligne lumineuse */
+@keyframes energyLine{
+  0%{ left:-100%; }
+  100%{ left:100%; }
+}
+
+.energy-line{
+  position:absolute;
+  top:50%;
+  width:200%;
+  height:2px;
+  background: linear-gradient(90deg, transparent, #60a5fa, transparent);
+  animation: energyLine 3s linear infinite;
+  opacity:.8;
 }
 
 /* Orbit rings */
-
 .ring{
   position:absolute;
-  inset:-25px;
+  inset:-30px;
   border-radius:50%;
   border:1px solid rgba(59,130,246,0.2);
-  animation:spin 20s linear infinite;
-}
-
-.ring:nth-child(2){
-  inset:-45px;
-  animation-duration:35s;
-  opacity:.5;
+  animation:spin 25s linear infinite;
 }
 
 @keyframes spin{
@@ -74,22 +85,22 @@ body{
   to{ transform:rotate(360deg); }
 }
 
-/* ===== GLASS ===== */
+/* Graph */
+.graph{
+  height:60px;
+  position:relative;
+}
 
+.graph svg{
+  width:100%;
+  height:100%;
+}
+
+/* Glass */
 .glass{
-  background: rgba(255,255,255,0.05);
-  backdrop-filter: blur(20px);
+  background:rgba(255,255,255,0.05);
+  backdrop-filter:blur(25px);
   border:1px solid rgba(255,255,255,0.08);
-}
-
-/* Fade up */
-@keyframes fadeUp{
-  from{ opacity:0; transform:translateY(20px); }
-  to{ opacity:1; transform:translateY(0); }
-}
-
-.fade-up{
-  animation:fadeUp .8s ease forwards;
 }
 
 /* Back button */
@@ -100,14 +111,14 @@ body{
   padding:10px 18px;
   border-radius:30px;
   font-size:14px;
-  backdrop-filter: blur(20px);
-  background: rgba(255,255,255,0.08);
+  backdrop-filter:blur(20px);
+  background:rgba(255,255,255,0.08);
   border:1px solid rgba(255,255,255,0.1);
-  transition:all .3s ease;
+  transition:.3s;
 }
 
 .back-btn:hover{
-  background: rgba(255,255,255,0.15);
+  background:rgba(255,255,255,0.15);
 }
 
 </style>
@@ -115,53 +126,58 @@ body{
 
 <body>
 
-<button onclick="history.back()" class="back-btn">
-← Retour
-</button>
+<button onclick="history.back()" class="back-btn">← Retour</button>
 
 <div class="flex flex-col items-center justify-center min-h-screen px-6 text-center space-y-10">
 
   <!-- CORE -->
-  <div class="core-wrapper fade-up">
+  <div class="core-wrapper">
 
-    <div class="ring"></div>
     <div class="ring"></div>
 
     <div class="core flex items-center justify-center">
-      <div class="text-sm tracking-widest text-blue-300">
-        ALGO CORE
-      </div>
-    </div>
 
+      <div class="radar"></div>
+      <div class="energy-line"></div>
+
+      <div class="text-xs tracking-widest text-blue-300">
+        NEURAL CORE
+      </div>
+
+    </div>
   </div>
 
-  <!-- USER HUD -->
-  <div class="glass rounded-2xl p-6 w-full max-w-sm space-y-4 fade-up">
+  <!-- HUD -->
+  <div class="glass rounded-2xl p-6 w-full max-w-sm space-y-4">
 
     <div>
-      <p id="username" class="text-lg font-semibold">Chargement...</p>
+      <p id="username" class="text-lg font-semibold">...</p>
       <p class="text-xs text-blue-300 tracking-wide">
-        Financial Identity Verified
+        Institutional Financial Identity
       </p>
     </div>
 
-    <div class="pt-2 space-y-2 text-sm">
+    <div class="flex justify-between text-sm">
+      <span>TrustScore</span>
+      <span id="score">--</span>
+    </div>
 
-      <div class="flex justify-between">
-        <span>TrustScore</span>
-        <span id="score" class="font-semibold">--</span>
-      </div>
+    <div class="flex justify-between text-sm">
+      <span>Risk Index</span>
+      <span id="risk">--</span>
+    </div>
 
-      <div class="flex justify-between">
-        <span>Risk Index</span>
-        <span id="risk" class="text-blue-300">--</span>
-      </div>
-
-      <div class="flex justify-between">
-        <span>Status</span>
-        <span id="status">--</span>
-      </div>
-
+    <!-- Graphique -->
+    <div class="graph">
+      <svg viewBox="0 0 100 40">
+        <polyline
+          id="graphLine"
+          fill="none"
+          stroke="#60a5fa"
+          stroke-width="1.5"
+          points=""
+        />
+      </svg>
     </div>
 
   </div>
@@ -187,17 +203,32 @@ const userId =
 if(!userId)
   window.location.href="/trustlink_app/index.html";
 
+/* ===== SUPERADMIN SECRET (8 taps) ===== */
+
+let tapCount=0;
+document.querySelector(".core").addEventListener("click",()=>{
+  tapCount++;
+  if(tapCount>=8){
+    alert("SuperAdmin Mode Activated");
+    window.location.href="/trustlink_app/public/superadmin.html";
+  }
+  setTimeout(()=>tapCount=0,4000);
+});
+
+/* ===== LOAD DATA ===== */
+
 async function loadData(){
 
-  const userSnap = await getDoc(doc(db,"users",userId));
-  const txQuery = query(
+  const userSnap=await getDoc(doc(db,"users",userId));
+
+  const txQuery=query(
     collection(db,"transactions"),
     where("participants","array-contains",userId)
   );
 
-  const txSnap = await getDocs(txQuery);
+  const txSnap=await getDocs(txQuery);
 
-  let completed=0, rejected=0;
+  let completed=0,rejected=0;
 
   txSnap.forEach(doc=>{
     const tx=doc.data();
@@ -205,25 +236,54 @@ async function loadData(){
     if(tx.status==="rejected") rejected++;
   });
 
-  let score = 70 + completed*2 - rejected*3;
-  score = Math.max(0,Math.min(100,score));
+  let score=75+completed*2-rejected*3;
+  score=Math.max(0,Math.min(100,score));
 
-  document.getElementById("username").textContent =
-    userSnap.exists()? userSnap.data().firstName+" "+userSnap.data().lastName : "Utilisateur";
+  document.getElementById("username").textContent=
+    userSnap.exists()? userSnap.data().firstName+" "+userSnap.data().lastName:"User";
 
   document.getElementById("score").textContent=score;
 
-  document.getElementById("risk").textContent =
-    score>80 ? "Low"
-    : score>60 ? "Moderate"
-    : "Elevated";
+  document.getElementById("risk").textContent=
+    score>85?"Low":
+    score>65?"Moderate":"Elevated";
 
-  document.getElementById("status").textContent =
-    score>85 ? "Institutional Grade"
-    : score>65 ? "Verified"
-    : "Standard";
-
+  animateGraph(score);
 }
+
+/* ===== GRAPH ANIMATION ===== */
+
+function animateGraph(score){
+
+  const line=document.getElementById("graphLine");
+
+  let points="";
+  for(let i=0;i<10;i++){
+    let x=i*10;
+    let y=30-Math.random()*score/5;
+    points+=`${x},${y} `;
+  }
+
+  line.setAttribute("points",points);
+}
+
+/* ===== ANALYSIS SOUND ===== */
+
+const audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+
+function playBeep(){
+  const osc=audioCtx.createOscillator();
+  const gain=audioCtx.createGain();
+  osc.type="sine";
+  osc.frequency.value=220;
+  gain.gain.value=0.02;
+  osc.connect(gain);
+  gain.connect(audioCtx.destination);
+  osc.start();
+  osc.stop(audioCtx.currentTime+0.1);
+}
+
+setInterval(playBeep,7000);
 
 loadData();
 
