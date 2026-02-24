@@ -157,53 +157,146 @@ body{
 
 <script type="module">
 
-import { initNeuralFX } from "/trustlink_app/main_js/neural-ui.js";
-initNeuralFX();
+import * as THREE from "https://unpkg.com/three@0.152.2/build/three.module.js";
 
-/* PARTICLES */
-const container=document.getElementById("particles");
+/* =========================
+   SCENE SETUP
+========================= */
 
-for(let i=0;i<40;i++){
-  const p=document.createElement("div");
-  p.className="particle";
-  p.style.left=Math.random()*100+"%";
-  p.style.top=Math.random()*100+"%";
-  p.style.animationDuration=(6+Math.random()*8)+"s";
-  container.appendChild(p);
+const scene = new THREE.Scene();
+
+const camera = new THREE.PerspectiveCamera(
+  75,
+  window.innerWidth / window.innerHeight,
+  0.1,
+  1000
+);
+
+camera.position.z = 4;
+
+const renderer = new THREE.WebGLRenderer({
+  antialias:true,
+  alpha:true
+});
+
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+document.body.appendChild(renderer.domElement);
+
+/* =========================
+   LIGHT
+========================= */
+
+const light = new THREE.PointLight(0x60a5fa,2,20);
+light.position.set(3,3,3);
+scene.add(light);
+
+/* =========================
+   GLOBE
+========================= */
+
+const globe = new THREE.Mesh(
+  new THREE.SphereGeometry(1,64,64),
+  new THREE.MeshStandardMaterial({
+    color:0x0f172a,
+    emissive:0x1e3a8a,
+    emissiveIntensity:0.6,
+    metalness:0.4,
+    roughness:0.3
+  })
+);
+
+scene.add(globe);
+
+/* =========================
+   NUMBER TEXTURE GENERATOR
+========================= */
+
+function createNumberTexture(){
+
+  const size = 512;
+  const canvas = document.createElement("canvas");
+  canvas.width = size;
+  canvas.height = size;
+
+  const ctx = canvas.getContext("2d");
+
+  ctx.fillStyle = "black";
+  ctx.fillRect(0,0,size,size);
+
+  ctx.font = "bold 80px monospace";
+  ctx.fillStyle = "#60a5fa";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+
+  for(let i=0;i<200;i++){
+    const x = Math.random()*size;
+    const y = Math.random()*size;
+    const num = Math.floor(Math.random()*10);
+    ctx.fillText(num,x,y);
+  }
+
+  return new THREE.CanvasTexture(canvas);
 }
 
-/* Live streaming simulation */
-function randomData(){
-  return "TX-"+Math.floor(Math.random()*99999)
-    +" | VALIDATED | NODE-"+Math.floor(Math.random()*100);
+/* =========================
+   FLOATING NUMBERS CLOUD
+========================= */
+
+const numberGeometry = new THREE.SphereGeometry(2.2,128,128);
+
+const numberMaterial = new THREE.PointsMaterial({
+  size:0.04,
+  map:createNumberTexture(),
+  transparent:true,
+  alphaTest:0.4,
+  depthWrite:false,
+  blending:THREE.AdditiveBlending
+});
+
+const numberField = new THREE.Points(numberGeometry, numberMaterial);
+scene.add(numberField);
+
+/* =========================
+   PARTICLE LAYER OUTER
+========================= */
+
+const outerGeometry = new THREE.SphereGeometry(3.2,128,128);
+const outerMaterial = new THREE.PointsMaterial({
+  color:0x3b82f6,
+  size:0.01
+});
+const outerField = new THREE.Points(outerGeometry,outerMaterial);
+scene.add(outerField);
+
+/* =========================
+   ANIMATION
+========================= */
+
+function animate(){
+  requestAnimationFrame(animate);
+
+  globe.rotation.y += 0.002;
+
+  numberField.rotation.y += 0.0008;
+  numberField.rotation.x += 0.0003;
+
+  outerField.rotation.y -= 0.0005;
+
+  renderer.render(scene,camera);
 }
 
-setInterval(()=>{
-  document.getElementById("stream1").textContent=randomData();
-  document.getElementById("stream2").textContent=randomData();
-  document.getElementById("stream3").textContent=randomData();
-},1500);
+animate();
 
-/* Analyse dynamique */
+/* =========================
+   RESPONSIVE
+========================= */
 
-const states=[
-  "SCANNING NETWORK",
-  "VERIFYING CONSENSUS",
-  "CALCULATING RISK",
-  "SYNCHRONIZING LEDGER",
-  "TRUST SCORE STABLE"
-];
-
-let i=0;
-setInterval(()=>{
-  const el=document.getElementById("analysisText");
-  el.style.opacity=0;
-  setTimeout(()=>{
-    el.textContent=states[i];
-    el.style.opacity=1;
-    i=(i+1)%states.length;
-  },300);
-},2500);
+window.addEventListener("resize",()=>{
+  camera.aspect = window.innerWidth/window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth,window.innerHeight);
+});
 
 </script>
 
