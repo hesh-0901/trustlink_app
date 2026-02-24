@@ -158,9 +158,12 @@ body{
 <script type="module">
 
 import * as THREE from "https://unpkg.com/three@0.152.2/build/three.module.js";
+import { EffectComposer } from "https://unpkg.com/three@0.152.2/examples/jsm/postprocessing/EffectComposer.js";
+import { RenderPass } from "https://unpkg.com/three@0.152.2/examples/jsm/postprocessing/RenderPass.js";
+import { UnrealBloomPass } from "https://unpkg.com/three@0.152.2/examples/jsm/postprocessing/UnrealBloomPass.js";
 
 /* =========================
-   SCENE SETUP
+   SCENE
 ========================= */
 
 const scene = new THREE.Scene();
@@ -172,22 +175,34 @@ const camera = new THREE.PerspectiveCamera(
   1000
 );
 
-camera.position.z = 4;
+camera.position.z = 5;
 
-const renderer = new THREE.WebGLRenderer({
-  antialias:true,
-  alpha:true
-});
-
+const renderer = new THREE.WebGLRenderer({ antialias:true, alpha:true });
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
 document.body.appendChild(renderer.domElement);
 
 /* =========================
+   POST PROCESSING (BLOOM)
+========================= */
+
+const composer = new EffectComposer(renderer);
+composer.addPass(new RenderPass(scene,camera));
+
+const bloomPass = new UnrealBloomPass(
+  new THREE.Vector2(window.innerWidth, window.innerHeight),
+  1.2, // strength
+  0.6, // radius
+  0.1  // threshold
+);
+
+composer.addPass(bloomPass);
+
+/* =========================
    LIGHT
 ========================= */
 
-const light = new THREE.PointLight(0x60a5fa,2,20);
+const light = new THREE.PointLight(0x60a5fa,3,20);
 light.position.set(3,3,3);
 scene.add(light);
 
@@ -200,8 +215,8 @@ const globe = new THREE.Mesh(
   new THREE.MeshStandardMaterial({
     color:0x0f172a,
     emissive:0x1e3a8a,
-    emissiveIntensity:0.6,
-    metalness:0.4,
+    emissiveIntensity:0.7,
+    metalness:0.5,
     roughness:0.3
   })
 );
@@ -209,93 +224,140 @@ const globe = new THREE.Mesh(
 scene.add(globe);
 
 /* =========================
-   NUMBER TEXTURE GENERATOR
+   RISK SCORE
 ========================= */
 
-function createNumberTexture(){
+let riskScore = 30;
 
-  const size = 512;
-  const canvas = document.createElement("canvas");
-  canvas.width = size;
-  canvas.height = size;
+setInterval(()=>{
+  riskScore = Math.random()*100;
 
-  const ctx = canvas.getContext("2d");
-
-  ctx.fillStyle = "black";
-  ctx.fillRect(0,0,size,size);
-
-  ctx.font = "bold 80px monospace";
-  ctx.fillStyle = "#60a5fa";
-  ctx.textAlign = "center";
-  ctx.textBaseline = "middle";
-
-  for(let i=0;i<200;i++){
-    const x = Math.random()*size;
-    const y = Math.random()*size;
-    const num = Math.floor(Math.random()*10);
-    ctx.fillText(num,x,y);
+  const el = document.getElementById("analysisText");
+  if(el){
+    el.textContent = "RISK INDEX: " + riskScore.toFixed(1);
   }
 
-  return new THREE.CanvasTexture(canvas);
+},2000);
+
+/* =========================
+   NUMBER SPRITES
+========================= */
+
+const sprites = [];
+const spriteGroup = new THREE.Group();
+scene.add(spriteGroup);
+
+function createNumberSprite(){
+
+  const canvas = document.createElement("canvas");
+  canvas.width = 128;
+  canvas.height = 128;
+  const ctx = canvas.getContext("2d");
+
+  ctx.clearRect(0,0,128,128);
+  ctx.fillStyle = "#60a5fa";
+  ctx.font = "bold 80px monospace";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText(Math.floor(Math.random()*10),64,64);
+
+  const texture = new THREE.CanvasTexture(canvas);
+
+  const material = new THREE.SpriteMaterial({
+    map:texture,
+    transparent:true,
+    blending:THREE.AdditiveBlending
+  });
+
+  const sprite = new THREE.Sprite(material);
+  sprite.scale.set(0.3,0.3,0.3);
+
+  return sprite;
+}
+
+/* CREATE THOUSANDS */
+
+for(let i=0;i<1500;i++){
+
+  const sprite = createNumberSprite();
+
+  const angle = Math.random()*Math.PI*2;
+  const radius = 1.5 + Math.random()*2;
+  const height = (Math.random()-0.5)*2;
+
+  sprite.position.set(
+    Math.cos(angle)*radius,
+    height,
+    Math.sin(angle)*radius
+  );
+
+  sprite.userData = {
+    angle: angle,
+    radius: radius,
+    height: height,
+    speed: 0.001 + Math.random()*0.002
+  };
+
+  spriteGroup.add(sprite);
+  sprites.push(sprite);
 }
 
 /* =========================
-   FLOATING NUMBERS CLOUD
+   MARKET FLUX SIMULATION
 ========================= */
 
-const numberGeometry = new THREE.SphereGeometry(2.2,128,128);
+let marketDrift = 0;
 
-const numberMaterial = new THREE.PointsMaterial({
-  size:0.04,
-  map:createNumberTexture(),
-  transparent:true,
-  alphaTest:0.4,
-  depthWrite:false,
-  blending:THREE.AdditiveBlending
-});
-
-const numberField = new THREE.Points(numberGeometry, numberMaterial);
-scene.add(numberField);
+setInterval(()=>{
+  marketDrift = (Math.random()-0.5)*0.02;
+},1500);
 
 /* =========================
-   PARTICLE LAYER OUTER
-========================= */
-
-const outerGeometry = new THREE.SphereGeometry(3.2,128,128);
-const outerMaterial = new THREE.PointsMaterial({
-  color:0x3b82f6,
-  size:0.01
-});
-const outerField = new THREE.Points(outerGeometry,outerMaterial);
-scene.add(outerField);
-
-/* =========================
-   ANIMATION
+   ANIMATION LOOP
 ========================= */
 
 function animate(){
+
   requestAnimationFrame(animate);
 
   globe.rotation.y += 0.002;
 
-  numberField.rotation.y += 0.0008;
-  numberField.rotation.x += 0.0003;
+  sprites.forEach(sprite=>{
 
-  outerField.rotation.y -= 0.0005;
+    sprite.userData.angle += sprite.userData.speed + (riskScore*0.00002);
 
-  renderer.render(scene,camera);
+    const vortexPull = 0.0005 * (riskScore/100);
+
+    sprite.userData.radius -= vortexPull;
+
+    if(sprite.userData.radius < 1.2){
+      sprite.userData.radius = 3 + Math.random()*2;
+    }
+
+    sprite.position.x = Math.cos(sprite.userData.angle) * sprite.userData.radius;
+    sprite.position.z = Math.sin(sprite.userData.angle) * sprite.userData.radius;
+
+    sprite.position.y += marketDrift;
+
+    /* Color based on risk */
+    const hue = 0.55 - (riskScore/200);
+    sprite.material.color.setHSL(hue,1,0.6);
+  });
+
+  composer.render();
 }
 
 animate();
 
 /* =========================
-   RESPONSIVE
+   RESIZE
 ========================= */
 
 window.addEventListener("resize",()=>{
   camera.aspect = window.innerWidth/window.innerHeight;
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth,window.innerHeight);
+  composer.setSize(window.innerWidth,window.innerHeight);
 });
 
 </script>
