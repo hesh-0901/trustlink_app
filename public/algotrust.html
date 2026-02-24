@@ -14,18 +14,22 @@ content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable
 body{
   margin:0;
   overflow:hidden;
-  font-family:system-ui;
   background:
-    radial-gradient(circle at 30% 40%, #0f172a 0%, #020617 60%),
+    radial-gradient(circle at 50% 40%, #0f172a 0%, #020617 60%),
     #020617;
   color:white;
+  font-family:system-ui;
+}
+
+/* Glow text */
+.glow{
+  text-shadow:0 0 15px cyan;
 }
 
 /* HUD */
 #hud{
   position:fixed;
   top:0;
-  left:0;
   width:100%;
   padding:20px;
   display:flex;
@@ -36,30 +40,11 @@ body{
 .glass{
   background:rgba(255,255,255,0.05);
   backdrop-filter:blur(25px);
-  border:1px solid rgba(0,255,255,0.15);
-  box-shadow:0 0 30px rgba(0,255,255,0.1);
+  border:1px solid rgba(0,255,255,0.2);
+  box-shadow:0 0 30px rgba(0,255,255,0.15);
 }
 
-/* Back */
-.back-btn{
-  position:fixed;
-  bottom:25px;
-  left:25px;
-  padding:12px 20px;
-  border-radius:30px;
-  background:rgba(0,255,255,0.08);
-  backdrop-filter:blur(20px);
-  border:1px solid rgba(0,255,255,0.3);
-  cursor:pointer;
-  z-index:30;
-  transition:0.3s;
-}
-
-.back-btn:hover{
-  box-shadow:0 0 20px cyan;
-}
-
-/* Scan effect */
+/* Scan line */
 .scan-line{
   position:fixed;
   top:0;
@@ -86,216 +71,172 @@ body{
 <div id="hud">
 
   <div class="glass p-4 rounded-xl text-sm">
-    <div class="text-xs opacity-70">ALGO CORE STATUS</div>
-    <div id="aiStatus" class="text-green-400">ANALYSING...</div>
+    <div class="text-xs opacity-70">NEURAL CORE STATUS</div>
+    <div class="text-green-400 glow">ACTIVE</div>
     <div id="riskScore" class="text-cyan-400">Risk Index: --</div>
   </div>
 
   <div class="glass p-4 rounded-xl text-sm">
-    <div>Blockchain</div>
-    <div id="blockHeight">Block: --</div>
-    <div id="txCount">TX/s: --</div>
+    <div>Data Flow</div>
+    <div id="blockHeight">Nodes: --</div>
+    <div id="txCount">Signals: --</div>
   </div>
 
-</div>
-
-<div class="back-btn" onclick="history.back()">
-← Retour
 </div>
 
 <script type="module">
 
 import * as THREE from "https://unpkg.com/three@0.152.2/build/three.module.js";
 
-/* ===============================
-   SCENE
-================================ */
-
+/* SCENE */
 const scene = new THREE.Scene();
-
 const camera = new THREE.PerspectiveCamera(
   75,
-  window.innerWidth / window.innerHeight,
+  window.innerWidth/window.innerHeight,
   0.1,
   1000
 );
 
-const renderer = new THREE.WebGLRenderer({
-  antialias:true,
-  powerPreference:"high-performance"
-});
-
-renderer.setSize(window.innerWidth, window.innerHeight);
+const renderer = new THREE.WebGLRenderer({antialias:true});
+renderer.setSize(window.innerWidth,window.innerHeight);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
 document.body.appendChild(renderer.domElement);
 
-camera.position.z = 3;
+camera.position.z = 4;
 
-/* ===============================
-   LIGHT
-================================ */
-
-const light = new THREE.DirectionalLight(0xffffff,1.4);
-light.position.set(5,3,5);
+/* LIGHT */
+const light = new THREE.PointLight(0x00ffff,2,50);
+light.position.set(0,2,4);
 scene.add(light);
 
-/* ===============================
-   EARTH
-================================ */
-
-const loader = new THREE.TextureLoader();
-
-const earthTexture = loader.load(
-  "https://threejs.org/examples/textures/land_ocean_ice_cloud_2048.jpg"
+/* PARTICLES BACKGROUND */
+const starsGeometry = new THREE.BufferGeometry();
+const starVertices=[];
+for(let i=0;i<2000;i++){
+  starVertices.push(
+    (Math.random()-0.5)*20,
+    (Math.random()-0.5)*20,
+    (Math.random()-0.5)*20
+  );
+}
+starsGeometry.setAttribute(
+  'position',
+  new THREE.Float32BufferAttribute(starVertices,3)
 );
+const starsMaterial = new THREE.PointsMaterial({color:0x00ffff,size:0.02});
+const starField = new THREE.Points(starsGeometry,starsMaterial);
+scene.add(starField);
 
-const globe = new THREE.Mesh(
+/* NEURAL BRAIN CORE */
+const brainMaterial = new THREE.MeshStandardMaterial({
+  color:0x8b5cf6,
+  emissive:0x00ffff,
+  emissiveIntensity:0.8,
+  roughness:0.3,
+  metalness:0.6
+});
+
+const brain = new THREE.Mesh(
   new THREE.SphereGeometry(1,64,64),
-  new THREE.MeshStandardMaterial({ map:earthTexture })
+  brainMaterial
 );
+scene.add(brain);
 
-scene.add(globe);
-
-/* Atmosphere */
-
-const atmosphere = new THREE.Mesh(
-  new THREE.SphereGeometry(1.1,64,64),
+/* OUTER GLOW */
+const glow = new THREE.Mesh(
+  new THREE.SphereGeometry(1.2,64,64),
   new THREE.MeshBasicMaterial({
     color:0x00ffff,
     transparent:true,
-    opacity:0.15,
+    opacity:0.1,
     side:THREE.BackSide
   })
 );
+scene.add(glow);
 
-scene.add(atmosphere);
+/* BOOKS (planes holographiques) */
+const bookMaterial = new THREE.MeshBasicMaterial({
+  color:0x00ffff,
+  wireframe:true
+});
 
-/* ===============================
-   NEURAL NETWORK
-================================ */
-
-const nodeGeometry = new THREE.SphereGeometry(0.02,8,8);
-const nodeMaterial = new THREE.MeshBasicMaterial({color:0x00ffff});
-const nodes=[];
-
-for(let i=0;i<200;i++){
-  const node=new THREE.Mesh(nodeGeometry,nodeMaterial);
-  const phi=Math.acos(2*Math.random()-1);
-  const theta=2*Math.PI*Math.random();
-  const radius=1.6;
-
-  node.position.set(
-    radius*Math.sin(phi)*Math.cos(theta),
-    radius*Math.sin(phi)*Math.sin(theta),
-    radius*Math.cos(phi)
+const books=[];
+for(let i=0;i<6;i++){
+  const book = new THREE.Mesh(
+    new THREE.BoxGeometry(0.8,0.05,0.6),
+    bookMaterial
   );
-
-  scene.add(node);
-  nodes.push(node);
+  const angle = (i/6)*Math.PI*2;
+  book.position.set(
+    Math.cos(angle)*2.5,
+    Math.sin(angle)*1.2,
+    Math.sin(angle)*2
+  );
+  scene.add(book);
+  books.push(book);
 }
 
-/* ===============================
-   FINANCIAL ARCS
-================================ */
-
-function createFinancialArc(){
-
-  const material=new THREE.LineBasicMaterial({color:0x8b5cf6});
+/* FINANCIAL NEURAL LINES */
+function createSignal(){
+  const material = new THREE.LineBasicMaterial({color:0xff00ff});
   const points=[];
-
+  points.push(new THREE.Vector3(0,0,0));
   points.push(new THREE.Vector3(
-    (Math.random()-0.5)*2,
-    (Math.random()-0.5)*2,
-    (Math.random()-0.5)*2
+    (Math.random()-0.5)*3,
+    (Math.random()-0.5)*3,
+    (Math.random()-0.5)*3
   ));
-
-  points.push(new THREE.Vector3(
-    (Math.random()-0.5)*2,
-    (Math.random()-0.5)*2,
-    (Math.random()-0.5)*2
-  ));
-
-  const geometry=new THREE.BufferGeometry().setFromPoints(points);
-  const line=new THREE.Line(geometry,material);
-
+  const geometry = new THREE.BufferGeometry().setFromPoints(points);
+  const line = new THREE.Line(geometry,material);
   scene.add(line);
-
-  setTimeout(()=>scene.remove(line),1500);
+  setTimeout(()=>scene.remove(line),500);
 }
+setInterval(createSignal,200);
 
-setInterval(createFinancialArc,300);
-
-/* ===============================
-   DATA HUD SIMULATION
-================================ */
-
+/* HUD UPDATE */
 setInterval(()=>{
   document.getElementById("riskScore").innerText =
     "Risk Index: "+(Math.random()*100).toFixed(2);
 
   document.getElementById("blockHeight").innerText =
-    "Block: "+Math.floor(Math.random()*100000);
+    "Nodes: "+Math.floor(Math.random()*5000);
 
   document.getElementById("txCount").innerText =
-    "TX/s: "+(Math.random()*500).toFixed(0);
+    "Signals: "+Math.floor(Math.random()*200);
 
-},1500);
+},1200);
 
-/* ===============================
-   GYROSCOPE
-================================ */
-
-window.addEventListener("deviceorientation",e=>{
-  camera.rotation.y = e.gamma*0.002;
-  camera.rotation.x = e.beta*0.002;
-});
-
-/* ===============================
-   SUPERADMIN HIDDEN
-================================ */
-
-let tap=0;
-renderer.domElement.addEventListener("click",()=>{
-  tap++;
-  if(tap>=6){
-    alert("SUPERADMIN ACCESS GRANTED");
-  }
-});
-
-/* ===============================
-   AMBIENT SYNTH SOUND
-================================ */
-
-const audioCtx=new (window.AudioContext||window.webkitAudioContext)();
-const oscillator=audioCtx.createOscillator();
-const gainNode=audioCtx.createGain();
-
+/* AUDIO AMBIENT */
+const audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+const oscillator = audioCtx.createOscillator();
+const gainNode = audioCtx.createGain();
 oscillator.type="sine";
-oscillator.frequency.setValueAtTime(40,audioCtx.currentTime);
-gainNode.gain.setValueAtTime(0.02,audioCtx.currentTime);
-
+oscillator.frequency.setValueAtTime(60,audioCtx.currentTime);
+gainNode.gain.setValueAtTime(0.015,audioCtx.currentTime);
 oscillator.connect(gainNode);
 gainNode.connect(audioCtx.destination);
 oscillator.start();
 
-/* ===============================
-   ANIMATION LOOP
-================================ */
-
+/* ANIMATION */
 function animate(){
   requestAnimationFrame(animate);
 
-  globe.rotation.y += 0.002;
-  atmosphere.rotation.y += 0.002;
-  nodes.forEach(n=>n.rotation.y+=0.002);
+  brain.rotation.y += 0.004;
+  glow.rotation.y += 0.004;
+
+  books.forEach((b,i)=>{
+    b.rotation.y += 0.01;
+    b.position.y = Math.sin(Date.now()*0.001+i)*0.5;
+  });
+
+  starField.rotation.y += 0.0005;
 
   renderer.render(scene,camera);
 }
-
 animate();
 
 window.addEventListener("resize",()=>{
-  camera.aspect=window.innerWidth/window.innerHeight;
+  camera.aspect = window.innerWidth/window.innerHeight;
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth,window.innerHeight);
 });
