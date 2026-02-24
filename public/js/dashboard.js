@@ -131,56 +131,45 @@ async function loadNotifications(page = 1) {
   const docs =
     snapshot.docs.slice(start, end);
 
-    let counterparty = null;
-let avatar = "";
-let name = "Système";
+  for (const docSnap of docs) {
 
-/* =========================
-   TRANSFER
-========================= */
-if (tx.category === "transfer") {
+  const tx = docSnap.data();
+  const txId = docSnap.id;
 
-  const counterpartyId =
-    tx.fromUserId === userId
-      ? tx.toUserId
-      : tx.fromUserId;
+  let counterparty = null;
+  let avatar = "";
+  let name = "Système";
 
-  if (counterpartyId) {
+  if (tx.category === "transfer") {
 
-    const userSnap =
-      await getDoc(doc(db, "users", counterpartyId));
+    const counterpartyId =
+      tx.fromUserId === userId
+        ? tx.toUserId
+        : tx.fromUserId;
 
-    if (userSnap.exists()) {
+    if (counterpartyId) {
 
-      counterparty = userSnap.data();
+      const userSnap =
+        await getDoc(doc(db, "users", counterpartyId));
 
-      name =
-        `${counterparty.firstName} ${counterparty.lastName}`;
+      if (userSnap.exists()) {
 
-      if (counterparty.avatarImage) {
+        counterparty = userSnap.data();
 
-        avatar =
-          AVATAR_PATH + counterparty.avatarImage;
+        name =
+          `${counterparty.firstName} ${counterparty.lastName}`;
 
-      } else {
-
-        avatar =
-          `https://api.dicebear.com/7.x/avataaars/png?seed=${counterparty.username}`;
+        avatar = counterparty.avatarImage
+          ? AVATAR_PATH + counterparty.avatarImage
+          : `https://api.dicebear.com/7.x/avataaars/png?seed=${counterparty.username}`;
       }
     }
+
+  } else if (tx.category === "deposit") {
+
+    name = "Dépôt";
+    avatar = "https://api.dicebear.com/7.x/avataaars/png?seed=deposit";
   }
-}
-
-/* =========================
-   DEPOSIT
-========================= */
-else if (tx.category === "deposit") {
-
-  name = "Dépôt";
-
-  avatar =
-    "https://api.dicebear.com/7.x/avataaars/png?seed=deposit";
-}
 
   const div = document.createElement("div");
 
@@ -191,12 +180,9 @@ else if (tx.category === "deposit") {
 
   div.innerHTML = `
     <div class="flex gap-3">
-
-      <!-- Avatar -->
       <img src="${avatar}"
            class="w-12 h-12 rounded-full object-cover border border-gray-200"/>
 
-      <!-- Content -->
       <div class="flex-1 min-w-0">
 
         <div class="flex justify-between items-start">
@@ -226,7 +212,6 @@ else if (tx.category === "deposit") {
         </p>
 
       </div>
-
     </div>
   `;
 
