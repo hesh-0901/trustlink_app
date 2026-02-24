@@ -72,6 +72,36 @@ class="w-full border rounded-xl px-4 py-3 bg-white shadow-sm text-lg font-semibo
 class="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-gray-500"></span>
 </div>
 
+<!-- TYPE TRANSACTION -->
+<div class="space-y-3 bg-white p-4 rounded-xl shadow-sm">
+
+  <div>
+    <label class="text-sm font-medium text-gray-700">
+      Type de transaction
+    </label>
+
+    <select id="transactionType"
+      class="w-full mt-1 border rounded-xl px-4 py-3 bg-white shadow-sm text-sm">
+      <option value="standard">Transfert standard</option>
+      <option value="loan">Prêt</option>
+      <option value="repayment">Remboursement</option>
+      <option value="engagement">Engagement</option>
+    </select>
+  </div>
+
+  <div>
+    <label class="text-sm font-medium text-gray-700">
+      Motif
+    </label>
+
+    <input type="text"
+      id="transactionMotif"
+      placeholder="Ex: Paiement service"
+      class="w-full mt-1 border rounded-xl px-4 py-3 bg-white shadow-sm text-sm">
+  </div>
+
+</div>
+
 <!-- RESERVED / AVAILABLE -->
 <div class="text-xs text-gray-500 space-y-1 hidden" id="balanceInfo">
 <div>Réservé :
