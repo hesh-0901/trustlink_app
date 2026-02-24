@@ -266,8 +266,11 @@ validateConfirm.addEventListener("click", async () => {
       });
       transaction.set(txRef, {
   category: "transfer",
-  type: transactionType.value,
+  type: "transfer",
   status: "pending",
+
+  motifType: transactionType.value,
+  customMotif: transactionMotif.value || "Transfert",
 
   fromUserId: userId,
   toUserId: toWallet.userId,
