@@ -6,7 +6,7 @@
 <meta name="viewport"
 content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 
-<title>AlgoTrust Global Control Room</title>
+<title>AlgoTrust Neural Finance Core</title>
 
 <script src="https://cdn.tailwindcss.com"></script>
 
@@ -14,8 +14,10 @@ content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable
 body{
   margin:0;
   overflow:hidden;
-  background:#020617;
   font-family:system-ui;
+  background:
+    radial-gradient(circle at 30% 40%, #0f172a 0%, #020617 60%),
+    #020617;
   color:white;
 }
 
@@ -29,45 +31,70 @@ body{
   display:flex;
   justify-content:space-between;
   z-index:20;
-  pointer-events:none;
 }
 
 .glass{
   background:rgba(255,255,255,0.05);
-  backdrop-filter:blur(20px);
-  border:1px solid rgba(255,255,255,0.08);
-  pointer-events:auto;
+  backdrop-filter:blur(25px);
+  border:1px solid rgba(0,255,255,0.15);
+  box-shadow:0 0 30px rgba(0,255,255,0.1);
 }
 
-/* Back Button */
+/* Back */
 .back-btn{
   position:fixed;
   bottom:25px;
   left:25px;
   padding:12px 20px;
   border-radius:30px;
-  background:rgba(255,255,255,0.08);
+  background:rgba(0,255,255,0.08);
   backdrop-filter:blur(20px);
-  border:1px solid rgba(255,255,255,0.1);
-  z-index:30;
+  border:1px solid rgba(0,255,255,0.3);
   cursor:pointer;
+  z-index:30;
+  transition:0.3s;
+}
+
+.back-btn:hover{
+  box-shadow:0 0 20px cyan;
+}
+
+/* Scan effect */
+.scan-line{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:3px;
+  background:linear-gradient(90deg, transparent, cyan, transparent);
+  animation:scan 4s linear infinite;
+  z-index:10;
+}
+
+@keyframes scan{
+  0%{top:0}
+  100%{top:100%}
 }
 </style>
+
 </head>
 
 <body>
 
+<div class="scan-line"></div>
+
 <div id="hud">
+
+  <div class="glass p-4 rounded-xl text-sm">
+    <div class="text-xs opacity-70">ALGO CORE STATUS</div>
+    <div id="aiStatus" class="text-green-400">ANALYSING...</div>
+    <div id="riskScore" class="text-cyan-400">Risk Index: --</div>
+  </div>
 
   <div class="glass p-4 rounded-xl text-sm">
     <div>Blockchain</div>
     <div id="blockHeight">Block: --</div>
     <div id="txCount">TX/s: --</div>
-  </div>
-
-  <div class="glass p-4 rounded-xl text-sm">
-    <div>Smart Contracts</div>
-    <div id="contracts">Active: --</div>
   </div>
 
 </div>
@@ -81,7 +108,7 @@ body{
 import * as THREE from "https://unpkg.com/three@0.152.2/build/three.module.js";
 
 /* ===============================
-   THREE SCENE
+   SCENE
 ================================ */
 
 const scene = new THREE.Scene();
@@ -94,18 +121,26 @@ const camera = new THREE.PerspectiveCamera(
 );
 
 const renderer = new THREE.WebGLRenderer({
-  antialias: true,
-  powerPreference: "high-performance"
+  antialias:true,
+  powerPreference:"high-performance"
 });
 
 renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
 document.body.appendChild(renderer.domElement);
 
 camera.position.z = 3;
 
 /* ===============================
-   EARTH TEXTURE
+   LIGHT
+================================ */
+
+const light = new THREE.DirectionalLight(0xffffff,1.4);
+light.position.set(5,3,5);
+scene.add(light);
+
+/* ===============================
+   EARTH
 ================================ */
 
 const loader = new THREE.TextureLoader();
@@ -114,56 +149,156 @@ const earthTexture = loader.load(
   "https://threejs.org/examples/textures/land_ocean_ice_cloud_2048.jpg"
 );
 
-const earthMaterial = new THREE.MeshStandardMaterial({
-  map: earthTexture
-});
-
 const globe = new THREE.Mesh(
-  new THREE.SphereGeometry(1, 64, 64),
-  earthMaterial
+  new THREE.SphereGeometry(1,64,64),
+  new THREE.MeshStandardMaterial({ map:earthTexture })
 );
 
 scene.add(globe);
 
-/* Light */
-const light = new THREE.DirectionalLight(0xffffff, 1.2);
-light.position.set(5, 3, 5);
-scene.add(light);
+/* Atmosphere */
 
-/* Animation */
+const atmosphere = new THREE.Mesh(
+  new THREE.SphereGeometry(1.1,64,64),
+  new THREE.MeshBasicMaterial({
+    color:0x00ffff,
+    transparent:true,
+    opacity:0.15,
+    side:THREE.BackSide
+  })
+);
 
-function animate() {
+scene.add(atmosphere);
+
+/* ===============================
+   NEURAL NETWORK
+================================ */
+
+const nodeGeometry = new THREE.SphereGeometry(0.02,8,8);
+const nodeMaterial = new THREE.MeshBasicMaterial({color:0x00ffff});
+const nodes=[];
+
+for(let i=0;i<200;i++){
+  const node=new THREE.Mesh(nodeGeometry,nodeMaterial);
+  const phi=Math.acos(2*Math.random()-1);
+  const theta=2*Math.PI*Math.random();
+  const radius=1.6;
+
+  node.position.set(
+    radius*Math.sin(phi)*Math.cos(theta),
+    radius*Math.sin(phi)*Math.sin(theta),
+    radius*Math.cos(phi)
+  );
+
+  scene.add(node);
+  nodes.push(node);
+}
+
+/* ===============================
+   FINANCIAL ARCS
+================================ */
+
+function createFinancialArc(){
+
+  const material=new THREE.LineBasicMaterial({color:0x8b5cf6});
+  const points=[];
+
+  points.push(new THREE.Vector3(
+    (Math.random()-0.5)*2,
+    (Math.random()-0.5)*2,
+    (Math.random()-0.5)*2
+  ));
+
+  points.push(new THREE.Vector3(
+    (Math.random()-0.5)*2,
+    (Math.random()-0.5)*2,
+    (Math.random()-0.5)*2
+  ));
+
+  const geometry=new THREE.BufferGeometry().setFromPoints(points);
+  const line=new THREE.Line(geometry,material);
+
+  scene.add(line);
+
+  setTimeout(()=>scene.remove(line),1500);
+}
+
+setInterval(createFinancialArc,300);
+
+/* ===============================
+   DATA HUD SIMULATION
+================================ */
+
+setInterval(()=>{
+  document.getElementById("riskScore").innerText =
+    "Risk Index: "+(Math.random()*100).toFixed(2);
+
+  document.getElementById("blockHeight").innerText =
+    "Block: "+Math.floor(Math.random()*100000);
+
+  document.getElementById("txCount").innerText =
+    "TX/s: "+(Math.random()*500).toFixed(0);
+
+},1500);
+
+/* ===============================
+   GYROSCOPE
+================================ */
+
+window.addEventListener("deviceorientation",e=>{
+  camera.rotation.y = e.gamma*0.002;
+  camera.rotation.x = e.beta*0.002;
+});
+
+/* ===============================
+   SUPERADMIN HIDDEN
+================================ */
+
+let tap=0;
+renderer.domElement.addEventListener("click",()=>{
+  tap++;
+  if(tap>=6){
+    alert("SUPERADMIN ACCESS GRANTED");
+  }
+});
+
+/* ===============================
+   AMBIENT SYNTH SOUND
+================================ */
+
+const audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+const oscillator=audioCtx.createOscillator();
+const gainNode=audioCtx.createGain();
+
+oscillator.type="sine";
+oscillator.frequency.setValueAtTime(40,audioCtx.currentTime);
+gainNode.gain.setValueAtTime(0.02,audioCtx.currentTime);
+
+oscillator.connect(gainNode);
+gainNode.connect(audioCtx.destination);
+oscillator.start();
+
+/* ===============================
+   ANIMATION LOOP
+================================ */
+
+function animate(){
   requestAnimationFrame(animate);
+
   globe.rotation.y += 0.002;
-  renderer.render(scene, camera);
+  atmosphere.rotation.y += 0.002;
+  nodes.forEach(n=>n.rotation.y+=0.002);
+
+  renderer.render(scene,camera);
 }
 
 animate();
 
-window.addEventListener("resize", () => {
-  camera.aspect = window.innerWidth / window.innerHeight;
+window.addEventListener("resize",()=>{
+  camera.aspect=window.innerWidth/window.innerHeight;
   camera.updateProjectionMatrix();
-  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setSize(window.innerWidth,window.innerHeight);
 });
-  /* ===============================
-   ATMOSPHERE GLOW
-================================ */
-
-const atmosphereGeometry = new THREE.SphereGeometry(1.1, 64, 64);
-
-const atmosphereMaterial = new THREE.MeshBasicMaterial({
-  color: 0x3b82f6,
-  transparent: true,
-  opacity: 0.15,
-  side: THREE.BackSide
-});
-
-const atmosphere = new THREE.Mesh(
-  atmosphereGeometry,
-  atmosphereMaterial
-);
-
-scene.add(atmosphere);
 
 </script>
 
