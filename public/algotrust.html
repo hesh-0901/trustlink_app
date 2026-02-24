@@ -9,97 +9,159 @@
 <script type="module" src="/trustlink_app/js/firebase-init.js"></script>
 
 <style>
-body {
+
+body{
   margin:0;
-  background:#020617;
-  overflow:hidden;
+  background: radial-gradient(circle at center, #0b1220 0%, #05070f 70%);
   color:white;
-  font-family: system-ui;
+  font-family: system-ui, -apple-system;
+  overflow:hidden;
 }
 
-/* Canvas Fullscreen */
-canvas {
-  position:fixed;
-  top:0;
-  left:0;
+/* ===== CORE ===== */
+
+.core-wrapper{
+  position:relative;
+  width:260px;
+  height:260px;
+}
+
+.core{
   width:100%;
   height:100%;
+  border-radius:50%;
+  background: radial-gradient(circle at 30% 30%, #1e3a8a, #0f172a 70%);
+  box-shadow:
+    0 0 60px rgba(37,99,235,0.4),
+    inset 0 0 40px rgba(59,130,246,0.3);
+  position:relative;
 }
 
-/* Glass HUD */
-.glass {
-  background:rgba(255,255,255,0.05);
-  backdrop-filter:blur(25px);
+/* Energy pulse */
+@keyframes pulse {
+  0%{ transform:scale(1); }
+  50%{ transform:scale(1.05); }
+  100%{ transform:scale(1); }
+}
+
+.core::after{
+  content:"";
+  position:absolute;
+  inset:25%;
+  border-radius:50%;
+  background: radial-gradient(circle, #3b82f6, transparent 70%);
+  animation:pulse 4s ease-in-out infinite;
+}
+
+/* Orbit rings */
+
+.ring{
+  position:absolute;
+  inset:-25px;
+  border-radius:50%;
+  border:1px solid rgba(59,130,246,0.2);
+  animation:spin 20s linear infinite;
+}
+
+.ring:nth-child(2){
+  inset:-45px;
+  animation-duration:35s;
+  opacity:.5;
+}
+
+@keyframes spin{
+  from{ transform:rotate(0deg); }
+  to{ transform:rotate(360deg); }
+}
+
+/* ===== GLASS ===== */
+
+.glass{
+  background: rgba(255,255,255,0.05);
+  backdrop-filter: blur(20px);
+  border:1px solid rgba(255,255,255,0.08);
+}
+
+/* Fade up */
+@keyframes fadeUp{
+  from{ opacity:0; transform:translateY(20px); }
+  to{ opacity:1; transform:translateY(0); }
+}
+
+.fade-up{
+  animation:fadeUp .8s ease forwards;
+}
+
+/* Back button */
+.back-btn{
+  position:fixed;
+  top:20px;
+  left:20px;
+  padding:10px 18px;
+  border-radius:30px;
+  font-size:14px;
+  backdrop-filter: blur(20px);
+  background: rgba(255,255,255,0.08);
   border:1px solid rgba(255,255,255,0.1);
+  transition:all .3s ease;
 }
 
-/* Floating animation */
-@keyframes float {
-  0%{ transform:translateY(0px); }
-  50%{ transform:translateY(-10px); }
-  100%{ transform:translateY(0px); }
+.back-btn:hover{
+  background: rgba(255,255,255,0.15);
 }
 
-.float {
-  animation: float 4s ease-in-out infinite;
-}
-
-/* Glow */
-@keyframes glowPulse {
-  0%{ box-shadow:0 0 10px #3b82f6; }
-  50%{ box-shadow:0 0 30px #3b82f6; }
-  100%{ box-shadow:0 0 10px #3b82f6; }
-}
-
-.glow {
-  animation: glowPulse 3s infinite;
-}
 </style>
 </head>
 
 <body>
 
-<canvas id="bg"></canvas>
+<button onclick="history.back()" class="back-btn">
+← Retour
+</button>
 
-<div class="relative z-10 flex flex-col items-center justify-center min-h-screen px-6 text-center space-y-8">
+<div class="flex flex-col items-center justify-center min-h-screen px-6 text-center space-y-10">
 
-  <!-- GLOBE -->
-  <div class="relative w-56 h-56 float">
+  <!-- CORE -->
+  <div class="core-wrapper fade-up">
 
-    <div class="absolute inset-0 rounded-full border border-blue-500 opacity-40 animate-spin"
-         style="animation-duration:30s;"></div>
+    <div class="ring"></div>
+    <div class="ring"></div>
 
-    <div class="absolute inset-4 rounded-full border border-blue-400 opacity-30 animate-spin"
-         style="animation-direction:reverse;animation-duration:20s;"></div>
-
-    <div class="w-full h-full rounded-full bg-gradient-to-br from-blue-500 via-indigo-600 to-blue-900 glow flex items-center justify-center text-5xl">
-      🌍
+    <div class="core flex items-center justify-center">
+      <div class="text-sm tracking-widest text-blue-300">
+        ALGO CORE
+      </div>
     </div>
 
   </div>
 
-  <!-- USER BADGE -->
-  <div class="glass rounded-2xl px-6 py-4 space-y-2 w-full max-w-sm">
+  <!-- USER HUD -->
+  <div class="glass rounded-2xl p-6 w-full max-w-sm space-y-4 fade-up">
 
-    <div class="flex items-center justify-center gap-3">
-      <div class="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center text-lg">
-        👤
-      </div>
-      <div class="text-left">
-        <p id="username" class="font-semibold">Chargement...</p>
-        <p class="text-xs text-blue-300">Trust Member</p>
-      </div>
+    <div>
+      <p id="username" class="text-lg font-semibold">Chargement...</p>
+      <p class="text-xs text-blue-300 tracking-wide">
+        Financial Identity Verified
+      </p>
     </div>
 
-    <div class="pt-3 space-y-1 text-sm">
+    <div class="pt-2 space-y-2 text-sm">
+
       <div class="flex justify-between">
         <span>TrustScore</span>
-        <span id="score">--</span>
+        <span id="score" class="font-semibold">--</span>
       </div>
+
       <div class="flex justify-between">
-        <span>Niveau</span>
-        <span id="level">--</span>
+        <span>Risk Index</span>
+        <span id="risk" class="text-blue-300">--</span>
       </div>
+
+      <div class="flex justify-between">
+        <span>Status</span>
+        <span id="status">--</span>
+      </div>
+
     </div>
 
   </div>
@@ -118,18 +180,14 @@ import {
   getDocs
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-/* ===============================
-   USER DATA + SCORE
-================================ */
-
 const userId =
   localStorage.getItem("userId") ||
   sessionStorage.getItem("userId");
 
-if (!userId)
+if(!userId)
   window.location.href="/trustlink_app/index.html";
 
-async function loadUser() {
+async function loadData(){
 
   const userSnap = await getDoc(doc(db,"users",userId));
   const txQuery = query(
@@ -147,78 +205,27 @@ async function loadUser() {
     if(tx.status==="rejected") rejected++;
   });
 
-  let score = 60 + completed*3 - rejected*4;
-  score=Math.max(0,Math.min(100,score));
+  let score = 70 + completed*2 - rejected*3;
+  score = Math.max(0,Math.min(100,score));
 
   document.getElementById("username").textContent =
-    userSnap.exists()? userSnap.data().firstName : "Utilisateur";
+    userSnap.exists()? userSnap.data().firstName+" "+userSnap.data().lastName : "Utilisateur";
 
   document.getElementById("score").textContent=score;
 
-  if(score>85)
-    document.getElementById("level").textContent="Elite";
-  else if(score>65)
-    document.getElementById("level").textContent="Fiable";
-  else
-    document.getElementById("level").textContent="Standard";
+  document.getElementById("risk").textContent =
+    score>80 ? "Low"
+    : score>60 ? "Moderate"
+    : "Elevated";
+
+  document.getElementById("status").textContent =
+    score>85 ? "Institutional Grade"
+    : score>65 ? "Verified"
+    : "Standard";
+
 }
 
-loadUser();
-
-/* ===============================
-   PARTICLE NETWORK
-================================ */
-
-const canvas=document.getElementById("bg");
-const ctx=canvas.getContext("2d");
-
-canvas.width=window.innerWidth;
-canvas.height=window.innerHeight;
-
-let particles=[];
-
-for(let i=0;i<80;i++){
-  particles.push({
-    x:Math.random()*canvas.width,
-    y:Math.random()*canvas.height,
-    vx:(Math.random()-0.5)*0.7,
-    vy:(Math.random()-0.5)*0.7
-  });
-}
-
-function animate(){
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-
-  particles.forEach(p=>{
-    p.x+=p.vx;
-    p.y+=p.vy;
-
-    if(p.x<0||p.x>canvas.width) p.vx*=-1;
-    if(p.y<0||p.y>canvas.height) p.vy*=-1;
-
-    ctx.beginPath();
-    ctx.arc(p.x,p.y,2,0,Math.PI*2);
-    ctx.fillStyle="#3b82f6";
-    ctx.fill();
-
-    particles.forEach(o=>{
-      const dx=p.x-o.x;
-      const dy=p.y-o.y;
-      const dist=Math.sqrt(dx*dx+dy*dy);
-      if(dist<120){
-        ctx.beginPath();
-        ctx.moveTo(p.x,p.y);
-        ctx.lineTo(o.x,o.y);
-        ctx.strokeStyle="rgba(59,130,246,0.08)";
-        ctx.stroke();
-      }
-    });
-  });
-
-  requestAnimationFrame(animate);
-}
-
-animate();
+loadData();
 
 </script>
 
