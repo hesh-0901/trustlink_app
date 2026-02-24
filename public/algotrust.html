@@ -6,240 +6,113 @@
 <meta name="viewport"
 content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 
-<title>AlgoTrust Neural Finance Core</title>
+<title>AlgoTrust Neural Observatory</title>
 
 <script src="https://cdn.tailwindcss.com"></script>
+<script type="module" src="/trustlink_app/js/firebase-init.js"></script>
 
 <style>
 body{
   margin:0;
-  overflow:hidden;
-  background:
-    radial-gradient(circle at 50% 40%, #0f172a 0%, #020617 60%),
-    #020617;
+  background:#04060d;
   color:white;
+  overflow:hidden;
   font-family:system-ui;
 }
 
-/* Glow text */
-.glow{
-  text-shadow:0 0 15px cyan;
+/* Volumetric hologram */
+.core{
+  width:260px;
+  height:260px;
+  border-radius:50%;
+  background: radial-gradient(circle, #1e3a8a 20%, #0f172a 70%);
+  box-shadow:
+    0 0 120px rgba(59,130,246,0.5),
+    inset 0 0 60px rgba(59,130,246,0.4);
+  position:relative;
 }
 
-/* HUD */
-#hud{
-  position:fixed;
-  top:0;
-  width:100%;
-  padding:20px;
-  display:flex;
-  justify-content:space-between;
-  z-index:20;
+/* Hologram layers */
+.layer{
+  position:absolute;
+  inset:0;
+  border-radius:50%;
+  border:1px solid rgba(59,130,246,0.2);
+  animation:spin 30s linear infinite;
 }
 
-.glass{
-  background:rgba(255,255,255,0.05);
-  backdrop-filter:blur(25px);
-  border:1px solid rgba(0,255,255,0.2);
-  box-shadow:0 0 30px rgba(0,255,255,0.15);
+@keyframes spin{
+  from{ transform:rotateX(0deg) rotateY(0deg); }
+  to{ transform:rotateX(360deg) rotateY(360deg); }
 }
 
-/* Scan line */
-.scan-line{
-  position:fixed;
-  top:0;
-  left:0;
-  width:100%;
-  height:3px;
-  background:linear-gradient(90deg, transparent, cyan, transparent);
-  animation:scan 4s linear infinite;
-  z-index:10;
+/* Streaming text */
+.stream{
+  font-size:10px;
+  color:#60a5fa;
+  opacity:.7;
+  animation:fade 2s infinite alternate;
 }
 
-@keyframes scan{
-  0%{top:0}
-  100%{top:100%}
+@keyframes fade{
+  from{ opacity:.2 }
+  to{ opacity:.8 }
 }
 </style>
-
 </head>
 
 <body>
 
-<div class="scan-line"></div>
+<div class="flex flex-col items-center justify-center min-h-screen space-y-10">
 
-<div id="hud">
+  <div class="relative">
 
-  <div class="glass p-4 rounded-xl text-sm">
-    <div class="text-xs opacity-70">NEURAL CORE STATUS</div>
-    <div class="text-green-400 glow">ACTIVE</div>
-    <div id="riskScore" class="text-cyan-400">Risk Index: --</div>
+    <div class="layer"></div>
+    <div class="layer" style="animation-duration:50s"></div>
+
+    <div class="core flex items-center justify-center">
+      <div id="analysisText" class="text-xs tracking-widest text-blue-300">
+        ANALYSING...
+      </div>
+    </div>
+
   </div>
 
-  <div class="glass p-4 rounded-xl text-sm">
-    <div>Data Flow</div>
-    <div id="blockHeight">Nodes: --</div>
-    <div id="txCount">Signals: --</div>
+  <!-- Live streaming data -->
+  <div class="space-y-1 text-center">
+    <div class="stream" id="stream1"></div>
+    <div class="stream" id="stream2"></div>
+    <div class="stream" id="stream3"></div>
   </div>
 
 </div>
 
 <script type="module">
 
-import * as THREE from "https://unpkg.com/three@0.152.2/build/three.module.js";
+import { initNeuralFX } from "/trustlink_app/main_js/neural-ui.js";
+initNeuralFX();
 
-/* SCENE */
-const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(
-  75,
-  window.innerWidth/window.innerHeight,
-  0.1,
-  1000
-);
+/* Live streaming simulation */
 
-const renderer = new THREE.WebGLRenderer({antialias:true});
-renderer.setSize(window.innerWidth,window.innerHeight);
-renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
-document.body.appendChild(renderer.domElement);
-
-camera.position.z = 4;
-
-/* LIGHT */
-const light = new THREE.PointLight(0x00ffff,2,50);
-light.position.set(0,2,4);
-scene.add(light);
-
-/* PARTICLES BACKGROUND */
-const starsGeometry = new THREE.BufferGeometry();
-const starVertices=[];
-for(let i=0;i<2000;i++){
-  starVertices.push(
-    (Math.random()-0.5)*20,
-    (Math.random()-0.5)*20,
-    (Math.random()-0.5)*20
-  );
-}
-starsGeometry.setAttribute(
-  'position',
-  new THREE.Float32BufferAttribute(starVertices,3)
-);
-const starsMaterial = new THREE.PointsMaterial({color:0x00ffff,size:0.02});
-const starField = new THREE.Points(starsGeometry,starsMaterial);
-scene.add(starField);
-
-/* NEURAL BRAIN CORE */
-const brainMaterial = new THREE.MeshStandardMaterial({
-  color:0x8b5cf6,
-  emissive:0x00ffff,
-  emissiveIntensity:0.8,
-  roughness:0.3,
-  metalness:0.6
-});
-
-const brain = new THREE.Mesh(
-  new THREE.SphereGeometry(1,64,64),
-  brainMaterial
-);
-scene.add(brain);
-
-/* OUTER GLOW */
-const glow = new THREE.Mesh(
-  new THREE.SphereGeometry(1.2,64,64),
-  new THREE.MeshBasicMaterial({
-    color:0x00ffff,
-    transparent:true,
-    opacity:0.1,
-    side:THREE.BackSide
-  })
-);
-scene.add(glow);
-
-/* BOOKS (planes holographiques) */
-const bookMaterial = new THREE.MeshBasicMaterial({
-  color:0x00ffff,
-  wireframe:true
-});
-
-const books=[];
-for(let i=0;i<6;i++){
-  const book = new THREE.Mesh(
-    new THREE.BoxGeometry(0.8,0.05,0.6),
-    bookMaterial
-  );
-  const angle = (i/6)*Math.PI*2;
-  book.position.set(
-    Math.cos(angle)*2.5,
-    Math.sin(angle)*1.2,
-    Math.sin(angle)*2
-  );
-  scene.add(book);
-  books.push(book);
+function randomData(){
+  return "TX-"+Math.floor(Math.random()*99999)+" | CONFIRMED | NODE-"+Math.floor(Math.random()*100);
 }
 
-/* FINANCIAL NEURAL LINES */
-function createSignal(){
-  const material = new THREE.LineBasicMaterial({color:0xff00ff});
-  const points=[];
-  points.push(new THREE.Vector3(0,0,0));
-  points.push(new THREE.Vector3(
-    (Math.random()-0.5)*3,
-    (Math.random()-0.5)*3,
-    (Math.random()-0.5)*3
-  ));
-  const geometry = new THREE.BufferGeometry().setFromPoints(points);
-  const line = new THREE.Line(geometry,material);
-  scene.add(line);
-  setTimeout(()=>scene.remove(line),500);
-}
-setInterval(createSignal,200);
-
-/* HUD UPDATE */
 setInterval(()=>{
-  document.getElementById("riskScore").innerText =
-    "Risk Index: "+(Math.random()*100).toFixed(2);
+  document.getElementById("stream1").textContent=randomData();
+  document.getElementById("stream2").textContent=randomData();
+  document.getElementById("stream3").textContent=randomData();
+},1500);
 
-  document.getElementById("blockHeight").innerText =
-    "Nodes: "+Math.floor(Math.random()*5000);
+/* Analyse dynamique */
 
-  document.getElementById("txCount").innerText =
-    "Signals: "+Math.floor(Math.random()*200);
+const states=["SCANNING","VERIFYING","CALCULATING RISK","SYNCING LEDGER","VALIDATING TRUST"];
 
-},1200);
-
-/* AUDIO AMBIENT */
-const audioCtx = new (window.AudioContext||window.webkitAudioContext)();
-const oscillator = audioCtx.createOscillator();
-const gainNode = audioCtx.createGain();
-oscillator.type="sine";
-oscillator.frequency.setValueAtTime(60,audioCtx.currentTime);
-gainNode.gain.setValueAtTime(0.015,audioCtx.currentTime);
-oscillator.connect(gainNode);
-gainNode.connect(audioCtx.destination);
-oscillator.start();
-
-/* ANIMATION */
-function animate(){
-  requestAnimationFrame(animate);
-
-  brain.rotation.y += 0.004;
-  glow.rotation.y += 0.004;
-
-  books.forEach((b,i)=>{
-    b.rotation.y += 0.01;
-    b.position.y = Math.sin(Date.now()*0.001+i)*0.5;
-  });
-
-  starField.rotation.y += 0.0005;
-
-  renderer.render(scene,camera);
-}
-animate();
-
-window.addEventListener("resize",()=>{
-  camera.aspect = window.innerWidth/window.innerHeight;
-  camera.updateProjectionMatrix();
-  renderer.setSize(window.innerWidth,window.innerHeight);
-});
+let i=0;
+setInterval(()=>{
+  document.getElementById("analysisText").textContent=states[i];
+  i=(i+1)%states.length;
+},2000);
 
 </script>
 
