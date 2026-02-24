@@ -1,265 +1,156 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 
-<meta charset="UTF-8">
-<meta name="viewport"
-content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-
-<title>AlgoTrust Neural Observatory</title>
+<title>AlgoTrust - TrustLink</title>
 
 <script src="https://cdn.tailwindcss.com"></script>
+
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        neonBlue: "#3D4BFF",
+        darkBg: "#0f172a",
+        cardBg: "rgba(255,255,255,0.05)"
+      }
+    }
+  }
+}
+</script>
+
 <script type="module" src="/trustlink_app/js/firebase-init.js"></script>
+<script type="module" src="/trustlink_app/js/algotrust.js"></script>
 
 <style>
-body{
-  margin:0;
-  background: radial-gradient(circle at 50% 40%, #0b1120 0%, #020617 60%, #000 100%);
-  overflow:hidden;
-  font-family:system-ui;
-  color:white;
+body {
+  background: radial-gradient(circle at top, #1e293b, #0f172a);
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+  color: white;
 }
 
-/* ===== HEADER ===== */
-
-.header{
-  position:fixed;
-  top:0;
-  width:100%;
-  padding:20px 40px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  z-index:50;
-  backdrop-filter:blur(20px);
-  background:rgba(15,23,42,0.6);
-  border-bottom:1px solid rgba(96,165,250,0.2);
+.glass {
+  backdrop-filter: blur(20px);
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
 }
 
-.logo{
-  font-size:18px;
-  font-weight:600;
-  letter-spacing:2px;
-  color:#60a5fa;
-  text-transform:uppercase;
+.neon-glow {
+  box-shadow: 0 0 20px rgba(61,75,255,0.6);
 }
 
-.status{
-  font-size:13px;
-  opacity:.8;
-  letter-spacing:1px;
+.typing::after {
+  content: "|";
+  animation: blink 1s infinite;
 }
 
-/* Canvas behind header */
-canvas{
-  position:fixed;
-  top:0;
-  left:0;
-  z-index:1;
+@keyframes blink {
+  50% { opacity: 0; }
+}
+
+.progress-ring {
+  transition: stroke-dashoffset 1s ease-out;
+  transform: rotate(-90deg);
+  transform-origin: 50% 50%;
 }
 </style>
+
 </head>
 
-<body>
+<body class="min-h-screen p-6">
 
-<header class="header">
-  <div class="logo">AlgoTrust Neural Core</div>
-  <div id="analysisText" class="status">Connecting...</div>
-</header>
+<div class="max-w-md mx-auto space-y-6">
 
-<script type="module">
+  <!-- HEADER -->
+  <div>
+    <h1 class="text-2xl font-bold tracking-wide">AlgoTrust</h1>
+    <p class="text-sm text-gray-400">Analyse intelligente de votre profil</p>
+  </div>
 
-import * as THREE from "https://unpkg.com/three@0.152.2/build/three.module.js";
-import { EffectComposer } from "https://unpkg.com/three@0.152.2/examples/jsm/postprocessing/EffectComposer.js";
-import { RenderPass } from "https://unpkg.com/three@0.152.2/examples/jsm/postprocessing/RenderPass.js";
-import { UnrealBloomPass } from "https://unpkg.com/three@0.152.2/examples/jsm/postprocessing/UnrealBloomPass.js";
+  <!-- TRUST SCORE -->
+  <div class="glass rounded-3xl p-6 neon-glow">
 
-import { getFirestore, doc, onSnapshot }
-from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    <div class="flex justify-center">
+      <svg width="160" height="160">
+        <circle cx="80" cy="80" r="70"
+          stroke="#1e293b"
+          stroke-width="12"
+          fill="transparent"/>
+        <circle id="scoreRing"
+          cx="80" cy="80" r="70"
+          stroke="#3D4BFF"
+          stroke-width="12"
+          fill="transparent"
+          stroke-dasharray="440"
+          stroke-dashoffset="440"
+          class="progress-ring"/>
+      </svg>
+    </div>
 
-/* ======================
-   FIRESTORE
-====================== */
+    <div class="text-center mt-4">
+      <div id="trustScore"
+           class="text-4xl font-bold">
+        0
+      </div>
+      <div id="trustLevel"
+           class="text-sm text-gray-400 mt-1">
+        Calcul en cours...
+      </div>
+    </div>
 
-const db = getFirestore();
+  </div>
 
-let riskScore = 30;
-let marketDrift = 0;
+  <!-- IA ANALYSIS -->
+  <div class="glass rounded-3xl p-5">
+    <div class="text-sm text-gray-400 mb-2">
+      Analyse comportementale
+    </div>
+    <div id="aiText"
+         class="text-sm typing">
+      Initialisation...
+    </div>
+  </div>
 
-const metricsRef = doc(db, "neural_core", "live_metrics");
+  <!-- STATS -->
+  <div class="glass rounded-3xl p-5 space-y-3">
 
-onSnapshot(metricsRef, (snapshot)=>{
+    <div class="flex justify-between text-sm">
+      <span>Volume total</span>
+      <span id="totalVolume">0</span>
+    </div>
 
-  if(snapshot.exists()){
-    const data = snapshot.data();
+    <div class="flex justify-between text-sm">
+      <span>Transactions</span>
+      <span id="totalTx">0</span>
+    </div>
 
-    riskScore = Number(data.riskIndex || 0);
-    marketDrift = Number(data.marketDrift || 0);
+    <div class="flex justify-between text-sm">
+      <span>Taux de réussite</span>
+      <span id="successRate">0%</span>
+    </div>
 
-    document.getElementById("analysisText").textContent =
-      "RISK INDEX : " + riskScore.toFixed(2);
-  }
+  </div>
 
-});
+  <!-- ADMIN SECRET -->
+  <div id="adminSection"
+       class="glass rounded-3xl p-5 hidden border border-red-500">
 
-/* ======================
-   THREE SETUP
-====================== */
+    <div class="text-red-400 text-sm font-semibold mb-2">
+      ADMIN INTELLIGENCE PANEL
+    </div>
 
-const scene = new THREE.Scene();
+    <div class="text-sm space-y-2">
+      <div>Risk Flag : <span id="riskFlag"></span></div>
+      <div>Suspicious Score : <span id="suspiciousScore"></span></div>
+      <div>Multi Account Detection : <span id="multiDetect"></span></div>
+    </div>
 
-const camera = new THREE.PerspectiveCamera(
-  75,
-  window.innerWidth/window.innerHeight,
-  0.1,
-  1000
-);
+  </div>
 
-camera.position.z = 5;
-
-const renderer = new THREE.WebGLRenderer({antialias:true, alpha:true});
-renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
-document.body.appendChild(renderer.domElement);
-
-/* ===== BLOOM ===== */
-
-const composer = new EffectComposer(renderer);
-composer.addPass(new RenderPass(scene,camera));
-
-const bloomPass = new UnrealBloomPass(
-  new THREE.Vector2(window.innerWidth,window.innerHeight),
-  1.3,
-  0.6,
-  0.05
-);
-
-composer.addPass(bloomPass);
-
-/* ===== LIGHT ===== */
-
-const light = new THREE.PointLight(0x60a5fa,3,20);
-light.position.set(3,3,3);
-scene.add(light);
-
-/* ===== GLOBE ===== */
-
-const globe = new THREE.Mesh(
-  new THREE.SphereGeometry(1,64,64),
-  new THREE.MeshStandardMaterial({
-    color:0x0f172a,
-    emissive:0x1e3a8a,
-    emissiveIntensity:0.8,
-    metalness:0.5,
-    roughness:0.3
-  })
-);
-
-scene.add(globe);
-
-/* ===== SPRITES ===== */
-
-const sprites=[];
-const group=new THREE.Group();
-scene.add(group);
-
-function createNumberSprite(){
-
-  const canvas=document.createElement("canvas");
-  canvas.width=128;
-  canvas.height=128;
-  const ctx=canvas.getContext("2d");
-
-  ctx.fillStyle="transparent";
-  ctx.fillRect(0,0,128,128);
-
-  ctx.fillStyle="#60a5fa";
-  ctx.font="bold 80px monospace";
-  ctx.textAlign="center";
-  ctx.textBaseline="middle";
-  ctx.fillText(Math.floor(Math.random()*10),64,64);
-
-  const texture=new THREE.CanvasTexture(canvas);
-
-  const material=new THREE.SpriteMaterial({
-    map:texture,
-    transparent:true,
-    blending:THREE.AdditiveBlending
-  });
-
-  const sprite=new THREE.Sprite(material);
-  sprite.scale.set(0.35,0.35,0.35);
-
-  return sprite;
-}
-
-for(let i=0;i<1500;i++){
-
-  const sprite=createNumberSprite();
-
-  const angle=Math.random()*Math.PI*2;
-  const radius=1.5+Math.random()*2;
-  const height=(Math.random()-0.5)*2;
-
-  sprite.position.set(
-    Math.cos(angle)*radius,
-    height,
-    Math.sin(angle)*radius
-  );
-
-  sprite.userData={
-    angle,
-    radius,
-    height,
-    speed:0.001+Math.random()*0.002
-  };
-
-  group.add(sprite);
-  sprites.push(sprite);
-}
-
-/* ===== ANIMATION ===== */
-
-function animate(){
-
-  requestAnimationFrame(animate);
-
-  globe.rotation.y+=0.002;
-
-  sprites.forEach(sprite=>{
-
-    sprite.userData.angle+=sprite.userData.speed+(riskScore*0.00003);
-
-    const vortexPull=0.0006*(riskScore/100);
-    sprite.userData.radius-=vortexPull;
-
-    if(sprite.userData.radius<1.2){
-      sprite.userData.radius=3+Math.random()*2;
-    }
-
-    sprite.position.x=Math.cos(sprite.userData.angle)*sprite.userData.radius;
-    sprite.position.z=Math.sin(sprite.userData.angle)*sprite.userData.radius;
-    sprite.position.y+=marketDrift;
-
-    const hue=0.55-(riskScore/200);
-    sprite.material.color.setHSL(hue,1,0.6);
-  });
-
-  composer.render();
-}
-
-animate();
-
-/* ===== RESPONSIVE ===== */
-
-window.addEventListener("resize",()=>{
-  camera.aspect=window.innerWidth/window.innerHeight;
-  camera.updateProjectionMatrix();
-  renderer.setSize(window.innerWidth,window.innerHeight);
-  composer.setSize(window.innerWidth,window.innerHeight);
-});
-
-</script>
+</div>
 
 </body>
 </html>
