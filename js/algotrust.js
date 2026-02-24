@@ -19,15 +19,30 @@ if (!userId)
 
 const trustScoreEl = document.getElementById("trustScore");
 const trustLevelEl = document.getElementById("trustLevel");
-const scoreRing = document.getElementById("scoreRing");
-const aiText = document.getElementById("aiText");
-
-const totalVolumeEl = document.getElementById("totalVolume");
-const totalTxEl = document.getElementById("totalTx");
-const successRateEl = document.getElementById("successRate");
-
+const badgesContainer = document.getElementById("badgesContainer");
 const adminSection = document.getElementById("adminSection");
+const adminData = document.getElementById("adminData");
 
+initTheme();
+loadAlgo();
+
+/* ==============================
+   THEME AUTO
+================================ */
+function initTheme() {
+  const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+  document.body.className = prefersDark ? "dark min-h-screen p-6" : "light min-h-screen p-6";
+
+  document.getElementById("themeToggle")
+    .addEventListener("click", () => {
+      document.body.classList.toggle("dark");
+      document.body.classList.toggle("light");
+    });
+}
+
+/* ==============================
+   LOAD + ADVANCED ALGO
+================================ */
 async function loadAlgo() {
 
   const q = query(
@@ -38,101 +53,130 @@ async function loadAlgo() {
   const snapshot = await getDocs(q);
 
   let totalVolume = 0;
-  let success = 0;
+  let completed = 0;
   let pending = 0;
 
   snapshot.forEach(doc => {
     const tx = doc.data();
     totalVolume += tx.amount;
-
-    if (tx.status === "completed")
-      success++;
-    if (tx.status === "pending")
-      pending++;
+    if (tx.status === "completed") completed++;
+    if (tx.status === "pending") pending++;
   });
 
   const totalTx = snapshot.size;
-  const successRate =
-    totalTx > 0 ? Math.round((success / totalTx) * 100) : 0;
+  const successRate = totalTx > 0 ? completed / totalTx : 0;
 
-  let score =
-    Math.min(
-      100,
-      Math.round(
-        successRate * 0.6 +
-        Math.min(totalVolume / 1000, 1) * 40
-      )
-    );
+  /* ==============================
+     ADVANCED WEIGHTED ALGORITHM
+  ================================= */
+
+  const volumeWeight = Math.min(totalVolume / 5000, 1) * 30;
+  const successWeight = successRate * 40;
+  const activityWeight = Math.min(totalTx / 50, 1) * 20;
+  const riskPenalty = pending * 2;
+
+  let score = Math.round(
+    volumeWeight +
+    successWeight +
+    activityWeight -
+    riskPenalty
+  );
+
+  score = Math.max(0, Math.min(100, score));
 
   animateScore(score);
-
-  totalVolumeEl.textContent = totalVolume.toFixed(2);
-  totalTxEl.textContent = totalTx;
-  successRateEl.textContent = successRate + "%";
-
-  generateAIText(score, successRate, totalTx);
+  generateBadges(score, totalVolume, totalTx);
+  generatePredictionGraph(score);
 
   if (role === "admin" || role === "super_admin") {
     adminSection.classList.remove("hidden");
-
-    document.getElementById("riskFlag").textContent =
-      score < 40 ? "HIGH" : "LOW";
-
-    document.getElementById("suspiciousScore").textContent =
-      (100 - score) + "%";
-
-    document.getElementById("multiDetect").textContent =
-      totalTx > 50 ? "Potential" : "None";
+    adminData.innerHTML = `
+      Risk Index : ${100 - score}%<br>
+      Pending Transactions : ${pending}<br>
+      Volume : ${totalVolume}
+    `;
   }
 }
 
+/* ==============================
+   SCORE ANIMATION
+================================ */
 function animateScore(score) {
 
-  trustScoreEl.textContent = score;
-
-  if (score > 80)
-    trustLevelEl.textContent = "Elite";
-  else if (score > 60)
-    trustLevelEl.textContent = "Gold";
-  else if (score > 40)
-    trustLevelEl.textContent = "Standard";
-  else
-    trustLevelEl.textContent = "Risk";
-
-  const circumference = 440;
-  const offset =
-    circumference - (score / 100) * circumference;
-
-  setTimeout(() => {
-    scoreRing.style.strokeDashoffset = offset;
-  }, 300);
-}
-
-function generateAIText(score, rate, tx) {
-
-  let message;
-
-  if (score > 80)
-    message = "Profil stable détecté. Activité fiable.";
-  else if (score > 60)
-    message = "Comportement cohérent. Risque modéré.";
-  else
-    message = "Activité irrégulière détectée.";
-
-  typeEffect(message);
-}
-
-function typeEffect(text) {
-
-  let i = 0;
-  aiText.textContent = "";
+  let current = 0;
 
   const interval = setInterval(() => {
-    aiText.textContent += text.charAt(i);
-    i++;
-    if (i >= text.length)
+    current++;
+    trustScoreEl.textContent = current;
+    if (current >= score)
       clearInterval(interval);
-  }, 30);
+  }, 15);
+
+  trustLevelEl.textContent =
+    score > 80 ? "Elite"
+    : score > 60 ? "Gold"
+    : score > 40 ? "Standard"
+    : "Risk";
 }
 
-loadAlgo();
+/* ==============================
+   BADGES
+================================ */
+function generateBadges(score, volume, tx) {
+
+  badgesContainer.innerHTML = "";
+
+  if (score > 80)
+    addBadge("Trusted Elite");
+
+  if (volume > 2000)
+    addBadge("High Volume");
+
+  if (tx > 30)
+    addBadge("Active User");
+
+  if (score < 40)
+    addBadge("Risk Watch");
+}
+
+function addBadge(text) {
+  const span = document.createElement("span");
+  span.className = "badge";
+  span.textContent = text;
+  badgesContainer.appendChild(span);
+}
+
+/* ==============================
+   PREDICTION GRAPH
+================================ */
+function generatePredictionGraph(score) {
+
+  const canvas = document.getElementById("predictionChart");
+  const ctx = canvas.getContext("2d");
+
+  const days = 30;
+  const data = [];
+
+  let base = score;
+
+  for (let i = 0; i < days; i++) {
+    base += (Math.random() - 0.4) * 5;
+    base = Math.max(0, Math.min(100, base));
+    data.push(base);
+  }
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  ctx.beginPath();
+  ctx.strokeStyle = "#3D4BFF";
+  ctx.lineWidth = 2;
+
+  data.forEach((val, i) => {
+    const x = (canvas.width / days) * i;
+    const y = canvas.height - (val / 100) * canvas.height;
+    if (i === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  });
+
+  ctx.stroke();
+}
