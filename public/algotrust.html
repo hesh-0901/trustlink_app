@@ -10,33 +10,40 @@
 
 <style>
 body {
-  background: radial-gradient(circle at top, #0c1335, #070c24);
+  background: radial-gradient(circle at top, #0c1335, #070c24 60%);
   font-family: -apple-system, BlinkMacSystemFont, sans-serif;
   color: white;
 }
 
-/* Hero container */
-.hero-card {
-  background: linear-gradient(145deg, #141b4d, #0e1438);
-  border-radius: 30px;
-  padding: 20px;
-  border: 1px solid rgba(124,58,237,0.4);
-  box-shadow: 0 0 40px rgba(124,58,237,0.4);
+/* ===== GLASS EFFECT ===== */
+.glass {
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px rgba(124, 58, 237, 0.2);
 }
 
-/* Glow border */
-.glow-border {
-  border-radius: 28px;
+/* ===== HERO CARD ===== */
+.hero-wrapper {
   padding: 2px;
+  border-radius: 32px;
   background: linear-gradient(45deg,#7C3AED,#3D4BFF);
 }
 
-/* Avatar glow */
+.hero-card {
+  border-radius: 30px;
+  padding: 30px 25px 60px 25px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* ===== AVATAR ===== */
 .avatar-wrapper {
   border-radius: 50%;
   padding: 3px;
   background: linear-gradient(45deg,#7C3AED,#3D4BFF);
-  box-shadow: 0 0 20px rgba(124,58,237,0.8);
+  box-shadow: 0 0 25px rgba(124,58,237,0.9);
 }
 
 .avatar-wrapper img {
@@ -46,36 +53,38 @@ body {
   object-fit: cover;
 }
 
-/* Floating icons */
+/* ===== FLOATING ICONS ===== */
 .floating-icon {
   position: absolute;
   background: rgba(255,255,255,0.08);
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(10px);
   border-radius: 50%;
   padding: 12px;
   border: 1px solid rgba(255,255,255,0.15);
   box-shadow: 0 0 20px rgba(124,58,237,0.6);
 }
 
-/* Robot glow */
-.robot-glow {
-  filter: drop-shadow(0 0 30px #7C3AED);
+/* ===== LOGO ANIMATION ===== */
+.logo-animate {
+  animation: pulseGlow 3s infinite ease-in-out;
 }
 
-/* Stats card */
+@keyframes pulseGlow {
+  0% { transform: scale(1); filter: drop-shadow(0 0 15px #7C3AED); }
+  50% { transform: scale(1.05); filter: drop-shadow(0 0 40px #3D4BFF); }
+  100% { transform: scale(1); filter: drop-shadow(0 0 15px #7C3AED); }
+}
+
+/* ===== STAT CARDS ===== */
 .stat-card {
-  background: linear-gradient(145deg,#131a48,#0c1233);
   border-radius: 24px;
-  padding: 20px;
-  border: 1px solid rgba(255,255,255,0.1);
+  padding: 22px;
 }
 
-/* Trend card */
+/* ===== TREND CARD ===== */
 .trend-card {
-  background: linear-gradient(145deg,#131a48,#0c1233);
   border-radius: 30px;
-  padding: 25px;
-  border: 1px solid rgba(255,255,255,0.08);
+  padding: 28px;
 }
 </style>
 
@@ -97,41 +106,26 @@ body {
     </div>
 
     <div class="avatar-wrapper">
-      <img src="/trustlink_app/assets/avatars/default.png" />
+      <img src="/trustlink_app/assets/avatars/default.png">
     </div>
   </div>
 
-  <!-- HERO SECTION -->
-  <div class="glow-border">
-    <div class="hero-card relative overflow-hidden">
+  <!-- HERO -->
+  <div class="hero-wrapper">
+    <div class="hero-card glass">
 
       <!-- Floating Icons -->
-      <div class="floating-icon top-6 left-6">
-        📊
-      </div>
+      
+      <!-- IMAGE CENTER -->
+      <div class="flex justify-center mt-10 relative">
 
-      <div class="floating-icon top-6 right-6">
-        🔐
-      </div>
+        <!-- Halo glow -->
+        <div class="absolute w-40 h-40 bg-purple-600/30 blur-3xl rounded-full">
+        </div>
 
-      <div class="floating-icon bottom-20 left-6">
-        ☁️
-      </div>
+        <img src="/trustlink_app/assets/algotrust-logo.jpeg"
+             class="w-28 relative z-10 logo-animate">
 
-      <div class="floating-icon bottom-20 right-6">
-        💬
-      </div>
-
-      <!-- Robot -->
-      <div class="flex justify-center mt-6">
-        <img src="https://cdn-icons-png.flaticon.com/512/4712/4712109.png"
-             class="w-36 robot-glow">
-      </div>
-
-      <!-- Logo -->
-      <div class="flex justify-center mt-6">
-        <img src="/trustlink_app/assets/algotrust-logo.svg"
-             class="w-16 drop-shadow-[0_0_25px_#7C3AED]">
       </div>
 
     </div>
@@ -140,7 +134,7 @@ body {
   <!-- STATS -->
   <div class="grid grid-cols-2 gap-5">
 
-    <div class="stat-card text-center">
+    <div class="stat-card glass text-center">
       <div class="text-gray-400 text-sm">
         Volume
       </div>
@@ -149,7 +143,7 @@ body {
       </div>
     </div>
 
-    <div class="stat-card text-center">
+    <div class="stat-card glass text-center">
       <div class="text-gray-400 text-sm">
         Transactions
       </div>
@@ -161,14 +155,13 @@ body {
   </div>
 
   <!-- TREND -->
-  <div class="trend-card">
+  <div class="trend-card glass">
     <div class="text-gray-400 mb-6">
       Trend Analysis (30 jours)
     </div>
 
     <div class="h-24 relative">
 
-      <!-- Fake graph line -->
       <svg viewBox="0 0 300 100" class="w-full h-full">
         <path d="M0 80 Q40 75 60 78 T120 72 T180 65 T240 55 T300 50"
               stroke="#7C3AED"
