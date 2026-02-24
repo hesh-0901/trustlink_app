@@ -139,35 +139,38 @@ form.addEventListener("submit", async (e) => {
 
     // USD Wallet
     await setDoc(
-      doc(db, "wallets", walletBase + "-01"),
-      {
-        userId: phone,
-        currency: "USD",
-        currencyCode: "01",
-        balance: 0,
-        isActive: true,
-        walletAddress: walletBase + "-01",
-        walletBase: walletBase,
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp()
-      }
-    );
+  doc(db, "wallets", walletBase + "-01"),
+  {
+    userId: phone,
+    currency: "USD",
+    currencyCode: "01",
+    balance: 0,
+    reservedBalance: 0,
+    isActive: true,
+    walletAddress: walletBase + "-01",
+    walletBase: walletBase,
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp()
+  }
+);
+
 
     // CDF Wallet
     await setDoc(
-      doc(db, "wallets", walletBase + "-02"),
-      {
-        userId: phone,
-        currency: "CDF",
-        currencyCode: "02",
-        balance: 0,
-        isActive: true,
-        walletAddress: walletBase + "-02",
-        walletBase: walletBase,
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp()
-      }
-    );
+  doc(db, "wallets", walletBase + "-02"),
+  {
+    userId: phone,
+    currency: "CDF",
+    currencyCode: "02",
+    balance: 0,
+    reservedBalance: 0,
+    isActive: true,
+    walletAddress: walletBase + "-02",
+    walletBase: walletBase,
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp()
+  }
+);
 
     /* ===============================
        REDIRECT
