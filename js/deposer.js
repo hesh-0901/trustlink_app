@@ -6,8 +6,7 @@ import {
   getDocs,
   doc,
   runTransaction,
-  serverTimestamp,
-  addDoc
+  serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 /* ===============================
@@ -69,10 +68,6 @@ form.addEventListener("submit", async (e) => {
   const amount = parseFloat(document.getElementById("amount").value);
   const motif = document.getElementById("motif").value.trim();
 
-  /* ===============================
-     VALIDATION
-  ================================= */
-
   if (!walletId || !method || !amount || amount <= 0 || !motif) {
     return showError("Tous les champs sont obligatoires.");
   }
@@ -97,34 +92,47 @@ form.addEventListener("submit", async (e) => {
         throw "Accès interdit.";
       }
 
+      const reserved = walletData.reservedBalance || 0;
       const newBalance = walletData.balance + amount;
 
-      /* UPDATE WALLET */
+      /* =========================
+         UPDATE WALLET
+      ========================= */
       transaction.update(walletRef, {
         balance: newBalance,
+        reservedBalance: reserved,
         updatedAt: serverTimestamp()
       });
 
-      /* CREATE TRANSACTION */
+      /* =========================
+         CREATE TRANSACTION
+      ========================= */
       const txRef = doc(collection(db, "transactions"));
 
       transaction.set(txRef, {
+        category: "deposit",
         type: "deposit",
+        status: "completed",
+
         userId,
         walletId,
+
         currency: walletData.currency,
         method,
         amount,
         motif,
+
         participants: [userId],
-        createdAt: serverTimestamp()
+
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
       });
 
     });
 
     form.reset();
     setLoading(false);
-    alert("Dépôt effectué avec succès.");
+    alert("Dépôt effectué avec succès ✔️");
 
   } catch (error) {
     console.error(error);
