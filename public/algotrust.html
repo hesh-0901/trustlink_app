@@ -145,6 +145,25 @@ window.addEventListener("resize", () => {
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
 });
+  /* ===============================
+   ATMOSPHERE GLOW
+================================ */
+
+const atmosphereGeometry = new THREE.SphereGeometry(1.1, 64, 64);
+
+const atmosphereMaterial = new THREE.MeshBasicMaterial({
+  color: 0x3b82f6,
+  transparent: true,
+  opacity: 0.15,
+  side: THREE.BackSide
+});
+
+const atmosphere = new THREE.Mesh(
+  atmosphereGeometry,
+  atmosphereMaterial
+);
+
+scene.add(atmosphere);
 
 </script>
 
