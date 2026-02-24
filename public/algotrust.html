@@ -2,21 +2,32 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>AI Cinematic Robot</title>
+<title>AI Robot</title>
 <style>
 body { margin:0; overflow:hidden; background:#000; }
-canvas { display:block; }
 </style>
+
+<!-- Import map -->
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
 </head>
+
 <body>
 
 <script type="module">
-import * as THREE from "https://unpkg.com/three@0.160.0/build/three.module.js";
-import { GLTFLoader } from "https://unpkg.com/three@0.160.0/examples/jsm/loaders/GLTFLoader.js";
-import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/controls/OrbitControls.js";
-import { EffectComposer } from "https://unpkg.com/three@0.160.0/examples/jsm/postprocessing/EffectComposer.js";
-import { RenderPass } from "https://unpkg.com/three@0.160.0/examples/jsm/postprocessing/RenderPass.js";
-import { UnrealBloomPass } from "https://unpkg.com/three@0.160.0/examples/jsm/postprocessing/UnrealBloomPass.js";
+
+import * as THREE from "three";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
+import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
+import { UnrealBloomPass } from "three/addons/postprocessing/UnrealBloomPass.js";
 
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x050510);
@@ -27,17 +38,14 @@ camera.position.set(0,1.6,4);
 const renderer = new THREE.WebGLRenderer({ antialias:true });
 renderer.setSize(innerWidth, innerHeight);
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.2;
 document.body.appendChild(renderer.domElement);
 
 const composer = new EffectComposer(renderer);
 composer.addPass(new RenderPass(scene, camera));
-
-const bloom = new UnrealBloomPass(
+composer.addPass(new UnrealBloomPass(
   new THREE.Vector2(innerWidth, innerHeight),
   1.8, 0.4, 0.85
-);
-composer.addPass(bloom);
+));
 
 const light = new THREE.PointLight(0x00ffff, 8, 20);
 light.position.set(0,3,3);
@@ -46,97 +54,32 @@ scene.add(light);
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
 
-let robot;
-
 const loader = new GLTFLoader();
-loader.load("robot.glb", (gltf) => {
+loader.load("./robot.glb", (gltf) => {
 
-  robot = gltf.scene;
+  const robot = gltf.scene;
   robot.scale.set(1.5,1.5,1.5);
   robot.position.y = -1;
 
   robot.traverse((child) => {
     if (child.isMesh) {
-
-      child.material = new THREE.ShaderMaterial({
-        uniforms: {
-          time: { value: 0 }
-        },
-        vertexShader: `
-          varying vec3 vNormal;
-          varying vec3 vPosition;
-          void main() {
-            vNormal = normalMatrix * normal;
-            vPosition = position;
-            gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0);
-          }
-        `,
-        fragmentShader: `
-          uniform float time;
-          varying vec3 vNormal;
-          varying vec3 vPosition;
-
-          void main() {
-
-            float fresnel = pow(1.0 - dot(normalize(vNormal), vec3(0.0,0.0,1.0)), 3.0);
-            float scan = sin(vPosition.y * 20.0 - time * 5.0) * 0.1;
-
-            vec3 color = vec3(0.0, 0.8, 1.0) * (fresnel + scan);
-
-            gl_FragColor = vec4(color, 1.0);
-          }
-        `,
-        blending: THREE.AdditiveBlending,
-        transparent: true
+      child.material = new THREE.MeshBasicMaterial({
+        color: 0x00ffff,
+        wireframe: true
       });
-
     }
   });
 
   scene.add(robot);
 });
 
-// Anneaux énergétiques
-const ringGeo = new THREE.TorusGeometry(1.5, 0.05, 32, 200);
-const ringMat = new THREE.MeshBasicMaterial({ color:0x00ffff });
-
-const ring1 = new THREE.Mesh(ringGeo, ringMat);
-ring1.rotation.x = Math.PI / 2;
-scene.add(ring1);
-
-const ring2 = new THREE.Mesh(ringGeo, ringMat);
-ring2.position.y = -0.5;
-ring2.rotation.x = Math.PI / 2;
-scene.add(ring2);
-
-function animate(t) {
+function animate(){
   requestAnimationFrame(animate);
-
-  if(robot){
-    robot.traverse(child => {
-      if(child.material && child.material.uniforms){
-        child.material.uniforms.time.value = t * 0.001;
-      }
-    });
-    robot.rotation.y += 0.003;
-  }
-
-  ring1.rotation.z += 0.01;
-  ring2.rotation.z -= 0.008;
-
   controls.update();
   composer.render();
 }
-
 animate();
 
-window.addEventListener("resize", () => {
-  camera.aspect = innerWidth/innerHeight;
-  camera.updateProjectionMatrix();
-  renderer.setSize(innerWidth, innerHeight);
-  composer.setSize(innerWidth, innerHeight);
-});
 </script>
-
 </body>
 </html>
