@@ -292,52 +292,65 @@ async function openModal(txId) {
 let avatar = "";
 let fullName = "Système";
 
-/* =========================
-   TRANSFER
-========================= */
-if (tx.category === "transfer") {
+async function openModal(txId) {
 
-  const counterpartyId =
-    tx.fromUserId === userId
-      ? tx.toUserId
-      : tx.fromUserId;
+  if (document.getElementById("txModal")) return;
 
-  if (counterpartyId) {
+  const snap = await getDoc(doc(db, "transactions", txId));
+  if (!snap.exists()) return;
 
-    const userSnap =
-      await getDoc(doc(db, "users", counterpartyId));
+  const tx = snap.data();
 
-    if (userSnap.exists()) {
+  let user = null;
+  let avatar = "";
+  let fullName = "Système";
 
-      user = userSnap.data();
+  /* =========================
+     TRANSFER
+  ========================= */
+  if (tx.category === "transfer") {
 
-      fullName =
-        `${user.firstName} ${user.lastName}`;
+    const counterpartyId =
+      tx.fromUserId === userId
+        ? tx.toUserId
+        : tx.fromUserId;
 
-      if (user.avatarImage) {
+    if (counterpartyId) {
 
-        avatar =
-          AVATAR_PATH + user.avatarImage;
+      const userSnap =
+        await getDoc(doc(db, "users", counterpartyId));
 
-      } else {
+      if (userSnap.exists()) {
 
-        avatar =
-          `https://api.dicebear.com/7.x/avataaars/png?seed=${user.username}`;
+        user = userSnap.data();
+
+        fullName =
+          `${user.firstName} ${user.lastName}`;
+
+        if (user.avatarImage) {
+
+          avatar =
+            AVATAR_PATH + user.avatarImage;
+
+        } else {
+
+          avatar =
+            `https://api.dicebear.com/7.x/avataaars/png?seed=${user.username}`;
+        }
       }
     }
   }
-}
 
-/* =========================
-   DEPOSIT
-========================= */
-else if (tx.category === "deposit") {
+  /* =========================
+     DEPOSIT
+  ========================= */
+  else if (tx.category === "deposit") {
 
-  fullName = "Dépôt";
+    fullName = "Dépôt";
 
-  avatar =
-    "https://api.dicebear.com/7.x/avataaars/png?seed=deposit";
-}
+    avatar =
+      "https://api.dicebear.com/7.x/avataaars/png?seed=deposit";
+  }
 
   const modal = document.createElement("div");
 
@@ -462,10 +475,6 @@ else if (tx.category === "deposit") {
   `;
 
   document.body.appendChild(modal);
-}
-function closeModal() {
-  const modal = document.getElementById("txModal");
-  if (modal) modal.remove();
 }
 /* ===============================
    EXECUTE ACTION
