@@ -14,146 +14,58 @@ content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable
 <style>
 body{
   margin:0;
-  background:
-    radial-gradient(circle at 50% 40%, #0b1120 0%, #03040a 60%, #000 100%);
-  color:white;
+  background: radial-gradient(circle at 50% 40%, #0b1120 0%, #020617 60%, #000 100%);
   overflow:hidden;
   font-family:system-ui;
+  color:white;
 }
 
-/* Cinematic light aura */
-.aura{
-  position:absolute;
-  width:420px;
-  height:420px;
-  border-radius:50%;
-  background: radial-gradient(circle,
-    rgba(59,130,246,0.25) 0%,
-    rgba(59,130,246,0.08) 40%,
-    transparent 70%);
-  filter:blur(40px);
-  animation: breathe 6s ease-in-out infinite;
-}
+/* ===== HEADER ===== */
 
-/* Core */
-.core{
-  width:260px;
-  height:260px;
-  border-radius:50%;
-  background:
-    radial-gradient(circle at 30% 30%, #1e3a8a 0%, #0f172a 60%);
-  box-shadow:
-    0 0 150px rgba(59,130,246,0.35),
-    inset 0 0 80px rgba(59,130,246,0.25);
-  position:relative;
-  backdrop-filter:blur(20px);
-  animation: pulse 4s ease-in-out infinite;
-}
-
-/* Glass subtle ring */
-.ring{
-  position:absolute;
-  inset:-30px;
-  border-radius:50%;
-  border:1px solid rgba(96,165,250,0.15);
-  animation: rotate 60s linear infinite;
-}
-
-.ring:nth-child(2){
-  inset:-60px;
-  animation-duration:90s;
-  opacity:.4;
-}
-
-@keyframes rotate{
-  from{ transform:rotate(0deg); }
-  to{ transform:rotate(360deg); }
-}
-
-/* Soft breathing */
-@keyframes breathe{
-  0%{ transform:scale(1); opacity:.7 }
-  50%{ transform:scale(1.05); opacity:1 }
-  100%{ transform:scale(1); opacity:.7 }
-}
-
-/* Core pulse */
-@keyframes pulse{
-  0%{ box-shadow:
-      0 0 100px rgba(59,130,246,0.3),
-      inset 0 0 60px rgba(59,130,246,0.2); }
-  50%{ box-shadow:
-      0 0 180px rgba(59,130,246,0.6),
-      inset 0 0 90px rgba(59,130,246,0.35); }
-  100%{ box-shadow:
-      0 0 100px rgba(59,130,246,0.3),
-      inset 0 0 60px rgba(59,130,246,0.2); }
-}
-
-/* Floating particles */
-.particles{
-  position:absolute;
+.header{
+  position:fixed;
+  top:0;
   width:100%;
-  height:100%;
-  pointer-events:none;
+  padding:20px 40px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  z-index:50;
+  backdrop-filter:blur(20px);
+  background:rgba(15,23,42,0.6);
+  border-bottom:1px solid rgba(96,165,250,0.2);
 }
 
-.particle{
-  position:absolute;
-  width:2px;
-  height:2px;
-  background:#60a5fa;
-  border-radius:50%;
-  opacity:.5;
-  animation: float 10s linear infinite;
+.logo{
+  font-size:18px;
+  font-weight:600;
+  letter-spacing:2px;
+  color:#60a5fa;
+  text-transform:uppercase;
 }
 
-@keyframes float{
-  from{ transform:translateY(0px); opacity:.2 }
-  to{ transform:translateY(-200px); opacity:.8 }
-}
-
-/* Streaming text */
-.stream{
-  font-size:11px;
+.status{
+  font-size:13px;
+  opacity:.8;
   letter-spacing:1px;
-  color:#93c5fd;
-  opacity:.6;
-  transition:.4s;
+}
+
+/* Canvas behind header */
+canvas{
+  position:fixed;
+  top:0;
+  left:0;
+  z-index:1;
 }
 </style>
 </head>
 
 <body>
 
-<div class="flex flex-col items-center justify-center min-h-screen relative">
-
-  <div class="relative flex items-center justify-center">
-
-    <div class="aura"></div>
-
-    <div class="ring"></div>
-    <div class="ring"></div>
-
-    <div class="core flex items-center justify-center">
-      <div id="analysisText"
-        class="text-sm tracking-widest text-blue-300 transition-all duration-500">
-        INITIALIZING
-      </div>
-    </div>
-
-  </div>
-
-  <!-- Live streaming data -->
-  <div class="mt-16 space-y-2 text-center">
-    <div class="stream" id="stream1"></div>
-    <div class="stream" id="stream2"></div>
-    <div class="stream" id="stream3"></div>
-  </div>
-
-  <div class="particles" id="particles"></div>
-
-</div>
+<header class="header">
+  <div class="logo">AlgoTrust Neural Core</div>
+  <div id="analysisText" class="status">Connecting...</div>
+</header>
 
 <script type="module">
 
@@ -162,60 +74,82 @@ import { EffectComposer } from "https://unpkg.com/three@0.152.2/examples/jsm/pos
 import { RenderPass } from "https://unpkg.com/three@0.152.2/examples/jsm/postprocessing/RenderPass.js";
 import { UnrealBloomPass } from "https://unpkg.com/three@0.152.2/examples/jsm/postprocessing/UnrealBloomPass.js";
 
-/* =========================
-   SCENE
-========================= */
+import { getFirestore, doc, onSnapshot }
+from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+/* ======================
+   FIRESTORE
+====================== */
+
+const db = getFirestore();
+
+let riskScore = 30;
+let marketDrift = 0;
+
+const metricsRef = doc(db, "neural_core", "live_metrics");
+
+onSnapshot(metricsRef, (snapshot)=>{
+
+  if(snapshot.exists()){
+    const data = snapshot.data();
+
+    riskScore = Number(data.riskIndex || 0);
+    marketDrift = Number(data.marketDrift || 0);
+
+    document.getElementById("analysisText").textContent =
+      "RISK INDEX : " + riskScore.toFixed(2);
+  }
+
+});
+
+/* ======================
+   THREE SETUP
+====================== */
 
 const scene = new THREE.Scene();
 
 const camera = new THREE.PerspectiveCamera(
   75,
-  window.innerWidth / window.innerHeight,
+  window.innerWidth/window.innerHeight,
   0.1,
   1000
 );
 
 camera.position.z = 5;
 
-const renderer = new THREE.WebGLRenderer({ antialias:true, alpha:true });
+const renderer = new THREE.WebGLRenderer({antialias:true, alpha:true});
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
 document.body.appendChild(renderer.domElement);
 
-/* =========================
-   POST PROCESSING (BLOOM)
-========================= */
+/* ===== BLOOM ===== */
 
 const composer = new EffectComposer(renderer);
 composer.addPass(new RenderPass(scene,camera));
 
 const bloomPass = new UnrealBloomPass(
-  new THREE.Vector2(window.innerWidth, window.innerHeight),
-  1.2, // strength
-  0.6, // radius
-  0.1  // threshold
+  new THREE.Vector2(window.innerWidth,window.innerHeight),
+  1.3,
+  0.6,
+  0.05
 );
 
 composer.addPass(bloomPass);
 
-/* =========================
-   LIGHT
-========================= */
+/* ===== LIGHT ===== */
 
 const light = new THREE.PointLight(0x60a5fa,3,20);
 light.position.set(3,3,3);
 scene.add(light);
 
-/* =========================
-   GLOBE
-========================= */
+/* ===== GLOBE ===== */
 
 const globe = new THREE.Mesh(
   new THREE.SphereGeometry(1,64,64),
   new THREE.MeshStandardMaterial({
     color:0x0f172a,
     emissive:0x1e3a8a,
-    emissiveIntensity:0.7,
+    emissiveIntensity:0.8,
     metalness:0.5,
     roughness:0.3
   })
@@ -223,67 +157,49 @@ const globe = new THREE.Mesh(
 
 scene.add(globe);
 
-/* =========================
-   RISK SCORE
-========================= */
+/* ===== SPRITES ===== */
 
-let riskScore = 30;
-
-setInterval(()=>{
-  riskScore = Math.random()*100;
-
-  const el = document.getElementById("analysisText");
-  if(el){
-    el.textContent = "RISK INDEX: " + riskScore.toFixed(1);
-  }
-
-},2000);
-
-/* =========================
-   NUMBER SPRITES
-========================= */
-
-const sprites = [];
-const spriteGroup = new THREE.Group();
-scene.add(spriteGroup);
+const sprites=[];
+const group=new THREE.Group();
+scene.add(group);
 
 function createNumberSprite(){
 
-  const canvas = document.createElement("canvas");
-  canvas.width = 128;
-  canvas.height = 128;
-  const ctx = canvas.getContext("2d");
+  const canvas=document.createElement("canvas");
+  canvas.width=128;
+  canvas.height=128;
+  const ctx=canvas.getContext("2d");
 
-  ctx.clearRect(0,0,128,128);
-  ctx.fillStyle = "#60a5fa";
-  ctx.font = "bold 80px monospace";
-  ctx.textAlign = "center";
-  ctx.textBaseline = "middle";
+  ctx.fillStyle="transparent";
+  ctx.fillRect(0,0,128,128);
+
+  ctx.fillStyle="#60a5fa";
+  ctx.font="bold 80px monospace";
+  ctx.textAlign="center";
+  ctx.textBaseline="middle";
   ctx.fillText(Math.floor(Math.random()*10),64,64);
 
-  const texture = new THREE.CanvasTexture(canvas);
+  const texture=new THREE.CanvasTexture(canvas);
 
-  const material = new THREE.SpriteMaterial({
+  const material=new THREE.SpriteMaterial({
     map:texture,
     transparent:true,
     blending:THREE.AdditiveBlending
   });
 
-  const sprite = new THREE.Sprite(material);
-  sprite.scale.set(0.3,0.3,0.3);
+  const sprite=new THREE.Sprite(material);
+  sprite.scale.set(0.35,0.35,0.35);
 
   return sprite;
 }
 
-/* CREATE THOUSANDS */
-
 for(let i=0;i<1500;i++){
 
-  const sprite = createNumberSprite();
+  const sprite=createNumberSprite();
 
-  const angle = Math.random()*Math.PI*2;
-  const radius = 1.5 + Math.random()*2;
-  const height = (Math.random()-0.5)*2;
+  const angle=Math.random()*Math.PI*2;
+  const radius=1.5+Math.random()*2;
+  const height=(Math.random()-0.5)*2;
 
   sprite.position.set(
     Math.cos(angle)*radius,
@@ -291,56 +207,41 @@ for(let i=0;i<1500;i++){
     Math.sin(angle)*radius
   );
 
-  sprite.userData = {
-    angle: angle,
-    radius: radius,
-    height: height,
-    speed: 0.001 + Math.random()*0.002
+  sprite.userData={
+    angle,
+    radius,
+    height,
+    speed:0.001+Math.random()*0.002
   };
 
-  spriteGroup.add(sprite);
+  group.add(sprite);
   sprites.push(sprite);
 }
 
-/* =========================
-   MARKET FLUX SIMULATION
-========================= */
-
-let marketDrift = 0;
-
-setInterval(()=>{
-  marketDrift = (Math.random()-0.5)*0.02;
-},1500);
-
-/* =========================
-   ANIMATION LOOP
-========================= */
+/* ===== ANIMATION ===== */
 
 function animate(){
 
   requestAnimationFrame(animate);
 
-  globe.rotation.y += 0.002;
+  globe.rotation.y+=0.002;
 
   sprites.forEach(sprite=>{
 
-    sprite.userData.angle += sprite.userData.speed + (riskScore*0.00002);
+    sprite.userData.angle+=sprite.userData.speed+(riskScore*0.00003);
 
-    const vortexPull = 0.0005 * (riskScore/100);
+    const vortexPull=0.0006*(riskScore/100);
+    sprite.userData.radius-=vortexPull;
 
-    sprite.userData.radius -= vortexPull;
-
-    if(sprite.userData.radius < 1.2){
-      sprite.userData.radius = 3 + Math.random()*2;
+    if(sprite.userData.radius<1.2){
+      sprite.userData.radius=3+Math.random()*2;
     }
 
-    sprite.position.x = Math.cos(sprite.userData.angle) * sprite.userData.radius;
-    sprite.position.z = Math.sin(sprite.userData.angle) * sprite.userData.radius;
+    sprite.position.x=Math.cos(sprite.userData.angle)*sprite.userData.radius;
+    sprite.position.z=Math.sin(sprite.userData.angle)*sprite.userData.radius;
+    sprite.position.y+=marketDrift;
 
-    sprite.position.y += marketDrift;
-
-    /* Color based on risk */
-    const hue = 0.55 - (riskScore/200);
+    const hue=0.55-(riskScore/200);
     sprite.material.color.setHSL(hue,1,0.6);
   });
 
@@ -349,12 +250,10 @@ function animate(){
 
 animate();
 
-/* =========================
-   RESIZE
-========================= */
+/* ===== RESPONSIVE ===== */
 
 window.addEventListener("resize",()=>{
-  camera.aspect = window.innerWidth/window.innerHeight;
+  camera.aspect=window.innerWidth/window.innerHeight;
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth,window.innerHeight);
   composer.setSize(window.innerWidth,window.innerHeight);
