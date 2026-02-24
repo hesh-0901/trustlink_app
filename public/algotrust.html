@@ -1,295 +1,118 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
+
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>AlgoTrust - Neural Core</title>
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+
+<title>AlgoTrust Neural Observatory</title>
 
 <script src="https://cdn.tailwindcss.com"></script>
 <script type="module" src="/trustlink_app/js/firebase-init.js"></script>
-<script type="module">
-import { initNeuralFX } from "/trustlink_app/main_js/neural-ui.js";
-initNeuralFX();
-</script>
 
 <style>
 body{
   margin:0;
-  background: radial-gradient(circle at center, #0a0f1c 0%, #05070f 80%);
+  background:#04060d;
   color:white;
-  font-family: system-ui,-apple-system;
   overflow:hidden;
+  font-family:system-ui;
 }
 
-/* ===== CORE ===== */
-
-.core-wrapper{
-  position:relative;
-  width:280px;
-  height:280px;
-}
-
+/* Volumetric hologram */
 .core{
-  width:100%;
-  height:100%;
+  width:260px;
+  height:260px;
   border-radius:50%;
-  background: radial-gradient(circle at 40% 40%, #1e40af, #0f172a 70%);
+  background: radial-gradient(circle, #1e3a8a 20%, #0f172a 70%);
   box-shadow:
-    0 0 80px rgba(37,99,235,0.4),
-    inset 0 0 50px rgba(59,130,246,0.3);
+    0 0 120px rgba(59,130,246,0.5),
+    inset 0 0 60px rgba(59,130,246,0.4);
   position:relative;
-  overflow:hidden;
 }
 
-/* Scanner radar */
-@keyframes radarSweep{
-  from{ transform:rotate(0deg); }
-  to{ transform:rotate(360deg); }
-}
-
-.radar{
+/* Hologram layers */
+.layer{
   position:absolute;
   inset:0;
   border-radius:50%;
-  background: conic-gradient(
-    rgba(59,130,246,0.4),
-    transparent 20%
-  );
-  animation: radarSweep 6s linear infinite;
-  mix-blend-mode: screen;
-}
-
-/* Ligne lumineuse */
-@keyframes energyLine{
-  0%{ left:-100%; }
-  100%{ left:100%; }
-}
-
-.energy-line{
-  position:absolute;
-  top:50%;
-  width:200%;
-  height:2px;
-  background: linear-gradient(90deg, transparent, #60a5fa, transparent);
-  animation: energyLine 3s linear infinite;
-  opacity:.8;
-}
-
-/* Orbit rings */
-.ring{
-  position:absolute;
-  inset:-30px;
-  border-radius:50%;
   border:1px solid rgba(59,130,246,0.2);
-  animation:spin 25s linear infinite;
+  animation:spin 30s linear infinite;
 }
 
 @keyframes spin{
-  from{ transform:rotate(0deg); }
-  to{ transform:rotate(360deg); }
+  from{ transform:rotateX(0deg) rotateY(0deg); }
+  to{ transform:rotateX(360deg) rotateY(360deg); }
 }
 
-/* Graph */
-.graph{
-  height:60px;
-  position:relative;
+/* Streaming text */
+.stream{
+  font-size:10px;
+  color:#60a5fa;
+  opacity:.7;
+  animation:fade 2s infinite alternate;
 }
 
-.graph svg{
-  width:100%;
-  height:100%;
+@keyframes fade{
+  from{ opacity:.2 }
+  to{ opacity:.8 }
 }
-
-/* Glass */
-.glass{
-  background:rgba(255,255,255,0.05);
-  backdrop-filter:blur(25px);
-  border:1px solid rgba(255,255,255,0.08);
-}
-
-/* Back button */
-.back-btn{
-  position:fixed;
-  top:20px;
-  left:20px;
-  padding:10px 18px;
-  border-radius:30px;
-  font-size:14px;
-  backdrop-filter:blur(20px);
-  background:rgba(255,255,255,0.08);
-  border:1px solid rgba(255,255,255,0.1);
-  transition:.3s;
-}
-
-.back-btn:hover{
-  background:rgba(255,255,255,0.15);
-}
-
 </style>
 </head>
 
 <body>
 
-<button onclick="history.back()" class="back-btn">← Retour</button>
+<div class="flex flex-col items-center justify-center min-h-screen space-y-10">
 
-<div class="flex flex-col items-center justify-center min-h-screen px-6 text-center space-y-10">
+  <div class="relative">
 
-  <!-- CORE -->
-  <div class="core-wrapper">
-
-    <div class="ring"></div>
+    <div class="layer"></div>
+    <div class="layer" style="animation-duration:50s"></div>
 
     <div class="core flex items-center justify-center">
-
-      <div class="radar"></div>
-      <div class="energy-line"></div>
-
-      <div class="text-xs tracking-widest text-blue-300">
-        NEURAL CORE
+      <div id="analysisText" class="text-xs tracking-widest text-blue-300">
+        ANALYSING...
       </div>
-
     </div>
+
   </div>
 
-  <!-- HUD -->
-  <div class="glass rounded-2xl p-6 w-full max-w-sm space-y-4">
-
-    <div>
-      <p id="username" class="text-lg font-semibold">...</p>
-      <p class="text-xs text-blue-300 tracking-wide">
-        Institutional Financial Identity
-      </p>
-    </div>
-
-    <div class="flex justify-between text-sm">
-      <span>TrustScore</span>
-      <span id="score">--</span>
-    </div>
-
-    <div class="flex justify-between text-sm">
-      <span>Risk Index</span>
-      <span id="risk">--</span>
-    </div>
-
-    <!-- Graphique -->
-    <div class="graph">
-      <svg viewBox="0 0 100 40">
-        <polyline
-          id="graphLine"
-          fill="none"
-          stroke="#60a5fa"
-          stroke-width="1.5"
-          points=""
-        />
-      </svg>
-    </div>
-
+  <!-- Live streaming data -->
+  <div class="space-y-1 text-center">
+    <div class="stream" id="stream1"></div>
+    <div class="stream" id="stream2"></div>
+    <div class="stream" id="stream3"></div>
   </div>
 
 </div>
 
 <script type="module">
 
-import { db } from "/trustlink_app/js/firebase-init.js";
-import {
-  doc,
-  getDoc,
-  collection,
-  query,
-  where,
-  getDocs
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { initNeuralFX } from "/trustlink_app/main_js/neural-ui.js";
+initNeuralFX();
 
-const userId =
-  localStorage.getItem("userId") ||
-  sessionStorage.getItem("userId");
+/* Live streaming simulation */
 
-if(!userId)
-  window.location.href="/trustlink_app/index.html";
-
-/* ===== SUPERADMIN SECRET (8 taps) ===== */
-
-let tapCount=0;
-document.querySelector(".core").addEventListener("click",()=>{
-  tapCount++;
-  if(tapCount>=8){
-    alert("SuperAdmin Mode Activated");
-    window.location.href="/trustlink_app/public/superadmin.html";
-  }
-  setTimeout(()=>tapCount=0,4000);
-});
-
-/* ===== LOAD DATA ===== */
-
-async function loadData(){
-
-  const userSnap=await getDoc(doc(db,"users",userId));
-
-  const txQuery=query(
-    collection(db,"transactions"),
-    where("participants","array-contains",userId)
-  );
-
-  const txSnap=await getDocs(txQuery);
-
-  let completed=0,rejected=0;
-
-  txSnap.forEach(doc=>{
-    const tx=doc.data();
-    if(tx.status==="completed") completed++;
-    if(tx.status==="rejected") rejected++;
-  });
-
-  let score=75+completed*2-rejected*3;
-  score=Math.max(0,Math.min(100,score));
-
-  document.getElementById("username").textContent=
-    userSnap.exists()? userSnap.data().firstName+" "+userSnap.data().lastName:"User";
-
-  document.getElementById("score").textContent=score;
-
-  document.getElementById("risk").textContent=
-    score>85?"Low":
-    score>65?"Moderate":"Elevated";
-
-  animateGraph(score);
+function randomData(){
+  return "TX-"+Math.floor(Math.random()*99999)+" | CONFIRMED | NODE-"+Math.floor(Math.random()*100);
 }
 
-/* ===== GRAPH ANIMATION ===== */
+setInterval(()=>{
+  document.getElementById("stream1").textContent=randomData();
+  document.getElementById("stream2").textContent=randomData();
+  document.getElementById("stream3").textContent=randomData();
+},1500);
 
-function animateGraph(score){
+/* Analyse dynamique */
 
-  const line=document.getElementById("graphLine");
+const states=["SCANNING","VERIFYING","CALCULATING RISK","SYNCING LEDGER","VALIDATING TRUST"];
 
-  let points="";
-  for(let i=0;i<10;i++){
-    let x=i*10;
-    let y=30-Math.random()*score/5;
-    points+=`${x},${y} `;
-  }
-
-  line.setAttribute("points",points);
-}
-
-/* ===== ANALYSIS SOUND ===== */
-
-const audioCtx=new (window.AudioContext||window.webkitAudioContext)();
-
-function playBeep(){
-  const osc=audioCtx.createOscillator();
-  const gain=audioCtx.createGain();
-  osc.type="sine";
-  osc.frequency.value=220;
-  gain.gain.value=0.02;
-  osc.connect(gain);
-  gain.connect(audioCtx.destination);
-  osc.start();
-  osc.stop(audioCtx.currentTime+0.1);
-}
-
-setInterval(playBeep,7000);
-
-loadData();
+let i=0;
+setInterval(()=>{
+  document.getElementById("analysisText").textContent=states[i];
+  i=(i+1)%states.length;
+},2000);
 
 </script>
 
