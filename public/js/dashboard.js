@@ -97,9 +97,7 @@ let totalPages = 1;
 
 async function loadNotifications(page = 1) {
 
-  const container =
-    document.getElementById("transactionsList");
-
+  const container = document.getElementById("transactionsList");
   container.innerHTML = "";
   currentPage = page;
 
@@ -112,15 +110,14 @@ async function loadNotifications(page = 1) {
   const snapshot = await getDocs(baseQuery);
 
   if (snapshot.empty) {
-    container.innerHTML =
-      `<div class="text-center text-gray-400 text-sm py-6">
+    container.innerHTML = `
+      <div class="text-center text-gray-400 text-sm py-6">
         Aucune notification
       </div>`;
     return;
   }
 
-  totalPages =
-    Math.ceil(snapshot.docs.length / pageSize);
+  totalPages = Math.ceil(snapshot.docs.length / pageSize);
 
   if (currentPage > totalPages)
     currentPage = totalPages;
@@ -128,116 +125,97 @@ async function loadNotifications(page = 1) {
   const start = (currentPage - 1) * pageSize;
   const end = start + pageSize;
 
-  const docs =
-    snapshot.docs.slice(start, end);
+  const docs = snapshot.docs.slice(start, end);
 
-for (const docSnap of docs) {
+  for (const docSnap of docs) {
 
-  const tx = docSnap.data();
-  const txId = docSnap.id;
+    const tx = docSnap.data();
+    const txId = docSnap.id;
 
-  let counterparty = null;
-  let avatar = "";
-  let name = "Système";
+    let avatar = "";
+    let name = "Système";
 
-  /* =========================
-     TRANSFER
-  ========================= */
-  if (tx.category === "transfer") {
+    if (tx.category === "transfer") {
 
-    const counterpartyId =
-      tx.fromUserId === userId
-        ? tx.toUserId
-        : tx.fromUserId;
+      const counterpartyId =
+        tx.fromUserId === userId
+          ? tx.toUserId
+          : tx.fromUserId;
 
-    if (counterpartyId) {
+      if (counterpartyId) {
 
-      const userSnap =
-        await getDoc(doc(db, "users", counterpartyId));
+        const userSnap =
+          await getDoc(doc(db, "users", counterpartyId));
 
-      if (userSnap.exists()) {
+        if (userSnap.exists()) {
 
-        counterparty = userSnap.data();
+          const counterparty = userSnap.data();
 
-        name =
-          `${counterparty.firstName} ${counterparty.lastName}`;
+          name = `${counterparty.firstName} ${counterparty.lastName}`;
 
-        if (counterparty.avatarImage) {
-
-          avatar =
-            AVATAR_PATH + counterparty.avatarImage;
-
-        } else {
-
-          avatar =
-            `https://api.dicebear.com/7.x/avataaars/png?seed=${counterparty.username}`;
+          avatar = counterparty.avatarImage
+            ? AVATAR_PATH + counterparty.avatarImage
+            : `https://api.dicebear.com/7.x/avataaars/png?seed=${counterparty.username}`;
         }
       }
     }
-  }
 
-  /* =========================
-     DEPOSIT
-  ========================= */
-  else if (tx.category === "deposit") {
+    else if (tx.category === "deposit") {
+      name = "Dépôt";
+      avatar = "https://api.dicebear.com/7.x/avataaars/png?seed=deposit";
+    }
 
-    name = "Dépôt";
+    const div = document.createElement("div");
 
-    avatar =
-      "https://api.dicebear.com/7.x/avataaars/png?seed=deposit";
-  }
+    div.className =
+      "bg-white rounded-2xl p-4 shadow-sm hover:shadow-md transition cursor-pointer";
 
-  const div = document.createElement("div");
+    div.onclick = () => openModal(txId);
 
-  div.className =
-    "bg-white rounded-2xl p-4 shadow-sm hover:shadow-md transition cursor-pointer";
+    div.innerHTML = `
+      <div class="flex gap-3">
+        <img src="${avatar}"
+             class="w-12 h-12 rounded-full object-cover border border-gray-200"/>
 
-  div.onclick = () => openModal(txId);
+        <div class="flex-1 min-w-0">
+          <div class="flex justify-between items-start">
 
-  div.innerHTML = `
-    <div class="flex gap-3">
-      <img src="${avatar}"
-           class="w-12 h-12 rounded-full object-cover border border-gray-200"/>
+            <div class="min-w-0">
+              <p class="text-sm font-semibold text-gray-800 truncate">
+                ${name}
+              </p>
 
-      <div class="flex-1 min-w-0">
-        <div class="flex justify-between items-start">
+              <p class="text-xs text-gray-500 truncate">
+                ${formatNotificationType(tx)}
+              </p>
+            </div>
 
-          <div class="min-w-0">
-            <p class="text-sm font-semibold text-gray-800 truncate">
-              ${name}
-            </p>
+            <span class="text-sm font-semibold ${
+              tx.toUserId === userId
+                ? "text-green-600"
+                : "text-red-500"
+            }">
+              ${formatMoney(tx.amount, tx.currency)}
+            </span>
 
-            <p class="text-xs text-gray-500 truncate">
-              ${formatNotificationType(tx)}
-            </p>
           </div>
 
-          <span class="text-sm font-semibold ${
-            tx.toUserId === userId
-              ? "text-green-600"
-              : "text-red-500"
-          }">
-            ${formatMoney(tx.amount, tx.currency)}
-          </span>
-
+          <p class="text-xs text-gray-400 mt-2">
+            ${formatDate(tx.createdAt)}
+          </p>
         </div>
-
-        <p class="text-xs text-gray-400 mt-2">
-          ${formatDate(tx.createdAt)}
-        </p>
       </div>
-    </div>
-  `;
+    `;
 
-  container.appendChild(div);
+    container.appendChild(div);
+  }
+
+  createPagination();
 }
-
-createPagination();
 
 /* ===============================
    PAGINATION
 ================================ */
-
 function createPagination() {
 
   const container =
@@ -276,6 +254,7 @@ function changePage(page) {
 }
 
 window.changePage = changePage;
+
 /* ===============================
    MODAL
 ================================ */
@@ -288,26 +267,9 @@ async function openModal(txId) {
 
   const tx = snap.data();
 
-    let user = null;
-let avatar = "";
-let fullName = "Système";
-
-async function openModal(txId) {
-
-  if (document.getElementById("txModal")) return;
-
-  const snap = await getDoc(doc(db, "transactions", txId));
-  if (!snap.exists()) return;
-
-  const tx = snap.data();
-
-  let user = null;
   let avatar = "";
   let fullName = "Système";
 
-  /* =========================
-     TRANSFER
-  ========================= */
   if (tx.category === "transfer") {
 
     const counterpartyId =
@@ -322,163 +284,200 @@ async function openModal(txId) {
 
       if (userSnap.exists()) {
 
-        user = userSnap.data();
+        const user = userSnap.data();
 
-        fullName =
-          `${user.firstName} ${user.lastName}`;
+        fullName = `${user.firstName} ${user.lastName}`;
 
-        if (user.avatarImage) {
-
-          avatar =
-            AVATAR_PATH + user.avatarImage;
-
-        } else {
-
-          avatar =
-            `https://api.dicebear.com/7.x/avataaars/png?seed=${user.username}`;
-        }
+        avatar = user.avatarImage
+          ? AVATAR_PATH + user.avatarImage
+          : `https://api.dicebear.com/7.x/avataaars/png?seed=${user.username}`;
       }
     }
   }
 
-  /* =========================
-     DEPOSIT
-  ========================= */
   else if (tx.category === "deposit") {
-
     fullName = "Dépôt";
-
-    avatar =
-      "https://api.dicebear.com/7.x/avataaars/png?seed=deposit";
+    avatar = "https://api.dicebear.com/7.x/avataaars/png?seed=deposit";
   }
 
   const modal = document.createElement("div");
-
   modal.id = "txModal";
-
   modal.className =
-    "fixed inset-0 bg-black/50 backdrop-blur-sm flex items-end sm:items-center justify-center z-50 px-4";
+    "fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 px-4";
 
   modal.onclick = (e) => {
     if (e.target.id === "txModal") closeModal();
   };
 
   modal.innerHTML = `
-    <div id="modalContent"
-         class="bg-white rounded-3xl w-full max-w-md p-6 shadow-2xl">
-
-      <!-- HEADER -->
-      <div class="flex flex-col items-center text-center mb-6">
-
-        <img src="${avatar}"
-             class="w-20 h-20 rounded-full shadow-md mb-3"/>
-
-        <p class="text-base font-semibold text-gray-800">
-          ${fullName}
-        </p>
-
-        <p class="text-lg font-bold text-gray-900 mt-1">
-          ${getTitle(tx)}
-        </p>
-
-        <p class="text-xs text-gray-400 mt-1">
-          ${formatDate(tx.createdAt)}
-        </p>
-
-      </div>
-
-      <!-- MONTANT PRINCIPAL -->
-      <div class="text-center mb-6">
-        <p class="text-3xl font-bold text-primaryStrong">
+    <div class="bg-white rounded-3xl w-full max-w-md p-6 shadow-2xl">
+      <div class="text-center">
+        <img src="${avatar}" class="w-20 h-20 rounded-full mx-auto mb-4"/>
+        <h3 class="text-lg font-semibold">${fullName}</h3>
+        <p class="text-sm text-gray-500 mt-1">
           ${formatMoney(tx.amount, tx.currency)}
         </p>
       </div>
-
-      <!-- DETAILS CARD -->
-      <div class="bg-gray-50 rounded-2xl p-4 space-y-4 text-sm mb-6">
-
-        <div class="flex justify-between">
-          <span class="text-gray-500">Statut</span>
-          <span class="font-medium ${
-            tx.status === "completed"
-              ? "text-green-600"
-              : tx.status === "rejected"
-              ? "text-red-500"
-              : "text-yellow-500"
-          }">
-            ${tx.status}
-          </span>
-        </div>
-
-        <div class="flex justify-between">
-          <span class="text-gray-500">Type</span>
-          <span class="font-medium">
-            ${formatNotificationType(tx)}
-          </span>
-        </div>
-
-        ${
-          tx.customMotif || tx.motif
-            ? `
-            <div class="pt-3 border-t border-gray-200">
-              <span class="block text-gray-400 text-xs uppercase mb-2">
-                Motif
-              </span>
-              <p class="text-gray-700 break-words">
-                ${tx.customMotif || tx.motif}
-              </p>
-            </div>
-            `
-            : ""
-        }
-
-      </div>
-
-      <!-- ACTIONS -->
-      <div class="flex gap-3">
-
-        <!-- DOWNLOAD -->
-        <button
-          onclick="downloadTransaction()"
-          class="flex-1 bg-primaryStrong hover:bg-primary text-white py-3 rounded-2xl flex items-center justify-center transition">
-          <i class="bi bi-download text-lg"></i>
-        </button>
-
-        ${
-          tx.status === "pending" &&
-          tx.toUserId === userId
-            ? `
-              <button
-                onclick="executeAction('${txId}','approve')"
-                class="flex-1 bg-green-500 hover:bg-green-600 text-white py-3 rounded-2xl flex items-center justify-center transition">
-                <i class="bi bi-check-lg text-lg"></i>
-              </button>
-
-              <button
-                onclick="executeAction('${txId}','reject')"
-                class="flex-1 bg-red-500 hover:bg-red-600 text-white py-3 rounded-2xl flex items-center justify-center transition">
-                <i class="bi bi-x-lg text-lg"></i>
-              </button>
-            `
-            : `
-              <button
-                onclick="closeModal()"
-                class="flex-1 bg-gray-200 hover:bg-gray-300 py-3 rounded-2xl flex items-center justify-center transition">
-                <i class="bi bi-x-lg text-lg"></i>
-              </button>
-            `
-        }
-
-      </div>
-
     </div>
   `;
 
   document.body.appendChild(modal);
 }
-/* ===============================
-   EXECUTE ACTION
-================================ */
+
+ /* ========================= TRANSFER ========================= */
+if (tx.category === "transfer") {
+
+  const counterpartyId =
+    tx.fromUserId === userId
+      ? tx.toUserId
+      : tx.fromUserId;
+
+  if (counterpartyId) {
+
+    const userSnap =
+      await getDoc(doc(db, "users", counterpartyId));
+
+    if (userSnap.exists()) {
+
+      user = userSnap.data();
+
+      fullName = `${user.firstName} ${user.lastName}`;
+
+      if (user.avatarImage) {
+        avatar = AVATAR_PATH + user.avatarImage;
+      } else {
+        avatar = `https://api.dicebear.com/7.x/avataaars/png?seed=${user.username}`;
+      }
+    }
+  }
+}
+
+/* ========================= DEPOSIT ========================= */
+else if (tx.category === "deposit") {
+
+  fullName = "Dépôt";
+  avatar = "https://api.dicebear.com/7.x/avataaars/png?seed=deposit";
+}
+
+const modal = document.createElement("div");
+
+modal.id = "txModal";
+
+modal.className =
+  "fixed inset-0 bg-black/50 backdrop-blur-sm flex items-end sm:items-center justify-center z-50 px-4";
+
+modal.onclick = (e) => {
+  if (e.target.id === "txModal") closeModal();
+};
+
+modal.innerHTML = `
+<div id="modalContent"
+     class="bg-white rounded-3xl w-full max-w-md p-6 shadow-2xl">
+
+  <div class="flex flex-col items-center text-center mb-6">
+
+    <img src="${avatar}"
+         class="w-20 h-20 rounded-full shadow-md mb-3"/>
+
+    <p class="text-base font-semibold text-gray-800">
+      ${fullName}
+    </p>
+
+    <p class="text-lg font-bold text-gray-900 mt-1">
+      ${getTitle(tx)}
+    </p>
+
+    <p class="text-xs text-gray-400 mt-1">
+      ${formatDate(tx.createdAt)}
+    </p>
+
+  </div>
+
+  <div class="text-center mb-6">
+    <p class="text-3xl font-bold text-primaryStrong">
+      ${formatMoney(tx.amount, tx.currency)}
+    </p>
+  </div>
+
+  <div class="bg-gray-50 rounded-2xl p-4 space-y-4 text-sm mb-6">
+
+    <div class="flex justify-between">
+      <span class="text-gray-500">Statut</span>
+      <span class="font-medium ${
+        tx.status === "completed"
+          ? "text-green-600"
+          : tx.status === "rejected"
+          ? "text-red-500"
+          : "text-yellow-500"
+      }">
+        ${tx.status}
+      </span>
+    </div>
+
+    <div class="flex justify-between">
+      <span class="text-gray-500">Type</span>
+      <span class="font-medium">
+        ${formatNotificationType(tx)}
+      </span>
+    </div>
+
+    ${
+      tx.customMotif || tx.motif
+        ? `
+          <div class="pt-3 border-t border-gray-200">
+            <span class="block text-gray-400 text-xs uppercase mb-2">
+              Motif
+            </span>
+            <p class="text-gray-700 break-words">
+              ${tx.customMotif || tx.motif}
+            </p>
+          </div>
+        `
+        : ""
+    }
+
+  </div>
+
+  <div class="flex gap-3">
+
+    <button
+      onclick="downloadTransaction()"
+      class="flex-1 bg-primaryStrong hover:bg-primary text-white py-3 rounded-2xl flex items-center justify-center transition">
+      <i class="bi bi-download text-lg"></i>
+    </button>
+
+    ${
+      tx.status === "pending" && tx.toUserId === userId
+        ? `
+          <button
+            onclick="executeAction('${txId}','approve')"
+            class="flex-1 bg-green-500 hover:bg-green-600 text-white py-3 rounded-2xl flex items-center justify-center transition">
+            <i class="bi bi-check-lg text-lg"></i>
+          </button>
+
+          <button
+            onclick="executeAction('${txId}','reject')"
+            class="flex-1 bg-red-500 hover:bg-red-600 text-white py-3 rounded-2xl flex items-center justify-center transition">
+            <i class="bi bi-x-lg text-lg"></i>
+          </button>
+        `
+        : `
+          <button
+            onclick="closeModal()"
+            class="flex-1 bg-gray-200 hover:bg-gray-300 py-3 rounded-2xl flex items-center justify-center transition">
+            <i class="bi bi-x-lg text-lg"></i>
+          </button>
+        `
+    }
+
+  </div>
+
+</div>
+`;
+
+document.body.appendChild(modal);
+
+/* =============================== EXECUTE ACTION ================================ */
 async function executeAction(txId, action) {
 
   const txRef = doc(db, "transactions", txId);
@@ -486,28 +485,18 @@ async function executeAction(txId, action) {
   await runTransaction(db, async (transaction) => {
 
     const txDoc = await transaction.get(txRef);
-    if (!txDoc.exists())
-      throw "Transaction introuvable";
+    if (!txDoc.exists()) throw "Transaction introuvable";
 
     const tx = txDoc.data();
 
-    if (tx.status !== "pending")
-      throw "Déjà traité";
+    if (tx.status !== "pending") throw "Déjà traité";
+    if (tx.toUserId !== userId) throw "Non autorisé";
 
-    if (tx.toUserId !== userId)
-      throw "Non autorisé";
+    const fromWalletRef = doc(db, "wallets", tx.fromWalletId);
+    const toWalletRef = doc(db, "wallets", tx.toWalletId);
 
-    const fromWalletRef =
-      doc(db, "wallets", tx.fromWalletId);
-
-    const toWalletRef =
-      doc(db, "wallets", tx.toWalletId);
-
-    const fromWalletDoc =
-      await transaction.get(fromWalletRef);
-
-    const toWalletDoc =
-      await transaction.get(toWalletRef);
+    const fromWalletDoc = await transaction.get(fromWalletRef);
+    const toWalletDoc = await transaction.get(toWalletRef);
 
     if (!fromWalletDoc.exists() || !toWalletDoc.exists())
       throw "Wallet introuvable";
@@ -515,28 +504,24 @@ async function executeAction(txId, action) {
     const fromWallet = fromWalletDoc.data();
     const toWallet = toWalletDoc.data();
 
-    const reserved =
-      fromWallet.reservedBalance || 0;
+    const reserved = fromWallet.reservedBalance || 0;
 
     if (action === "approve") {
 
       if (reserved < tx.amount)
         throw "Réserve insuffisante";
 
-      // 🔥 Déduire solde réel + enlever réserve
       transaction.update(fromWalletRef, {
         balance: fromWallet.balance - tx.amount,
         reservedBalance: reserved - tx.amount,
         updatedAt: serverTimestamp()
       });
 
-      // 🔥 Ajouter au receveur
       transaction.update(toWalletRef, {
         balance: toWallet.balance + tx.amount,
         updatedAt: serverTimestamp()
       });
 
-      // 🔥 Marquer completed
       transaction.update(txRef, {
         status: "completed",
         updatedAt: serverTimestamp()
@@ -544,7 +529,6 @@ async function executeAction(txId, action) {
 
     } else {
 
-      // 🔥 Rejet → libérer réserve
       transaction.update(fromWalletRef, {
         reservedBalance: reserved - tx.amount,
         updatedAt: serverTimestamp()
@@ -554,9 +538,7 @@ async function executeAction(txId, action) {
         status: "rejected",
         updatedAt: serverTimestamp()
       });
-
     }
-
   });
 
   closeModal();
@@ -566,38 +548,28 @@ async function executeAction(txId, action) {
 window.executeAction = executeAction;
 window.closeModal = closeModal;
 
-/* ===============================
-   Helpers
-================================ */
+/* =============================== Helpers ================================ */
 function formatDate(timestamp) {
-
   if (!timestamp) return "";
-
   const date = new Date(timestamp.seconds * 1000);
-
   return date.toLocaleDateString("fr-FR") +
-         " • " +
-         date.toLocaleTimeString("fr-FR", {
-           hour: "2-digit",
-           minute: "2-digit"
-         });
+    " • " +
+    date.toLocaleTimeString("fr-FR", {
+      hour: "2-digit",
+      minute: "2-digit"
+    });
 }
 
 function getTitle(tx) {
-
-  if (tx.category === "request")
-    return "Nouvelle demande";
-
+  if (tx.category === "request") return "Nouvelle demande";
   if (tx.type === "transfer")
     return tx.fromUserId === userId
       ? "Transfert envoyé"
       : "Transfert reçu";
-
   return "Opération";
 }
 
 function getIconConfig(tx) {
-
   if (tx.category === "request")
     return {
       icon: "bi-question-circle",
@@ -618,72 +590,45 @@ function getIconConfig(tx) {
     color: "text-gray-600"
   };
 }
-/* ===============================
-   NOUVEAU
-================================ */
 
-/* ===============================
-   NOUVEAU 2
-================================ */
 function formatNotificationType(tx) {
-
   if (tx.category === "request") {
-    if (tx.type === "fund_request")
-      return "Demande de fonds";
-    if (tx.type === "repayment_request")
-      return "Demande de remboursement";
+    if (tx.type === "fund_request") return "Demande de fonds";
+    if (tx.type === "repayment_request") return "Demande de remboursement";
     return "Demande";
   }
 
-  if (tx.type === "transfer")
-    return "Transfert";
-
+  if (tx.type === "transfer") return "Transfert";
   return "Opération";
 }
-/* ===============================
-   TELECHARGEMENT PNG
-================================ */
 
+/* =============================== TELECHARGEMENT PNG ================================ */
 async function downloadTransaction() {
 
-  const element =
-    document.getElementById("modalContent");
-
+  const element = document.getElementById("modalContent");
   if (!element) return;
 
-  // Désactiver l’ombre et animation pendant capture
   element.classList.remove("shadow-2xl");
   element.classList.remove("animate-slideUp");
 
-  const canvas =
-    await html2canvas(element, {
-      scale: 3,                 // qualité HD
-      useCORS: true,
-      backgroundColor: "#ffffff"
-    });
+  const canvas = await html2canvas(element, {
+    scale: 3,
+    useCORS: true,
+    backgroundColor: "#ffffff"
+  });
 
-  const link =
-    document.createElement("a");
-
-  link.download =
-    "TrustLink_Transaction.png";
-
-  link.href =
-    canvas.toDataURL("image/png");
-
+  const link = document.createElement("a");
+  link.download = "TrustLink_Transaction.png";
+  link.href = canvas.toDataURL("image/png");
   link.click();
 
-  // Remettre les styles
   element.classList.add("shadow-2xl");
   element.classList.add("animate-slideUp");
 }
 
 window.downloadTransaction = downloadTransaction;
 
-/* ===============================
-   INIT
-================================ */
-
+/* =============================== INIT ================================ */
 loadUser();
 loadWallets();
 loadNotifications();
