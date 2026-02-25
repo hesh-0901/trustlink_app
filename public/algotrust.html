@@ -15,110 +15,135 @@ content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable
 <script type="module" src="/trustlink_app/js/algotrust.js"></script>
 
 <style>
-body {
-  background:#F4F6FF;
+body{
+  background:#F7F8FC;
   font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto;
 }
-.card-premium {
-  border-radius:28px;
+
+.card{
+  border-radius:24px;
   background:white;
-  box-shadow:
-    0 30px 80px rgba(30,43,224,0.08),
-    0 10px 30px rgba(0,0,0,0.04);
+  border:1px solid #EEF1F7;
 }
-.card-blue {
-  background:linear-gradient(135deg,#1E2BE0,#3D4BFF);
-  color:white;
+
+.soft-shadow{
+  box-shadow:0 10px 30px rgba(16,24,40,0.04);
 }
 </style>
 </head>
 
 <body class="min-h-screen pb-28">
 
-<main class="max-w-md mx-auto px-5 pt-8 space-y-6">
+<main class="max-w-md mx-auto px-6 pt-10 space-y-8">
 
-<!-- HEADER CONTAINER -->
-<div id="header-container"></div>
+<!-- HEADER (PROPRE À LA PAGE) -->
+<header class="flex justify-between items-center">
 
-<!-- SCORE CARD -->
-<div class="card-premium card-blue p-6 text-center relative overflow-hidden">
+  <div>
+    <h1 class="text-2xl font-semibold text-gray-900 flex items-center gap-3">
+      AlgoTrust
 
-  <canvas id="engineChart" width="180" height="180"></canvas>
+      <!-- ROBOT ICON (ADMIN ONLY ACTIVE VIA JS) -->
+      <button id="adminTrigger"
+              class="text-gray-300 transition">
+        <i class="bi bi-robot text-xl"></i>
+      </button>
+    </h1>
+
+    <p class="text-sm text-gray-400 mt-1">
+      Moteur algorithmique interne
+    </p>
+  </div>
+
+  <!-- FILTER -->
+  <select id="periodFilter"
+          class="bg-white border border-gray-200 
+                 rounded-xl px-4 py-2 text-sm
+                 focus:outline-none focus:ring-2 
+                 focus:ring-[#1E2BE0]/20">
+    <option value="day">Jour</option>
+    <option value="week" selected>Semaine</option>
+    <option value="month">Mois</option>
+  </select>
+
+</header>
+
+<!-- ENGINE CARD -->
+<section class="card soft-shadow p-8 text-center">
+
+  <div class="flex justify-center">
+    <canvas id="engineChart"
+            width="170"
+            height="170"></canvas>
+  </div>
 
   <p id="engineScore"
-     class="text-3xl font-bold mt-4">
+     class="text-3xl font-semibold text-gray-900 mt-6">
     100%
   </p>
 
-  <p class="text-xs opacity-80">
-    Intégrité Système
+  <p class="text-sm text-gray-400 mt-1">
+    Intégrité transactionnelle
   </p>
 
-</div>
+</section>
 
 <!-- PERFORMANCE -->
-<div class="card-premium p-6">
-  <h2 class="text-sm font-semibold mb-4">
-    Activité Transactionnelle
-  </h2>
+<section class="card soft-shadow p-6">
+
+  <div class="flex justify-between items-center mb-6">
+    <h2 class="text-sm font-medium text-gray-800">
+      Activité
+    </h2>
+    <i class="bi bi-activity text-gray-400 text-lg"></i>
+  </div>
+
   <canvas id="activityChart"></canvas>
-</div>
 
-<!-- STATS -->
-<div class="grid grid-cols-2 gap-4">
+</section>
 
-  <div class="card-premium p-5 text-center">
-    <i class="bi bi-arrow-left-right text-3xl text-blue-600"></i>
-    <p class="text-xs text-gray-400 mt-2">Transactions</p>
-    <p id="totalTx" class="text-lg font-bold">0</p>
+<!-- STATS GRID -->
+<section class="grid grid-cols-2 gap-4">
+
+  <div class="card p-5 text-center">
+    <i class="bi bi-arrow-left-right text-2xl text-[#1E2BE0]"></i>
+    <p class="text-xs text-gray-400 mt-3">Transactions</p>
+    <p id="totalTx" class="text-lg font-semibold mt-1">0</p>
   </div>
 
-  <div class="card-premium p-5 text-center">
-    <i class="bi bi-hourglass-split text-3xl text-yellow-500"></i>
-    <p class="text-xs text-gray-400 mt-2">En attente</p>
-    <p id="pendingTx" class="text-lg font-bold">0</p>
+  <div class="card p-5 text-center">
+    <i class="bi bi-hourglass-split text-2xl text-amber-500"></i>
+    <p class="text-xs text-gray-400 mt-3">En attente</p>
+    <p id="pendingTx" class="text-lg font-semibold mt-1">0</p>
   </div>
 
-  <div class="card-premium p-5 text-center">
-    <i class="bi bi-currency-dollar text-3xl text-green-600"></i>
-    <p class="text-xs text-gray-400 mt-2">Volume USD</p>
-    <p id="volumeUSD" class="text-lg font-bold">$0</p>
+  <div class="card p-5 text-center">
+    <i class="bi bi-currency-dollar text-2xl text-emerald-600"></i>
+    <p class="text-xs text-gray-400 mt-3">Volume USD</p>
+    <p id="volumeUSD" class="text-lg font-semibold mt-1">$0</p>
   </div>
 
-  <div class="card-premium p-5 text-center">
-    <i class="bi bi-cash-stack text-3xl text-indigo-600"></i>
-    <p class="text-xs text-gray-400 mt-2">Volume CDF</p>
-    <p id="volumeCDF" class="text-lg font-bold">0</p>
+  <div class="card p-5 text-center">
+    <i class="bi bi-cash-stack text-2xl text-indigo-600"></i>
+    <p class="text-xs text-gray-400 mt-3">Volume CDF</p>
+    <p id="volumeCDF" class="text-lg font-semibold mt-1">0</p>
   </div>
 
-</div>
+</section>
 
 </main>
 
-<!-- NAVBAR -->
+<!-- NAVBAR IMPORT ONLY -->
 <div id="navbar-container"
      class="fixed bottom-0 left-0 w-full z-50 bg-transparent"></div>
 
-<!-- LOAD PARTIALS -->
 <script type="module">
-async function loadPartial(id, path) {
-  const res = await fetch(path);
+async function loadNavbar(){
+  const res = await fetch("/trustlink_app/partials/nav.html");
   const html = await res.text();
-  document.getElementById(id).innerHTML = html;
+  document.getElementById("navbar-container").innerHTML = html;
 }
-
-await loadPartial("navbar-container", "/trustlink_app/partials/nav.html");
-await loadPartial("header-container", "/trustlink_app/partials/header-algotrust.html");
-
-/* ADMIN SECRET BUTTON */
-setTimeout(() => {
-  const adminBtn = document.getElementById("adminTrigger");
-  if(adminBtn){
-    adminBtn.addEventListener("click", () => {
-      window.location.href = "/trustlink_app/admin/dashboard-admin.html";
-    });
-  }
-}, 100);
+loadNavbar();
 </script>
 
 </body>
