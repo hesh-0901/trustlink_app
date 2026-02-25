@@ -9,72 +9,140 @@ content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable
 
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 
 <script type="module" src="/trustlink_app/js/firebase-init.js"></script>
 <script type="module" src="/trustlink_app/js/algotrust.js"></script>
 
 <style>
 body {
-  background:#EEF2FF;
+  background:#F4F6FF;
   font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto;
 }
-.card {
-  border-radius:24px;
+.card-premium {
+  border-radius:28px;
   background:white;
-  box-shadow:0 25px 60px rgba(0,0,0,0.06);
+  box-shadow:
+    0 30px 80px rgba(30,43,224,0.08),
+    0 10px 30px rgba(0,0,0,0.04);
+}
+.card-blue {
+  background:linear-gradient(135deg,#1E2BE0,#3D4BFF);
+  color:white;
+}
+.navbar-premium {
+  backdrop-filter:blur(15px);
+  background:rgba(255,255,255,0.85);
 }
 </style>
 </head>
 
-<body class="min-h-screen pb-24">
+<body class="min-h-screen pb-28">
 
 <main class="max-w-md mx-auto px-5 pt-8 space-y-6">
 
-<h1 class="text-xl font-bold text-gray-800">
-AlgoTrust Engine
-</h1>
+<!-- HEADER -->
+<div class="flex justify-between items-center">
+  <div>
+    <h1 class="text-xl font-bold text-gray-800">
+      AlgoTrust
+    </h1>
+    <p class="text-xs text-gray-400">
+      Moteur Algorithmique
+    </p>
+  </div>
+
+  <!-- FILTER -->
+  <select id="periodFilter"
+    class="bg-white rounded-xl px-3 py-2 text-xs shadow">
+    <option value="day">Jour</option>
+    <option value="week" selected>Semaine</option>
+    <option value="month">Mois</option>
+  </select>
+</div>
 
 <!-- SCORE CARD -->
-<div class="card p-6 text-center">
-  <canvas id="engineChart" width="200" height="200"></canvas>
-  <p class="mt-4 text-sm text-gray-500">
-    Intégrité transactionnelle
+<div class="card-premium card-blue p-6 text-center relative overflow-hidden">
+
+  <i class="bi bi-cpu text-4xl opacity-20 absolute top-4 right-4"></i>
+
+  <canvas id="engineChart" width="180" height="180"></canvas>
+
+  <p id="engineScore"
+     class="text-3xl font-bold mt-4">
+    100%
   </p>
+
+  <p class="text-xs opacity-80">
+    Intégrité Système
+  </p>
+
 </div>
 
 <!-- PERFORMANCE -->
-<div class="card p-6">
-  <h2 class="text-sm font-semibold mb-4">
-    Activité Système
-  </h2>
+<div class="card-premium p-6">
+  <div class="flex justify-between items-center mb-4">
+    <h2 class="text-sm font-semibold">
+      Activité Transactionnelle
+    </h2>
+    <i class="bi bi-graph-up text-xl text-primary"></i>
+  </div>
   <canvas id="activityChart"></canvas>
 </div>
 
-<!-- STATS -->
+<!-- STATS GRID -->
 <div class="grid grid-cols-2 gap-4">
 
-  <div class="card p-4">
-    <p class="text-xs text-gray-400">Transactions</p>
+  <div class="card-premium p-5 text-center">
+    <i class="bi bi-arrow-left-right text-3xl text-blue-600"></i>
+    <p class="text-xs text-gray-400 mt-2">Transactions</p>
     <p id="totalTx" class="text-lg font-bold">0</p>
   </div>
 
-  <div class="card p-4">
-    <p class="text-xs text-gray-400">En attente</p>
+  <div class="card-premium p-5 text-center">
+    <i class="bi bi-hourglass-split text-3xl text-yellow-500"></i>
+    <p class="text-xs text-gray-400 mt-2">En attente</p>
     <p id="pendingTx" class="text-lg font-bold">0</p>
   </div>
 
-  <div class="card p-4">
-    <p class="text-xs text-gray-400">Volume USD</p>
+  <div class="card-premium p-5 text-center">
+    <i class="bi bi-currency-dollar text-3xl text-green-600"></i>
+    <p class="text-xs text-gray-400 mt-2">Volume USD</p>
     <p id="volumeUSD" class="text-lg font-bold">$0</p>
   </div>
 
-  <div class="card p-4">
-    <p class="text-xs text-gray-400">Volume CDF</p>
-    <p id="volumeCDF" class="text-lg font-bold">0 CDF</p>
+  <div class="card-premium p-5 text-center">
+    <i class="bi bi-cash-stack text-3xl text-indigo-600"></i>
+    <p class="text-xs text-gray-400 mt-2">Volume CDF</p>
+    <p id="volumeCDF" class="text-lg font-bold">0</p>
   </div>
 
 </div>
 
 </main>
+
+<!-- NAVBAR -->
+<nav class="navbar-premium fixed bottom-0 left-0 w-full border-t border-gray-200 py-3">
+  <div class="max-w-md mx-auto flex justify-around text-gray-500 text-xs">
+
+    <a href="dashboard.html" class="flex flex-col items-center">
+      <i class="bi bi-house text-xl"></i>
+      Accueil
+    </a>
+
+    <a href="profile.html" class="flex flex-col items-center">
+      <i class="bi bi-person text-xl"></i>
+      Profil
+    </a>
+
+    <a href="algotrust.html"
+       class="flex flex-col items-center text-blue-600">
+      <i class="bi bi-cpu text-xl"></i>
+      AlgoTrust
+    </a>
+
+  </div>
+</nav>
+
 </body>
 </html>
