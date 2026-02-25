@@ -4,111 +4,118 @@ import {
   getDocs
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-const engineCtx = document.getElementById("engineChart");
-const activityCtx = document.getElementById("activityChart");
+const periodFilter = document.getElementById("periodFilter");
 
-let total = 0;
-let pending = 0;
-let usdVolume = 0;
-let cdfVolume = 0;
-let dailyData = {};
+let engineChart;
+let activityChart;
+
+periodFilter.addEventListener("change", loadData);
 
 async function loadData() {
 
-  const snapshot = await getDocs(collection(db, "transactions"));
+  const period = periodFilter.value;
 
-  snapshot.forEach(doc => {
+  const snapshot =
+    await getDocs(collection(db,"transactions"));
+
+  const now = new Date();
+
+  let total=0, pending=0, usd=0, cdf=0;
+  let dailyData={};
+
+  snapshot.forEach(doc=>{
 
     const tx = doc.data();
+    if(!tx.createdAt?.seconds) return;
+
+    const date =
+      new Date(tx.createdAt.seconds*1000);
+
+    const diff =
+      (now - date)/(1000*60*60*24);
+
+    if(
+      (period==="day" && diff>1) ||
+      (period==="week" && diff>7) ||
+      (period==="month" && diff>30)
+    ) return;
 
     total++;
 
-    if (tx.status === "pending") pending++;
+    if(tx.status==="pending") pending++;
 
-    if (tx.currency === "USD")
-      usdVolume += tx.amount;
+    if(tx.currency==="USD") usd+=tx.amount;
+    if(tx.currency==="CDF") cdf+=tx.amount;
 
-    if (tx.currency === "CDF")
-      cdfVolume += tx.amount;
+    const label =
+      date.toLocaleDateString();
 
-    if (tx.createdAt?.seconds) {
-      const date =
-        new Date(tx.createdAt.seconds * 1000)
-        .toLocaleDateString();
-
-      dailyData[date] =
-        (dailyData[date] || 0) + 1;
-    }
+    dailyData[label]=(dailyData[label]||0)+1;
 
   });
 
-  renderCharts();
-  updateStats();
+  updateStats(total,pending,usd,cdf);
+  renderCharts(total,pending,dailyData);
 }
 
-function renderCharts() {
+function updateStats(total,pending,usd,cdf){
 
-  const integrity =
-    total === 0
-      ? 100
-      : ((total - pending) / total) * 100;
+  document.getElementById("totalTx").textContent=total;
+  document.getElementById("pendingTx").textContent=pending;
+  document.getElementById("volumeUSD").textContent="$"+usd.toLocaleString();
+  document.getElementById("volumeCDF").textContent=cdf.toLocaleString()+" CDF";
 
-  new Chart(engineCtx, {
-    type: "doughnut",
-    data: {
-      datasets: [{
-        data: [integrity, 100 - integrity],
-        backgroundColor: [
-          "#1E2BE0",
-          "#E5E7EB"
-        ],
-        borderWidth:0
-      }]
-    },
-    options:{
-      cutout:"75%",
-      plugins:{legend:{display:false}}
-    }
-  });
+  const integrity = total===0?100:((total-pending)/total)*100;
 
-  new Chart(activityCtx, {
-    type:"line",
-    data:{
-      labels:Object.keys(dailyData),
-      datasets:[{
-        data:Object.values(dailyData),
-        borderColor:"#1E2BE0",
-        tension:0.4,
-        fill:true,
-        backgroundColor:"rgba(30,43,224,0.08)"
-      }]
-    },
-    options:{
-      plugins:{legend:{display:false}},
-      scales:{
-        x:{display:false},
-        y:{display:false}
+  document.getElementById("engineScore")
+    .textContent=Math.round(integrity)+"%";
+}
+
+function renderCharts(total,pending,data){
+
+  if(engineChart) engineChart.destroy();
+  if(activityChart) activityChart.destroy();
+
+  const integrity = total===0?100:((total-pending)/total)*100;
+
+  engineChart = new Chart(
+    document.getElementById("engineChart"),
+    {
+      type:"doughnut",
+      data:{
+        datasets:[{
+          data:[integrity,100-integrity],
+          backgroundColor:["#FFFFFF","#ffffff33"],
+          borderWidth:0
+        }]
+      },
+      options:{
+        cutout:"75%",
+        plugins:{legend:{display:false}}
       }
     }
-  });
+  );
 
-}
-
-function updateStats() {
-
-  document.getElementById("totalTx")
-    .textContent = total;
-
-  document.getElementById("pendingTx")
-    .textContent = pending;
-
-  document.getElementById("volumeUSD")
-    .textContent =
-      "$" + usdVolume.toLocaleString();
-
-  document.getElementById("volumeCDF")
-    .textContent =
-      cdfVolume.toLocaleString() + " CDF";
+  activityChart = new Chart(
+    document.getElementById("activityChart"),
+    {
+      type:"line",
+      data:{
+        labels:Object.keys(data),
+        datasets:[{
+          data:Object.values(data),
+          borderColor:"#1E2BE0",
+          backgroundColor:"rgba(30,43,224,0.08)",
+          fill:true,
+          tension:0.4
+        }]
+      },
+      options:{
+        plugins:{legend:{display:false}},
+        scales:{x:{display:false},y:{display:false}}
+      }
+    }
+  );
 }
 
 loadData();
