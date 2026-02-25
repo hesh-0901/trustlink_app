@@ -30,10 +30,6 @@ body {
   background:linear-gradient(135deg,#1E2BE0,#3D4BFF);
   color:white;
 }
-.navbar-premium {
-  backdrop-filter:blur(15px);
-  background:rgba(255,255,255,0.85);
-}
 </style>
 </head>
 
@@ -41,30 +37,11 @@ body {
 
 <main class="max-w-md mx-auto px-5 pt-8 space-y-6">
 
-<!-- HEADER -->
-<div class="flex justify-between items-center">
-  <div>
-    <h1 class="text-xl font-bold text-gray-800">
-      AlgoTrust
-    </h1>
-    <p class="text-xs text-gray-400">
-      Moteur Algorithmique
-    </p>
-  </div>
-
-  <!-- FILTER -->
-  <select id="periodFilter"
-    class="bg-white rounded-xl px-3 py-2 text-xs shadow">
-    <option value="day">Jour</option>
-    <option value="week" selected>Semaine</option>
-    <option value="month">Mois</option>
-  </select>
-</div>
+<!-- HEADER CONTAINER -->
+<div id="header-container"></div>
 
 <!-- SCORE CARD -->
 <div class="card-premium card-blue p-6 text-center relative overflow-hidden">
-
-  <i class="bi bi-cpu text-4xl opacity-20 absolute top-4 right-4"></i>
 
   <canvas id="engineChart" width="180" height="180"></canvas>
 
@@ -81,16 +58,13 @@ body {
 
 <!-- PERFORMANCE -->
 <div class="card-premium p-6">
-  <div class="flex justify-between items-center mb-4">
-    <h2 class="text-sm font-semibold">
-      Activité Transactionnelle
-    </h2>
-    <i class="bi bi-graph-up text-xl text-primary"></i>
-  </div>
+  <h2 class="text-sm font-semibold mb-4">
+    Activité Transactionnelle
+  </h2>
   <canvas id="activityChart"></canvas>
 </div>
 
-<!-- STATS GRID -->
+<!-- STATS -->
 <div class="grid grid-cols-2 gap-4">
 
   <div class="card-premium p-5 text-center">
@@ -122,27 +96,30 @@ body {
 </main>
 
 <!-- NAVBAR -->
-<nav class="navbar-premium fixed bottom-0 left-0 w-full border-t border-gray-200 py-3">
-  <div class="max-w-md mx-auto flex justify-around text-gray-500 text-xs">
+<div id="navbar-container"
+     class="fixed bottom-0 left-0 w-full z-50 bg-transparent"></div>
 
-    <a href="dashboard.html" class="flex flex-col items-center">
-      <i class="bi bi-house text-xl"></i>
-      Accueil
-    </a>
+<!-- LOAD PARTIALS -->
+<script type="module">
+async function loadPartial(id, path) {
+  const res = await fetch(path);
+  const html = await res.text();
+  document.getElementById(id).innerHTML = html;
+}
 
-    <a href="profile.html" class="flex flex-col items-center">
-      <i class="bi bi-person text-xl"></i>
-      Profil
-    </a>
+await loadPartial("navbar-container", "/trustlink_app/partials/nav.html");
+await loadPartial("header-container", "/trustlink_app/partials/header-algotrust.html");
 
-    <a href="algotrust.html"
-       class="flex flex-col items-center text-blue-600">
-      <i class="bi bi-cpu text-xl"></i>
-      AlgoTrust
-    </a>
-
-  </div>
-</nav>
+/* ADMIN SECRET BUTTON */
+setTimeout(() => {
+  const adminBtn = document.getElementById("adminTrigger");
+  if(adminBtn){
+    adminBtn.addEventListener("click", () => {
+      window.location.href = "/trustlink_app/admin/dashboard-admin.html";
+    });
+  }
+}, 100);
+</script>
 
 </body>
 </html>
